@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast'
 import Sidebar from '../components/Sidebar'
 import Widgets from '../components/Widgets'
 
-export default function postPage() {
+export default function PostPage() {
   const router = useRouter()
 
   return (

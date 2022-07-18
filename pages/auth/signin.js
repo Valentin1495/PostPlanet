@@ -20,10 +20,10 @@ export default function SignIn({ providers }) {
                       hover:ring-2 hover:ring-offset-2 hover:ring-blue-300 
                       transition-all ease-out duration-300'
           >
-            <span class="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 
+            <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 
                         transform translate-x-12 bg-white opacity-10 rotate-12 
                         group-hover:-translate-x-40 ease" />
-            <span class="relative">Sign in with {provider.name}</span>
+            <span className="relative">Sign in with {provider.name}</span>
           </button>
         </div>
       ))}
