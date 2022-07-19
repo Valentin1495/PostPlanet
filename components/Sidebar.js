@@ -12,8 +12,10 @@ import {
   DotsCircleHorizontalIcon,
 } from '@heroicons/react/outline'
 import { useRouter } from 'next/router'
+import { useSession, signOut } from 'next-auth/react'
 
 function Sidebar() {
+  const { data: session } = useSession()
   const router = useRouter()
 
   return (
@@ -65,16 +67,23 @@ function Sidebar() {
             <DotsCircleHorizontalIcon className='icon'/>
             <p className='b'>More</p>
           </button>
+          <button className='navBtn'>
+            <img 
+              src={session?.user.image}
+              alt='Log Out'
+              className='icon rounded-full lg:hidden'
+              onClick={signOut}
+            />
+          </button>
+          <button 
+            className='ib bg-twitter py-3 px-20 rounded-full -mt-12
+                     text-white text-lg hover:bg-sky-400 font-bold shadow-lg'
+          >
+            Tweet
+          </button>
         </div>
-
-        <button 
-          className='hidden xl:ib w- bg-twitter py-3 px-20 rounded-full mt-4
-                  text-white text-lg hover:bg-sky-400 font-bold shadow-lg'
-        >
-          Tweet
-        </button>
-
       </div>
+      
     </div>
   )
 }

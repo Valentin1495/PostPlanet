@@ -14,7 +14,7 @@
     }
 
     .ib {
-        @apply hidden lg:inline-block
+        @apply hidden xl:inline-block
     }
 
     .icon {
