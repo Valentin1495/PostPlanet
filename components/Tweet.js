@@ -190,15 +190,13 @@ function Tweet() {
       }
 
       {file &&
-        <div className='flex items-center justify-center mt-2'>
           <img
             src={file}
             alt='Please select a right file'
-            className='w-2/3 my-3 rounded-xl object-contain cursor-pointer
-                        hover:opacity-90 shadow-lg'
+            className='w-1/2 my-3 rounded-xl object-contain cursor-pointer
+                        hover:opacity-90 shadow-lg mx-auto'
             onClick={() => setFile(null)}
           />
-        </div> 
       }
     </div>
   )

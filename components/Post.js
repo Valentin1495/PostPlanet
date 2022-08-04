@@ -75,7 +75,7 @@ function Post({ postId, uid, name, username, profilePic, image, caption, timesta
 
   return (
     <motion.div 
-      className='p-5 border-b border-gray-300 cursor-pointer hover:bg-gray-50'
+      className='px-5 pt-5 border-b border-gray-300 cursor-pointer hover:bg-gray-50'
       onClick={() => router.push(`/${postId}`)}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }} 
@@ -115,8 +115,8 @@ function Post({ postId, uid, name, username, profilePic, image, caption, timesta
       }
 
       <div 
-        className='mx-auto flex items-center justify-between
-                   mt-5 relative'
+        className='flex items-center justify-center gap-x-[107px]
+                   mt-5'
         onClick={e => e.stopPropagation()}
       >
           <button
@@ -197,7 +197,7 @@ function Post({ postId, uid, name, username, profilePic, image, caption, timesta
       {isOpen && 
             <div 
               onClick={e => e.stopPropagation()}
-              className='mt-3'
+              className='mt-3 mb-5'
             >
               <form 
                 className='flex gap-x-3 items-center'

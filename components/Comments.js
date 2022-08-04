@@ -17,7 +17,7 @@ function Comments({ postId }) {
 
   return (
     <div 
-    className='mt-3'
+    className='mt-3 mb-5'
     onClick={e => e.stopPropagation()}
     >
       {comments.length > 0 &&
