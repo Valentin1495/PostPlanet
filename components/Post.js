@@ -110,13 +110,13 @@ function Post({ postId, uid, name, username, profilePic, image, caption, timesta
         <img
           src={image}
           alt='tweetImg'
-          className='max-h-28 sm:max-h-48 md:max-h-60 mx-auto
-                     my-3 rounded-xl object-cover shadow-xl'
+          className='w-2/3 mx-auto
+                     my-3 rounded-xl object-contain shadow-xl'
         />
       }
 
       <div 
-        className='ml-10 md:ml-12 flex items-center justify-between
+        className='mx-auto flex items-center justify-between
                    mt-5 relative'
         onClick={e => e.stopPropagation()}
       >
