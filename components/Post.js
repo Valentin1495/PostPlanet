@@ -110,8 +110,7 @@ function Post({ postId, uid, name, username, profilePic, image, caption, timesta
         <img
           src={image}
           alt='tweetImg'
-          className='w-2/3 mx-auto
-                     my-3 rounded-xl object-contain shadow-xl'
+          className='w-2/3 mx-auto my-3 rounded-xl object-contain shadow-xl'
         />
       }
 
