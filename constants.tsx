@@ -3,7 +3,7 @@ import { Activity, CircleUser, Home, ImagePlus, Search } from 'lucide-react';
 export const sidebarLinks = [
   {
     label: 'Home',
-    href: '/',
+    href: '/home',
     active: true,
     icon: <Home size='28' strokeWidth='1.5' />,
     activeIcon: <Home size='28' strokeWidth='2' />,

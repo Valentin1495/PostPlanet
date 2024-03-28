@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 export default function LeftSidebar() {
   const router = useRouter();
   const pathname = usePathname();
+
   return (
     <nav className='w-1/6 xl:w-1/4 py-5 flex flex-col gap-5 items-center xl:items-start sticky top-0 min-h-screen md:pl-10 xl:pl-24'>
       <Link
