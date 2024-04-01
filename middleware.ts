@@ -7,8 +7,8 @@ import { NextResponse } from 'next/server';
 export default authMiddleware({
   afterAuth(auth, req) {
     if (auth.userId && req.nextUrl.pathname === '/') {
-      const home = new URL('/home', req.url);
-      return NextResponse.redirect(home);
+      const onboarding = new URL('/onboarding', req.url);
+      return NextResponse.redirect(onboarding);
     }
     if (!auth.userId && !auth.isPublicRoute) {
       return redirectToSignIn({ returnBackUrl: req.url });

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '../globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
+import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,7 +20,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang='en'>
-        <body className={inter.className}>{children}</body>
+        <body
+          className={cn(
+            inter.className,
+            'max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl mx-auto'
+          )}
+        >
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
