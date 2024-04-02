@@ -1,4 +1,4 @@
-import { getUser } from '@/app/actions';
+import { readUser } from '@/actions/user.actions';
 import FeedTab from '@/components/feed-tab';
 import PostForm from '@/components/post-form';
 import { redirect } from 'next/navigation';
@@ -13,7 +13,7 @@ export default async function Home({
   searchParams: SearchParams;
 }) {
   const { feed } = searchParams;
-  const user = await getUser();
+  const user = await readUser();
   const profilePic = user?.profileImage;
 
   if (!user) redirect('/onboarding');

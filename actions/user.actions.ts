@@ -1,19 +1,25 @@
 'use server';
 
 import db from '@/lib/db';
-import { utapi } from '@/lib/uploadthing';
+import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { z } from 'zod';
 
-export async function uploadImage(image: File) {
-  try {
-    const response = await utapi.uploadFiles(image);
-    return { imageUrl: response.data?.url };
-  } catch (error) {
-    console.error(error);
-    return { message: 'Failed to upload image.' };
-  }
-}
+const schema = z.object({
+  id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
+  username: z
+    .string()
+    .trim()
+    .min(1, { message: 'Username must contain at least 1 character.' }),
+  bio: z.string(),
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: 'Name must contain at least 1 character.' }),
+  profileImage: z.string().min(1, {
+    message: 'Profile image must contain at least 1 character.',
+  }),
+});
 
 export async function createUser(
   prevState: {
@@ -36,22 +42,6 @@ export async function createUser(
   const profileImage = result.imageUrl;
   const user = await currentUser();
   const id = user?.id;
-
-  const schema = z.object({
-    id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
-    username: z
-      .string()
-      .trim()
-      .min(1, { message: 'Username must contain at least 1 character.' }),
-    bio: z.string().trim().optional(),
-    name: z
-      .string()
-      .trim()
-      .min(1, { message: 'Name must contain at least 1 character.' }),
-    profileImage: z.string().min(1, {
-      message: 'Profile image must contain at least 1 character.',
-    }),
-  });
 
   const parse = schema.safeParse({
     id,
@@ -76,7 +66,7 @@ export async function createUser(
   const sameUserList = userList.filter((el) => el.username === data.username);
   if (sameUserList[0]) {
     return {
-      message: 'That username has been taken.',
+      message: 'That username has been taken.\nPlease choose another.',
     };
   }
 
@@ -102,7 +92,7 @@ export async function createUser(
   }
 }
 
-export async function getUser() {
+export async function readUser() {
   const user = await currentUser();
 
   try {

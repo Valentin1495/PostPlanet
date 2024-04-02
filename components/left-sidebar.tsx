@@ -33,7 +33,10 @@ export default function LeftSidebar() {
           >
             {active ? activeIcon : icon}
             <span
-              className={cn('text-lg hidden xl:inline', active && 'font-bold')}
+              className={cn(
+                'text-lg hidden xl:inline',
+                active && 'font-bold text-primary'
+              )}
             >
               {label}
             </span>

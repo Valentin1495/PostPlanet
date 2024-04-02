@@ -6,30 +6,26 @@ export const sidebarLinks = [
     href: '/home',
     active: true,
     icon: <Home size='28' strokeWidth='1.5' />,
-    activeIcon: <Home size='28' strokeWidth='2' />,
+    activeIcon: <Home size='28' strokeWidth='2' className='text-primary' />,
   },
   {
     label: 'Search',
     href: '/search',
     icon: <Search size='28' strokeWidth='1.5' />,
-    activeIcon: <Search size='28' strokeWidth='2' />,
+    activeIcon: <Search size='28' strokeWidth='2' className='text-primary' />,
   },
   {
     label: 'Activity',
     href: '/activity',
     icon: <Activity size='28' strokeWidth='1.5' />,
-    activeIcon: <Activity size='28' strokeWidth='2' />,
-  },
-  {
-    label: 'Post',
-    href: '/post',
-    icon: <ImagePlus size='28' strokeWidth='1.5' />,
-    activeIcon: <ImagePlus size='28' strokeWidth='2' />,
+    activeIcon: <Activity size='28' strokeWidth='2' className='text-primary' />,
   },
   {
     label: 'Profile',
     href: '/profile',
     icon: <CircleUser size='28' strokeWidth='1.5' />,
-    activeIcon: <CircleUser size='28' strokeWidth='2' />,
+    activeIcon: (
+      <CircleUser size='28' strokeWidth='2' className='text-primary' />
+    ),
   },
 ];
