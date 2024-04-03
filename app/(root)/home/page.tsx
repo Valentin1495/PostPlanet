@@ -1,8 +1,8 @@
-import { readUser } from '@/actions/user.actions';
+import { readCurrentUser } from '@/actions/user.actions';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
-  const onBoardedUser = await readUser();
+  const onBoardedUser = await readCurrentUser();
 
   if (!onBoardedUser) {
     redirect('/onboarding');

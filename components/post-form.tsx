@@ -18,11 +18,11 @@ const initialState = {
 };
 
 type PostFormPorps = {
-  profilePic?: string;
+  profileImage?: string;
   username?: string;
 };
 
-export default function PostForm({ profilePic, username }: PostFormPorps) {
+export default function PostForm({ profileImage, username }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -67,7 +67,7 @@ export default function PostForm({ profilePic, username }: PostFormPorps) {
       <section className='flex gap-2'>
         <Link href={`/${username}`}>
           <Avatar className='w-10 h-10 darker'>
-            <AvatarImage src={profilePic} alt='profile picture' />
+            <AvatarImage src={profileImage} alt='profile picture' />
             <AvatarFallback className='bg-primary/10'>
               <Skeleton className='rounded-full' />
             </AvatarFallback>

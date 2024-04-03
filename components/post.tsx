@@ -12,7 +12,6 @@ type PostProps = {
   text: string | null;
   image: string | null;
   createdAt: Date;
-  updatedAt: Date;
   likedIds: string[];
   authorId: string;
   currentUserId?: string;
@@ -23,16 +22,15 @@ export default async function Post({
   text,
   image,
   createdAt,
-  updatedAt,
   likedIds,
   authorId,
   currentUserId,
 }: PostProps) {
   const author = (await readUser(authorId)) as User;
   const { username, name, profileImage } = author;
-  const followers = await countFollowers(username);
+  const followers = await countFollowers(authorId);
   const isMyPost = authorId === currentUserId;
-  const isFollowing = await checkFollow(username);
+  const isFollowing = await checkFollow(authorId);
 
   return (
     <div className='border-b-2 border-secondary p-3 flex gap-2'>
@@ -48,6 +46,7 @@ export default async function Post({
       ) : (
         <ProfileImage
           {...author}
+          authorId={authorId}
           followers={followers}
           isFollowing={isFollowing}
         />

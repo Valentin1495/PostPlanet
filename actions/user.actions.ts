@@ -123,12 +123,12 @@ export async function readUser(id: string) {
   }
 }
 
-export async function countFollowers(username: string) {
+export async function countFollowers(userId: string) {
   try {
     const followers = await db.user.count({
       where: {
         followingIds: {
-          has: username,
+          has: userId,
         },
       },
     });
@@ -139,18 +139,18 @@ export async function countFollowers(username: string) {
   }
 }
 
-export async function checkFollow(username: string) {
+export async function checkFollow(userId: string) {
   const user = await readCurrentUser();
-  const isFollowing = user?.followingIds.includes(username);
+  const isFollowing = user?.followingIds.includes(userId);
 
   return isFollowing;
 }
 
-export async function follow(username: string) {
+export async function follow(userId: string) {
   const user = await readCurrentUser();
   const id = user?.id;
   const followingIds = user?.followingIds;
-  followingIds?.push(username);
+  followingIds?.push(userId);
 
   try {
     await db.user.update({
@@ -164,7 +164,7 @@ export async function follow(username: string) {
 
     await db.user.update({
       where: {
-        username,
+        id: userId,
       },
       data: {
         hasActivity: true,
@@ -177,11 +177,11 @@ export async function follow(username: string) {
   }
 }
 
-export async function unfollow(username: string) {
+export async function unfollow(userId: string) {
   const user = await readCurrentUser();
   const id = user?.id;
   const followingIds = user?.followingIds;
-  const newFollowingIds = followingIds?.filter((name) => name !== username);
+  const newFollowingIds = followingIds?.filter((name) => name !== userId);
 
   try {
     await db.user.update({

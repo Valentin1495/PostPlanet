@@ -16,6 +16,7 @@ type ProfileImageProps = {
   followingIds: string[];
   followers?: number;
   isFollowing?: boolean;
+  authorId: string;
 };
 
 export default function ProfileImage({
@@ -26,13 +27,14 @@ export default function ProfileImage({
   followingIds,
   followers,
   isFollowing,
+  authorId,
 }: ProfileImageProps) {
   const [btnText, setBtnText] = useState<string>('Following');
   const toggleFollow = async () => {
     if (isFollowing) {
-      await unfollow(username);
+      await unfollow(authorId);
     } else {
-      await follow(username);
+      await follow(authorId);
     }
   };
 

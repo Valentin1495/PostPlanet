@@ -24,7 +24,7 @@ export default function LeftSidebar({ username }: { username?: string }) {
 
       {sidebarLinks.map((link) => {
         const { activeIcon, href, icon, label } = link;
-        const active = pathname === href;
+        const active = pathname.includes(href);
         return (
           <Link
             key={label}

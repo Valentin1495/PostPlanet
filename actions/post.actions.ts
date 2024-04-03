@@ -4,6 +4,8 @@ import db from '@/lib/db';
 import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
+import { readCurrentUser, readUser } from './user.actions';
+import { Post, User } from '@prisma/client';
 
 export async function createPost(
   prevState: {
@@ -61,10 +63,44 @@ export async function createPost(
 
 export async function readAllPosts() {
   try {
-    const posts = await db.post.findMany();
+    const posts = await db.post.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     return posts;
   } catch (error) {
     console.error(error);
   }
+}
+
+export async function readPosts(userId: string) {
+  try {
+    const posts = await db.post.findMany({
+      where: {
+        authorId: userId,
+      },
+    });
+
+    return posts;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function readFollowingPosts() {
+  const user = (await readCurrentUser()) as User;
+  const followingIds = user.followingIds;
+
+  const postPromises = followingIds.map(async (id) => {
+    const promise = await readPosts(id);
+    return promise;
+  });
+
+  const postArrays = await Promise.all(postPromises);
+  const posts = postArrays.flat();
+  posts.sort((a, b) => b!.createdAt.getTime() - a!.createdAt.getTime());
+
+  return posts;
 }
