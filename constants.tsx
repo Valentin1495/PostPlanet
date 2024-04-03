@@ -1,4 +1,4 @@
-import { Activity, CircleUser, Home, ImagePlus, Search } from 'lucide-react';
+import { Activity, CircleUser, Home, Search } from 'lucide-react';
 
 export const sidebarLinks = [
   {
@@ -19,13 +19,5 @@ export const sidebarLinks = [
     href: '/activity',
     icon: <Activity size='28' strokeWidth='1.5' />,
     activeIcon: <Activity size='28' strokeWidth='2' className='text-primary' />,
-  },
-  {
-    label: 'Profile',
-    href: '/profile',
-    icon: <CircleUser size='28' strokeWidth='1.5' />,
-    activeIcon: (
-      <CircleUser size='28' strokeWidth='2' className='text-primary' />
-    ),
   },
 ];

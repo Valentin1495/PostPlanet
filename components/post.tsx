@@ -1,10 +1,11 @@
 import Image from 'next/image';
-
-import { readUser } from '@/actions/user.actions';
+import { checkFollow, countFollowers, readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import { formatDate } from '@/lib/utils';
 import ProfileImage from './profile-image';
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Skeleton } from './ui/skeleton';
 
 type PostProps = {
   id: string;
@@ -14,6 +15,7 @@ type PostProps = {
   updatedAt: Date;
   likedIds: string[];
   authorId: string;
+  currentUserId?: string;
 };
 
 export default async function Post({
@@ -24,13 +26,32 @@ export default async function Post({
   updatedAt,
   likedIds,
   authorId,
+  currentUserId,
 }: PostProps) {
   const author = (await readUser(authorId)) as User;
-  const { username, name, bio, profileImage, followingIds } = author;
+  const { username, name, profileImage } = author;
+  const followers = await countFollowers(username);
+  const isMyPost = authorId === currentUserId;
+  const isFollowing = await checkFollow(username);
 
   return (
     <div className='border-b-2 border-secondary p-3 flex gap-2'>
-      <ProfileImage {...author} />
+      {isMyPost ? (
+        <Link href={`/${username}`}>
+          <Avatar className='w-10 h-10 darker'>
+            <AvatarImage src={profileImage} alt='profile picture' />
+            <AvatarFallback className='bg-primary/10'>
+              <Skeleton className='rounded-full' />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      ) : (
+        <ProfileImage
+          {...author}
+          followers={followers}
+          isFollowing={isFollowing}
+        />
+      )}
       <div className='w-full'>
         <section className='flex text-sm gap-1.5 items-center'>
           <Link href={`/${username}`} className='font-bold hover:underline'>

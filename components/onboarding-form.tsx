@@ -56,7 +56,7 @@ export default function OnboardingForm({
     setName(defaultName);
   }, []);
 
-  if (onboarded) redirect('/home?feed=for-you');
+  if (onboarded) redirect('/home/for-you');
   return (
     <div className='w-1/2 xl:w-1/3'>
       <h1 className='text-2xl font-bold'>Onboarding</h1>

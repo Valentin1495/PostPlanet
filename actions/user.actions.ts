@@ -3,6 +3,7 @@
 import db from '@/lib/db';
 import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -17,7 +18,7 @@ const schema = z.object({
     .trim()
     .min(1, { message: 'Name must contain at least 1 character.' }),
   profileImage: z.string().min(1, {
-    message: 'Profile image must contain at least 1 character.',
+    message: 'Profile image url must contain at least 1 character.',
   }),
 });
 
@@ -117,6 +118,82 @@ export async function readUser(id: string) {
     });
 
     return user;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function countFollowers(username: string) {
+  try {
+    const followers = await db.user.count({
+      where: {
+        followingIds: {
+          has: username,
+        },
+      },
+    });
+
+    return followers;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function checkFollow(username: string) {
+  const user = await readCurrentUser();
+  const isFollowing = user?.followingIds.includes(username);
+
+  return isFollowing;
+}
+
+export async function follow(username: string) {
+  const user = await readCurrentUser();
+  const id = user?.id;
+  const followingIds = user?.followingIds;
+  followingIds?.push(username);
+
+  try {
+    await db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        followingIds,
+      },
+    });
+
+    await db.user.update({
+      where: {
+        username,
+      },
+      data: {
+        hasActivity: true,
+      },
+    });
+
+    revalidatePath('/home/for-you');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function unfollow(username: string) {
+  const user = await readCurrentUser();
+  const id = user?.id;
+  const followingIds = user?.followingIds;
+  const newFollowingIds = followingIds?.filter((name) => name !== username);
+
+  try {
+    await db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        followingIds: newFollowingIds,
+      },
+    });
+
+    revalidatePath('/home/for-you');
   } catch (error) {
     console.error(error);
   }

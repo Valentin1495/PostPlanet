@@ -17,7 +17,12 @@ const initialState = {
   message: '',
 };
 
-export default function PostForm({ profilePic }: { profilePic?: string }) {
+type PostFormPorps = {
+  profilePic?: string;
+  username?: string;
+};
+
+export default function PostForm({ profilePic, username }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -60,7 +65,7 @@ export default function PostForm({ profilePic }: { profilePic?: string }) {
       className='border-b-2 border-b-secondary p-3 space-y-2'
     >
       <section className='flex gap-2'>
-        <Link href='/profile'>
+        <Link href={`/${username}`}>
           <Avatar className='w-10 h-10 darker'>
             <AvatarImage src={profilePic} alt='profile picture' />
             <AvatarFallback className='bg-primary/10'>
