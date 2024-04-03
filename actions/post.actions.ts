@@ -46,7 +46,7 @@ export async function createPost(
       },
     });
 
-    revalidatePath('/home');
+    revalidatePath('/home/for-you');
 
     return {
       message: 'Posted! 🥳',
@@ -56,5 +56,15 @@ export async function createPost(
     return {
       message: 'Failed to post. 😢',
     };
+  }
+}
+
+export async function readAllPosts() {
+  try {
+    const posts = await db.post.findMany();
+
+    return posts;
+  } catch (error) {
+    console.error(error);
   }
 }

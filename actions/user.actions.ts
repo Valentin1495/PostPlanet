@@ -92,7 +92,7 @@ export async function createUser(
   }
 }
 
-export async function readUser() {
+export async function readCurrentUser() {
   const user = await currentUser();
 
   try {
@@ -103,6 +103,20 @@ export async function readUser() {
     });
 
     return currentUser;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function readUser(id: string) {
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return user;
   } catch (error) {
     console.error(error);
   }
