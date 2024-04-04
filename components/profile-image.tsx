@@ -6,7 +6,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { follow, unfollow } from '@/actions/user.actions';
-import { useState } from 'react';
+import { useOptimistic, useState } from 'react';
 
 type ProfileImageProps = {
   profileImage: string;
@@ -30,10 +30,22 @@ export default function ProfileImage({
   authorId,
 }: ProfileImageProps) {
   const [btnText, setBtnText] = useState<string>('Following');
+  const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
+    followers,
+    (state, amount) => state! + Number(amount)
+  );
+  const [optimisticFollow, updateOptimisticFollow] = useOptimistic(
+    isFollowing,
+    (state, newFollowingState) => !state
+  );
   const toggleFollow = async () => {
-    if (isFollowing) {
+    if (optimisticFollow) {
+      updateOptimisticFollowers(-1);
+      updateOptimisticFollow(false);
       await unfollow(authorId);
     } else {
+      updateOptimisticFollowers(1);
+      updateOptimisticFollow(true);
       await follow(authorId);
     }
   };
@@ -66,7 +78,7 @@ export default function ProfileImage({
                 </AvatarFallback>
               </Avatar>
             </Link>
-            {isFollowing ? (
+            {optimisticFollow ? (
               <Button
                 variant='secondary'
                 size='sm'
@@ -78,12 +90,7 @@ export default function ProfileImage({
                 {btnText}
               </Button>
             ) : (
-              <Button
-                variant='default'
-                size='sm'
-                className='rounded-full'
-                onClick={toggleFollow}
-              >
+              <Button size='sm' className='rounded-full' onClick={toggleFollow}>
                 Follow
               </Button>
             )}
@@ -109,7 +116,8 @@ export default function ProfileImage({
                 following
               </span>
               <span>
-                <span className='font-bold'>{followers}</span> followers
+                <span className='font-bold'>{optimisticFollowers}</span>{' '}
+                followers
               </span>
             </section>
           </section>

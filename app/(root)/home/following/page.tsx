@@ -17,7 +17,7 @@ export default async function FollowingPosts() {
       {followingPosts.map((post) => (
         <Post {...post} key={post.id} currentUserId={currentUserId} />
       ))}
-      <p className='text-center py-10'>No more posts.</p>
+      <p className='text-center py-10'>No posts.</p>
     </main>
   );
 }
