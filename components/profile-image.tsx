@@ -3,10 +3,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
-import { Button } from './ui/button';
 import Link from 'next/link';
 import { follow, unfollow } from '@/actions/user.actions';
 import { useOptimistic, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import ToggleFollowButton from './toggle-follow-button';
 
 type ProfileImageProps = {
   profileImage: string;
@@ -14,9 +15,16 @@ type ProfileImageProps = {
   username: string;
   bio: string | null;
   followingIds: string[];
-  followers?: number;
-  isFollowing?: boolean;
-  authorId: string;
+  // followers?: number;
+  // isFollowing?: boolean;
+  // userId: string;
+  isCurrentUser: boolean;
+  btnText: string;
+  handleMouseOver: () => void;
+  handleMouseOut: () => void;
+  optimisticFollow?: boolean;
+  optimisticFollowers: number;
+  toggleFollow: () => Promise<void>;
 };
 
 export default function ProfileImage({
@@ -25,41 +33,49 @@ export default function ProfileImage({
   username,
   bio,
   followingIds,
-  followers,
-  isFollowing,
-  authorId,
+  // followers,
+  // isFollowing,
+  // userId,
+  isCurrentUser,
+  btnText,
+  handleMouseOver,
+  handleMouseOut,
+  optimisticFollow,
+  optimisticFollowers,
+  toggleFollow,
 }: ProfileImageProps) {
-  const [btnText, setBtnText] = useState<string>('Following');
-  const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
-    followers,
-    (state, amount) => state! + Number(amount)
-  );
-  const [optimisticFollow, updateOptimisticFollow] = useOptimistic(
-    isFollowing,
-    (state, newFollowingState) => !state
-  );
-  const toggleFollow = async () => {
-    if (optimisticFollow) {
-      updateOptimisticFollowers(-1);
-      updateOptimisticFollow(false);
-      await unfollow(authorId);
-    } else {
-      updateOptimisticFollowers(1);
-      updateOptimisticFollow(true);
-      await follow(authorId);
-    }
-  };
+  // const [btnText, setBtnText] = useState<string>('Following');
+  // const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
+  //   followers,
+  //   (state, amount) => state! + Number(amount)
+  // );
+  // const [optimisticFollow, updateOptimisticFollow] = useOptimistic(
+  //   isFollowing,
+  //   (state, newFollowingState) => !state
+  // );
 
-  const handleMouseEnter = () => {
-    setBtnText('Unfollow');
-  };
-  const handleMouseLeave = () => {
-    setBtnText('Following');
-  };
+  // const toggleFollow = async () => {
+  //   if (optimisticFollow) {
+  //     updateOptimisticFollowers(-1);
+  //     updateOptimisticFollow(false);
+  //     await unfollow(userId);
+  //   } else {
+  //     updateOptimisticFollowers(1);
+  //     updateOptimisticFollow(true);
+  //     await follow(userId);
+  //   }
+  // };
+
+  // const handleMouseEnter = () => {
+  //   setBtnText('Unfollow');
+  // };
+  // const handleMouseLeave = () => {
+  //   setBtnText('Following');
+  // };
 
   return (
     <HoverCard>
-      <div>
+      <div onClick={(e) => e.stopPropagation()} className='cursor-default'>
         <HoverCardTrigger href={`/${username}`}>
           <Avatar className='w-10 h-10 darker'>
             <AvatarImage src={profileImage} alt='profile picture' />
@@ -78,21 +94,14 @@ export default function ProfileImage({
                 </AvatarFallback>
               </Avatar>
             </Link>
-            {optimisticFollow ? (
-              <Button
-                variant='secondary'
-                size='sm'
-                className='rounded-full hover:bg-destructive/10 hover:text-destructive'
-                onClick={toggleFollow}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                {btnText}
-              </Button>
-            ) : (
-              <Button size='sm' className='rounded-full' onClick={toggleFollow}>
-                Follow
-              </Button>
+            {!isCurrentUser && (
+              <ToggleFollowButton
+                btnText={btnText}
+                handleMouseOver={handleMouseOver}
+                handleMouseOut={handleMouseOut}
+                optimisticFollow={optimisticFollow}
+                toggleFollow={toggleFollow}
+              />
             )}
           </section>
 

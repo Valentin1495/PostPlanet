@@ -22,6 +22,7 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   followingIds String[]   @default([])
+  followers    Int        @default(0)
   hasActivity  Boolean    @default(false)
   posts        Post[]
   comments     Comment[]

@@ -1,10 +1,12 @@
 'use server';
 
 import db from '@/lib/db';
+import { pickRandomElements } from '@/lib/pick-random-elements';
 import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { faker } from '@faker-js/faker';
 
 const schema = z.object({
   id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
@@ -109,11 +111,11 @@ export async function readCurrentUser() {
   }
 }
 
-export async function readUser(id: string) {
+export async function readUser(userId: string) {
   try {
     const user = await db.user.findUnique({
       where: {
-        id,
+        id: userId,
       },
     });
 
@@ -123,17 +125,18 @@ export async function readUser(id: string) {
   }
 }
 
-export async function countFollowers(userId: string) {
-  try {
-    const followers = await db.user.count({
-      where: {
-        followingIds: {
-          has: userId,
-        },
-      },
-    });
+export async function readRandomUsers() {
+  const currentUser = await readCurrentUser();
 
-    return followers;
+  try {
+    const randomUsers = await db.user.findMany();
+    const nonFollowers = randomUsers.filter(
+      (user) =>
+        !currentUser?.followingIds.includes(user.id) &&
+        user.id !== currentUser?.id
+    );
+
+    return pickRandomElements(3, nonFollowers);
   } catch (error) {
     console.error(error);
   }
@@ -167,6 +170,9 @@ export async function follow(userId: string) {
         id: userId,
       },
       data: {
+        followers: {
+          increment: 1,
+        },
         hasActivity: true,
       },
     });
@@ -193,8 +199,78 @@ export async function unfollow(userId: string) {
       },
     });
 
+    await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        followers: {
+          decrement: 1,
+        },
+      },
+    });
+
     revalidatePath('/home/for-you');
   } catch (error) {
     console.error(error);
+  }
+}
+
+async function generateUniqueUsername(baseUsername: string) {
+  let uniqueUsername = baseUsername;
+  let userExists = await db.user.findUnique({
+    where: {
+      username: uniqueUsername,
+    },
+  });
+  let attempt = 0;
+
+  while (userExists) {
+    attempt++;
+    uniqueUsername = `${baseUsername}${attempt}`;
+    userExists = await db.user.findUnique({
+      where: {
+        username: uniqueUsername,
+      },
+    });
+  }
+
+  return uniqueUsername;
+}
+
+export async function createRandomUsers(userCount: number) {
+  for (let i = 0; i < userCount; i++) {
+    const sex = faker.person.sexType();
+    const firstName = faker.person.firstName(sex);
+    const lastName = faker.person.lastName();
+    const fullName = `${firstName} ${lastName}`;
+    const baseUsername = faker.internet.userName();
+    const username = await generateUniqueUsername(baseUsername);
+    const userData = {
+      id: faker.string.uuid(),
+      profileImage: faker.image.avatar(),
+      name: fullName,
+      username,
+      bio: faker.lorem.sentence(),
+      createdAt: faker.date.past(),
+      updatedAt: faker.date.past(),
+      followingIds: [
+        'user_2ZiTE2jqizA7RLyq1QOdw2eiGHu',
+        'user_2edjx2T39LOpGHfvjxesMuFKcFR',
+        'user_2edfm2kvCrndEhpy4fpCqDJg8sy',
+        'user_2ZiXhKpFc36P3SSE5rZm98JKRMf',
+        'user_2eGnPfeYXw69sgZScKvyrOWixhX',
+      ],
+      hasActivity: false,
+      followers: 0,
+    };
+
+    try {
+      await db.user.create({
+        data: userData,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
