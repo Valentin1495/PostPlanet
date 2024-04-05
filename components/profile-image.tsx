@@ -4,9 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import Link from 'next/link';
-import { follow, unfollow } from '@/actions/user.actions';
-import { useOptimistic, useState } from 'react';
-import { useUser } from '@clerk/nextjs';
 import ToggleFollowButton from './toggle-follow-button';
 
 type ProfileImageProps = {
@@ -15,9 +12,6 @@ type ProfileImageProps = {
   username: string;
   bio: string | null;
   followingIds: string[];
-  // followers?: number;
-  // isFollowing?: boolean;
-  // userId: string;
   isCurrentUser: boolean;
   btnText: string;
   handleMouseOver: () => void;
@@ -33,9 +27,6 @@ export default function ProfileImage({
   username,
   bio,
   followingIds,
-  // followers,
-  // isFollowing,
-  // userId,
   isCurrentUser,
   btnText,
   handleMouseOver,
@@ -44,38 +35,9 @@ export default function ProfileImage({
   optimisticFollowers,
   toggleFollow,
 }: ProfileImageProps) {
-  // const [btnText, setBtnText] = useState<string>('Following');
-  // const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
-  //   followers,
-  //   (state, amount) => state! + Number(amount)
-  // );
-  // const [optimisticFollow, updateOptimisticFollow] = useOptimistic(
-  //   isFollowing,
-  //   (state, newFollowingState) => !state
-  // );
-
-  // const toggleFollow = async () => {
-  //   if (optimisticFollow) {
-  //     updateOptimisticFollowers(-1);
-  //     updateOptimisticFollow(false);
-  //     await unfollow(userId);
-  //   } else {
-  //     updateOptimisticFollowers(1);
-  //     updateOptimisticFollow(true);
-  //     await follow(userId);
-  //   }
-  // };
-
-  // const handleMouseEnter = () => {
-  //   setBtnText('Unfollow');
-  // };
-  // const handleMouseLeave = () => {
-  //   setBtnText('Following');
-  // };
-
   return (
     <HoverCard>
-      <div onClick={(e) => e.stopPropagation()} className='cursor-default'>
+      <div>
         <HoverCardTrigger href={`/${username}`}>
           <Avatar className='w-10 h-10 darker'>
             <AvatarImage src={profileImage} alt='profile picture' />
@@ -84,7 +46,10 @@ export default function ProfileImage({
             </AvatarFallback>
           </Avatar>
         </HoverCardTrigger>
-        <HoverCardContent className='space-y-2'>
+        <HoverCardContent
+          className='space-y-2 cursor-default'
+          onClick={(e) => e.stopPropagation()}
+        >
           <section className='flex justify-between'>
             <Link href={`/${username}`}>
               <Avatar className='w-16 h-16 darker'>

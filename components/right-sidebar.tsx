@@ -9,7 +9,7 @@ export default async function RightSidebar() {
     <div className='sticky top-0 w-1/3 hidden lg:block p-5'>
       <div className='bg-secondary rounded-lg'>
         <h1 className='font-bold p-3'>Who to follow</h1>
-        <div className='space-y-2 w-full'>
+        <div className='space-y-2'>
           {randomUsers.map((user) => (
             <RandomUser key={user.id} {...user} />
           ))}

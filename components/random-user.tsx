@@ -4,8 +4,6 @@ import ProfileImage from './profile-image';
 import { useUser } from '@clerk/nextjs';
 import ToggleFollowButton from './toggle-follow-button';
 import { useRouter } from 'next/navigation';
-import { useOptimistic, useState } from 'react';
-import { follow, unfollow } from '@/actions/user.actions';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 
 type RandomUserProps = {

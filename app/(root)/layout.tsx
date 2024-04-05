@@ -29,7 +29,7 @@ export default async function RootLayout({
         <body className={inter.className}>
           <div className='max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl mx-auto flex items-start'>
             <LeftSidebar username={username} />
-            <div className='w-full md:w-2/3 border-l-2 md:border-r-2'>
+            <div className='w-full md:w-2/3 border-l-2 sm:border-r-2'>
               {children}
             </div>
             <RightSidebar />

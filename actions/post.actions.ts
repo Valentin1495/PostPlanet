@@ -4,8 +4,8 @@ import db from '@/lib/db';
 import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
-import { readCurrentUser, readUser } from './user.actions';
-import { Post, User } from '@prisma/client';
+import { readCurrentUser } from './user.actions';
+import { User } from '@prisma/client';
 
 export async function createPost(
   prevState: {
@@ -89,6 +89,20 @@ export async function readPosts(userId: string) {
   }
 }
 
+export async function readPost(postId: string) {
+  try {
+    const post = await db.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    return post;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function readFollowingPosts() {
   const user = (await readCurrentUser()) as User;
   const followingIds = user.followingIds;
@@ -103,4 +117,60 @@ export async function readFollowingPosts() {
   posts.sort((a, b) => b!.createdAt.getTime() - a!.createdAt.getTime());
 
   return posts;
+}
+
+export async function checkHasLiked(postId: string) {
+  const post = await readPost(postId);
+  const user = await currentUser();
+
+  const hasLiked = post?.likedIds.includes(user!.id);
+
+  return hasLiked;
+}
+
+export async function likePost(postId: string) {
+  const post = await readPost(postId);
+  const user = await currentUser();
+  const likedIds = post!.likedIds;
+  likedIds.push(user!.id);
+
+  try {
+    await db.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        likedIds,
+      },
+    });
+
+    revalidatePath('/home/for-you');
+    revalidatePath('/home/following');
+    revalidatePath(`/post/${postId}`);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function unlikePost(postId: string) {
+  const post = await readPost(postId);
+  const user = await currentUser();
+  const newLikedIds = post?.likedIds.filter((id) => id !== user?.id);
+
+  try {
+    await db.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        likedIds: newLikedIds,
+      },
+    });
+
+    revalidatePath('/home/for-you');
+    revalidatePath('/home/following');
+    revalidatePath(`/post/${postId}`);
+  } catch (error) {
+    console.error(error);
+  }
 }

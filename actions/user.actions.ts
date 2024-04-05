@@ -1,12 +1,12 @@
 'use server';
 
 import db from '@/lib/db';
-import { pickRandomElements } from '@/lib/pick-random-elements';
 import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { faker } from '@faker-js/faker';
+import { pickRandomElements } from '@/lib/utils';
 
 const schema = z.object({
   id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
@@ -126,6 +126,7 @@ export async function readUser(userId: string) {
 }
 
 export async function readRandomUsers() {
+  ('');
   const currentUser = await readCurrentUser();
 
   try {
@@ -136,7 +137,7 @@ export async function readRandomUsers() {
         user.id !== currentUser?.id
     );
 
-    return pickRandomElements(3, nonFollowers);
+    return pickRandomElements(10, nonFollowers);
   } catch (error) {
     console.error(error);
   }
