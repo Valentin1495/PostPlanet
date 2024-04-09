@@ -43,7 +43,7 @@ export default async function PostPage({ params }: PostPageProps) {
       />
 
       <PostForm
-        isForPost={false}
+        isForReply
         profileImage={profileImage}
         username={username}
         postId={postId}

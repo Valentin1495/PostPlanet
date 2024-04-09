@@ -3,6 +3,7 @@
 import db from '@/lib/db';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function replyToPost(
   prevState: {
@@ -22,6 +23,8 @@ export async function replyToPost(
   const user = await currentUser();
   const id = user?.id;
   const postId = formData.get('postId') as string;
+  const isForDialog = formData.get('isForDialog') as string;
+  let redirectUrl = '';
 
   try {
     await db.reply.create({
@@ -43,6 +46,7 @@ export async function replyToPost(
 
     revalidatePath('/post');
     revalidatePath('/home');
+    redirectUrl = `/post/${postId}`;
 
     return {
       message: '',
@@ -51,6 +55,8 @@ export async function replyToPost(
     return {
       message: 'Failed to reply 😢',
     };
+  } finally {
+    if (redirectUrl && isForDialog === 'true') redirect(redirectUrl);
   }
 }
 

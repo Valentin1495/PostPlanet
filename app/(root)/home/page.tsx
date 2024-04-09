@@ -18,13 +18,14 @@ export default async function Home() {
   return (
     <main className='min-h-screen'>
       <FeedTab />
-      <PostForm
-        isForPost={true}
-        profileImage={profileImage}
-        username={username}
-      />
+      <PostForm isForPost profileImage={profileImage} username={username} />
       {allPosts.map((post) => (
-        <Post {...post} key={post.id} currentUserId={onboardedUserId} />
+        <Post
+          {...post}
+          key={post.id}
+          currentUserId={onboardedUserId}
+          myProfilePic={profileImage}
+        />
       ))}
       <p className='text-center py-10'>No more posts.</p>
     </main>

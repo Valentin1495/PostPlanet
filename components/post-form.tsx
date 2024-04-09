@@ -7,14 +7,13 @@ import { Button } from './ui/button';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
-import { ImagePlus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { createPost } from '@/actions/post.actions';
 import { Input } from './ui/input';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { replyToPost } from '@/actions/reply.action';
-import { UploadButton } from '@/lib/uploadthing';
 import UploadBtn from './upload-btn';
 
 const initialState = {
@@ -24,15 +23,19 @@ const initialState = {
 type PostFormPorps = {
   profileImage?: string;
   username?: string;
-  isForPost: boolean;
+  isForPost?: boolean;
   postId?: string;
+  isForDialog?: boolean;
+  isForReply?: boolean;
 };
 
 export default function PostForm({
   profileImage,
   username,
-  isForPost,
   postId,
+  isForPost,
+  isForDialog,
+  isForReply,
 }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -59,23 +62,34 @@ export default function PostForm({
     <form
       action={formAction}
       className={cn(
-        'border-b space-y-2',
-        isForPost ? 'p-3' : 'pb-3 pt-1.5 px-3'
+        'space-y-2',
+        !isForDialog && 'border-b',
+        isForPost && 'p-3',
+        isForReply && 'pb-3 pt-1.5 px-3'
       )}
     >
       <section className='flex gap-2'>
-        <Link href={`/${username}`}>
-          <Avatar className='w-10 h-10 darker'>
+        {isForDialog ? (
+          <Avatar className='w-10 h-10'>
             <AvatarImage src={profileImage} alt='profile picture' />
             <AvatarFallback className='bg-primary/10'>
               <Skeleton className='rounded-full' />
             </AvatarFallback>
           </Avatar>
-        </Link>
+        ) : (
+          <Link href={`/${username}`}>
+            <Avatar className='w-10 h-10 darker'>
+              <AvatarImage src={profileImage} alt='profile picture' />
+              <AvatarFallback className='bg-primary/10'>
+                <Skeleton className='rounded-full' />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+        )}
         {mounted && (
           <TextareaAutosize
             className='resize-none w-full outline-none my-auto text-lg hide-scrollbar'
-            minRows={1}
+            minRows={isForDialog ? 3 : 1}
             placeholder={
               isForPost ? 'What is happening?!' : 'Post your reply...'
             }
@@ -104,9 +118,17 @@ export default function PostForm({
       )}
       <div className='justify-end flex items-center gap-2'>
         <UploadBtn setFileUrl={setFileUrl} />
-        <Input className='hidden' name='fileUrl' value={fileUrl} />
+        <Input className='hidden' name='fileUrl' value={fileUrl} readOnly />
         {!isForPost && (
           <Input className='hidden' name='postId' value={postId} readOnly />
+        )}
+        {isForDialog && (
+          <Input
+            className='hidden'
+            name='isForDialog'
+            value={String(isForDialog)}
+            readOnly
+          />
         )}
         <SubmitButton text={text} file={fileUrl} isForPost={isForPost} />
       </div>
@@ -117,7 +139,7 @@ export default function PostForm({
 type SubmitButtonProps = {
   text: string;
   file: string;
-  isForPost: boolean;
+  isForPost?: boolean;
 };
 
 function SubmitButton({ text, file, isForPost }: SubmitButtonProps) {
