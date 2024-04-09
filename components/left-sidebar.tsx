@@ -17,7 +17,7 @@ export default function LeftSidebar({ username }: { username?: string }) {
     <nav className='w-1/6 xl:w-1/4 py-5 flex flex-col gap-5 items-center xl:items-start sticky top-0 min-h-screen md:pl-10 xl:pl-24'>
       <Link
         className='text-xl inline-block font-bold p-3 hover:bg-secondary shadow-secondary rounded-full duration-300'
-        href='/'
+        href='/home'
       >
         <Image src='/logo.svg' alt='logo' width={28} height={28} />
       </Link>
@@ -25,11 +25,12 @@ export default function LeftSidebar({ username }: { username?: string }) {
       {sidebarLinks.map((link) => {
         const { activeIcon, href, icon, label } = link;
         const active = pathname.includes(href);
+
         return (
           <Link
             key={label}
             className='flex items-center gap-2 hover:bg-secondary p-3 rounded-full duration-300 max-w-fit'
-            href={href}
+            href={href === '/home' ? '/home' : href}
           >
             {active ? activeIcon : icon}
             <span

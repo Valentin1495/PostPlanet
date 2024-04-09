@@ -1,4 +1,4 @@
-import { Activity, CircleUser, Home, Search } from 'lucide-react';
+import { Activity, Home, Search } from 'lucide-react';
 
 export const sidebarLinks = [
   {

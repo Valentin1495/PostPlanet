@@ -1,38 +1,48 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { format, formatDistanceToNowStrict } from 'date-fns';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(date: Date) {
-  const thisYear = new Date().getFullYear();
-  const formattedDate = thisYear
-    ? date.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-      })
-    : date.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+function has24HoursPassed(date: Date) {
+  const currentDate = new Date();
+  const differenceInMilliseconds = currentDate.getTime() - date.getTime();
+  const hoursPassed = differenceInMilliseconds / (1000 * 60 * 60);
 
-  return formattedDate;
+  return hoursPassed >= 24;
 }
 
-export function pickRandomElements<T>(number: number, array: T[]) {
-  const result: T[] = [];
-  const usedIndices = new Set();
+function isPastYear(date: Date) {
+  const currentYear = new Date().getFullYear();
+  const givenYear = date.getFullYear();
 
-  while (result.length < number) {
-    const randomIndex = Math.floor(Math.random() * array.length);
+  // Check if the given year is before the current year
+  return givenYear < currentYear;
+}
 
-    if (!usedIndices.has(randomIndex)) {
-      result.push(array[randomIndex]);
-      usedIndices.add(randomIndex);
-    }
+export function getSimpleDate(date: Date) {
+  if (isPastYear(date)) {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   }
 
-  return result;
+  if (has24HoursPassed(date)) {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  return formatDistanceToNowStrict(date);
+}
+
+export function getDetailedDate(date: Date) {
+  const formattedDate = format(date, 'h:mm a · MMM d, yyyy');
+
+  return formattedDate;
 }

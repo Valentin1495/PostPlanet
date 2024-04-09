@@ -1,7 +1,6 @@
 'use server';
 
 import db from '@/lib/db';
-import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { readCurrentUser } from './user.actions';
@@ -13,27 +12,17 @@ export async function createPost(
   },
   formData: FormData
 ) {
-  const imageToPost = formData.get('imageToPost') as File;
-  const user = await currentUser();
-  const id = user?.id;
-  let result;
-
-  if (imageToPost.size) {
-    result = await uploadImage(imageToPost);
-  }
-
-  if (result?.message) {
-    return result;
-  }
-
+  const image = formData.get('fileUrl') as string;
   let text = formData.get('text') as string;
   text = text.trim();
-  const image = result?.imageUrl;
 
-  if (!text && !imageToPost.size)
+  if (!text && !image)
     return {
-      message: "There's nothing to post. 😢",
+      message: "There's nothing to post 😢",
     };
+
+  const user = await currentUser();
+  const id = user?.id;
 
   try {
     await db.post.create({
@@ -48,15 +37,14 @@ export async function createPost(
       },
     });
 
-    revalidatePath('/home/for-you');
+    revalidatePath('/home');
 
     return {
-      message: 'Posted! 🥳',
+      message: '',
     };
   } catch (error) {
-    console.error(error);
     return {
-      message: 'Failed to post. 😢',
+      message: 'Failed to post 😢',
     };
   }
 }
@@ -70,8 +58,8 @@ export async function readAllPosts() {
     });
 
     return posts;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -84,8 +72,8 @@ export async function readPosts(userId: string) {
     });
 
     return posts;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -98,8 +86,8 @@ export async function readPost(postId: string) {
     });
 
     return post;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -131,8 +119,8 @@ export async function checkHasLiked(postId: string) {
 export async function likePost(postId: string) {
   const post = await readPost(postId);
   const user = await currentUser();
-  const likedIds = post!.likedIds;
-  likedIds.push(user!.id);
+  const likedIds = post?.likedIds;
+  likedIds?.push(user!.id);
 
   try {
     await db.post.update({
@@ -144,11 +132,10 @@ export async function likePost(postId: string) {
       },
     });
 
-    revalidatePath('/home/for-you');
-    revalidatePath('/home/following');
-    revalidatePath(`/post/${postId}`);
-  } catch (error) {
-    console.error(error);
+    revalidatePath('/home');
+    revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -167,10 +154,9 @@ export async function unlikePost(postId: string) {
       },
     });
 
-    revalidatePath('/home/for-you');
-    revalidatePath('/home/following');
-    revalidatePath(`/post/${postId}`);
-  } catch (error) {
-    console.error(error);
+    revalidatePath('/home');
+    revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
   }
 }

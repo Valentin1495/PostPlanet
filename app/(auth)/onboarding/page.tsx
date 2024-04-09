@@ -10,7 +10,7 @@ export default async function Onboarding() {
   const firstName = user?.firstName;
   const lastName = user?.lastName;
 
-  if (onboardedUser) redirect('/home/for-you');
+  if (onboardedUser) redirect('/home');
   return (
     <main className='flex items-center justify-center min-h-screen'>
       <OnboardingForm

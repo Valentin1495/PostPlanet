@@ -1,5 +1,5 @@
 import { likePost, unlikePost } from '@/actions/post.actions';
-import { useOptimistic } from 'react';
+import { startTransition, useOptimistic } from 'react';
 
 export function useToggleLike(
   likes: number,
@@ -17,12 +17,16 @@ export function useToggleLike(
 
   const toggleLike = async () => {
     if (optimisticHasLiked) {
-      updateOptimisticLikes(-1);
-      updateOptimisticHasLiked(false);
+      startTransition(() => {
+        updateOptimisticLikes(-1);
+        updateOptimisticHasLiked(false);
+      });
       await unlikePost(postId);
     } else {
-      updateOptimisticLikes(1);
-      updateOptimisticHasLiked(true);
+      startTransition(() => {
+        updateOptimisticLikes(1);
+        updateOptimisticHasLiked(true);
+      });
       await likePost(postId);
     }
   };

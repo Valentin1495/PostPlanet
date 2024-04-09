@@ -1,5 +1,5 @@
 import { follow, unfollow } from '@/actions/user.actions';
-import { useOptimistic, useState } from 'react';
+import { startTransition, useOptimistic, useState } from 'react';
 
 export function useToggleFollow(
   followers: number,
@@ -19,13 +19,17 @@ export function useToggleFollow(
   const toggleFollow = async () => {
     if (optimisticFollow) {
       setBtnText('Follow');
-      updateOptimisticFollowers(-1);
-      updateOptimisticFollow(false);
+      startTransition(() => {
+        updateOptimisticFollowers(-1);
+        updateOptimisticFollow(false);
+      });
       await unfollow(userId);
     } else {
       setBtnText('Unfollow');
-      updateOptimisticFollowers(1);
-      updateOptimisticFollow(true);
+      startTransition(() => {
+        updateOptimisticFollowers(1);
+        updateOptimisticFollow(true);
+      });
       await follow(userId);
     }
   };

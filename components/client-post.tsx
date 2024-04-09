@@ -2,7 +2,7 @@
 
 import { PostProps } from './post';
 import Image from 'next/image';
-import { cn, formatDate } from '@/lib/utils';
+import { cn, getSimpleDate } from '@/lib/utils';
 import ProfileImage from './profile-image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -10,7 +10,7 @@ import { Skeleton } from './ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import { useToggleLike } from '@/hooks/use-toggle-like';
-import { FilledHeart, Heart } from '@/lib/icons';
+import { ChatBubble, FilledHeart, Heart } from '@/lib/icons';
 
 type ClientPostProps = PostProps & {
   username: string;
@@ -23,6 +23,7 @@ type ClientPostProps = PostProps & {
   followingIds: string[];
   likedIds: string[];
   hasLiked?: boolean;
+  replyCount: number;
 };
 
 export default function ClientPost({
@@ -41,6 +42,7 @@ export default function ClientPost({
   followingIds,
   likedIds,
   hasLiked,
+  replyCount,
 }: ClientPostProps) {
   const router = useRouter();
   const {
@@ -60,7 +62,7 @@ export default function ClientPost({
 
   return (
     <div
-      className='border-b-2 border-secondary px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary transition cursor-pointer'
+      className='border-b px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary/50 transition cursor-pointer'
       onClick={() => router.push(`/post/${id}`)}
     >
       {isMyPost ? (
@@ -107,7 +109,7 @@ export default function ClientPost({
           </Link>
           <span className='text-muted-foreground mb-0.5'>·</span>
           <span className='text-muted-foreground mb-0.5 min-w-fit'>
-            {formatDate(createdAt)}
+            {getSimpleDate(createdAt)}
           </span>
         </section>
 
@@ -120,7 +122,16 @@ export default function ClientPost({
           )}
         </section>
 
-        <section className='-ml-2'>
+        <section className='-ml-2 flex items-center gap-14'>
+          <section className='flex items-center -space-x-1 group w-fit'>
+            <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
+              <ChatBubble chatBubbleProps='w-[18px] h-[18px] text-slate-400 group-hover:text-primary transition' />
+            </section>
+            <span className='text-sm font-medium group-hover:text-primary transition'>
+              {replyCount ? replyCount : null}
+            </span>
+          </section>
+
           <section
             className='flex items-center -space-x-1 group w-fit'
             onClick={(e) => {
@@ -128,15 +139,11 @@ export default function ClientPost({
               toggleLike();
             }}
           >
-            <section
-              className={cn(
-                'rounded-full p-2 group-hover:bg-rose-500/5 transition'
-              )}
-            >
+            <section className='rounded-full p-2 group-hover:bg-rose-500/5 transition'>
               {optimisticHasLiked ? (
-                <FilledHeart FilledHeartProps='w-[18px] h-[18px] text-rose-500' />
+                <FilledHeart filledHeartProps='w-[18px] h-[18px] text-rose-500' />
               ) : (
-                <Heart HeartProps='w-[18px] h-[18px] group-hover:text-rose-500 transition' />
+                <Heart heartProps='w-[18px] h-[18px] text-slate-400 group-hover:text-rose-500 transition' />
               )}
             </section>
             <span
@@ -147,7 +154,7 @@ export default function ClientPost({
                 'text-sm font-medium'
               )}
             >
-              {optimisticLikes}
+              {optimisticLikes ? optimisticLikes : null}
             </span>
           </section>
         </section>

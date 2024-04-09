@@ -1,12 +1,10 @@
 'use server';
 
 import db from '@/lib/db';
-import { uploadImage } from '@/lib/upload-image';
 import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { faker } from '@faker-js/faker';
-import { pickRandomElements } from '@/lib/utils';
 
 const schema = z.object({
   id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
@@ -36,13 +34,8 @@ export async function createUser(
   bio = bio.trim();
   let name = formData.get('name') as string;
   name = name.trim();
+  const profileImage = formData.get('fileUrl') as string;
 
-  const image = formData.get('profileImage') as File;
-  const result = await uploadImage(image);
-  if (result.message) {
-    return result;
-  }
-  const profileImage = result.imageUrl;
   const user = await currentUser();
   const id = user?.id;
 
@@ -88,9 +81,8 @@ export async function createUser(
       message: 'Onboarded.',
     };
   } catch (error) {
-    console.error(error);
     return {
-      message: 'Onboarding failed.',
+      message: 'Onboarding failed 😢',
     };
   }
 }
@@ -106,8 +98,8 @@ export async function readCurrentUser() {
     });
 
     return currentUser;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -120,13 +112,12 @@ export async function readUser(userId: string) {
     });
 
     return user;
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
 export async function readRandomUsers() {
-  ('');
   const currentUser = await readCurrentUser();
 
   try {
@@ -137,9 +128,9 @@ export async function readRandomUsers() {
         user.id !== currentUser?.id
     );
 
-    return pickRandomElements(10, nonFollowers);
-  } catch (error) {
-    console.error(error);
+    return nonFollowers.slice(-10);
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -178,9 +169,10 @@ export async function follow(userId: string) {
       },
     });
 
-    revalidatePath('/home/for-you');
-  } catch (error) {
-    console.error(error);
+    revalidatePath('/home');
+    revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -211,9 +203,10 @@ export async function unfollow(userId: string) {
       },
     });
 
-    revalidatePath('/home/for-you');
-  } catch (error) {
-    console.error(error);
+    revalidatePath('/home');
+    revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -270,8 +263,8 @@ export async function createRandomUsers(userCount: number) {
       await db.user.create({
         data: userData,
       });
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

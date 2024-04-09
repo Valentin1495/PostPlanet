@@ -13,7 +13,11 @@ export default async function FollowingPosts() {
   return (
     <main className='min-h-screen'>
       <FeedTab />
-      <PostForm profileImage={profileImage} username={username} />
+      <PostForm
+        isForPost={true}
+        profileImage={profileImage}
+        username={username}
+      />
       {followingPosts.map((post) => (
         <Post {...post} key={post.id} currentUserId={currentUserId} />
       ))}

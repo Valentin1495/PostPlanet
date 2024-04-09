@@ -6,16 +6,16 @@ import { usePathname } from 'next/navigation';
 
 export default function FeedTab() {
   const pathname = usePathname();
-  const forYouPath = '/home/for-you';
+  const forYouPath = '/home';
   const forYouActive = pathname === forYouPath;
   const followingPath = '/home/following';
   const followingActive = pathname === followingPath;
 
   return (
-    <div className='flex h-12'>
+    <div className='flex h-12 sticky top-0 backdrop-blur-md z-10'>
       <Link
         className={cn(
-          'relative border-b-2 w-1/2 text-center hover:bg-secondary transition-colors duration-300',
+          'relative border-b-[0.5px] w-1/2 text-center hover:bg-secondary transition-colors duration-300',
           forYouActive ? 'font-bold' : 'font-medium'
         )}
         href={forYouPath}
@@ -29,7 +29,7 @@ export default function FeedTab() {
       </Link>
       <Link
         className={cn(
-          'relative border-b-2 w-1/2 text-center hover:bg-secondary transition-colors duration-300',
+          'relative border-b-[0.5px] w-1/2 text-center hover:bg-secondary transition-colors duration-300',
           followingActive ? 'font-bold' : 'font-medium'
         )}
         href={followingPath}

@@ -25,25 +25,26 @@ model User {
   followers    Int        @default(0)
   hasActivity  Boolean    @default(false)
   posts        Post[]
-  comments     Comment[]
+  replies      Reply[]
   actiivities  Activity[]
 }
 
 model Post {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   text      String?
   image     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  likedIds  String[]  @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  likedIds  String[] @default([])
   authorId  String
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  comments  Comment[]
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies   Reply[]
 }
 
-model Comment {
+model Reply {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  body      String
+  text      String?
+  image     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   postId    String   @db.ObjectId

@@ -5,11 +5,13 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { createUser } from '@/actions/user.actions';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { redirect } from 'next/navigation';
-import { ImagePlus } from 'lucide-react';
 import { Textarea } from './ui/textarea';
+import UploadBtn from './upload-btn';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Skeleton } from './ui/skeleton';
+import { toast } from 'sonner';
 
 type OnboardingFormProps = {
   imageUrl?: string;
@@ -27,99 +29,53 @@ export default function OnboardingForm({
   lastName,
 }: OnboardingFormProps) {
   const [state, formAction] = useFormState(createUser, initialState);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [name, setName] = useState<string>('');
-  const fileRef = useRef<HTMLInputElement | null>(null);
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    setSelectedFile(file);
-  };
+
   const onboarded = state.message === 'Onboarded.';
   const onboardingFailed = state.message && state.message !== 'Onboarded.';
-
-  useEffect(() => {
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-    } else {
-      setPreviewUrl(null);
-    }
-  }, [selectedFile]);
 
   useEffect(() => {
     const defaultName = firstName && lastName ? `${firstName} ${lastName}` : '';
     setName(defaultName);
   }, []);
 
-  if (onboarded) redirect('/home/for-you');
+  useEffect(() => {
+    if (onboardingFailed) {
+      toast(state.message);
+    }
+  }, [state]);
+
+  if (onboarded) redirect('/home');
   return (
     <div className='w-1/2 xl:w-1/3'>
-      <h1 className='text-2xl font-bold'>Onboarding</h1>
-      <p className='mb-3'>
-        Complete your profile now, <br /> to use PostPlanet.
-      </p>
+      <h1 className='text-2xl text-center font-bold'>Onboarding</h1>
+      <p className='mb-3 text-center font-medium'>Welcome to PostPlanet! 🥳</p>
       <form
         action={formAction}
-        className='space-y-5 bg-secondary px-5 pb-5 pt-2 rounded-md'
+        className='space-y-5 bg-primary/15 px-5 pb-5 pt-2 rounded-md'
       >
-        <Input
-          type='file'
-          id='profileImage'
-          name='profileImage'
-          accept='image/*'
-          onChange={handleFileChange}
-          className='hidden'
-          ref={fileRef}
-        />
-
-        <section className='flex justify-center'>
-          {previewUrl ? (
-            <section className='relative w-32 h-32'>
-              <Image
-                src={previewUrl}
-                alt='profile image'
-                fill
-                priority
-                className='rounded-full object-cover'
-              />
-              <article
-                className='hover:opacity-90 cursor-pointer transition bg-black/60 rounded-full p-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-                onClick={() => fileRef.current?.click()}
-              >
-                <ImagePlus size={18} className='text-secondary' />
-              </article>
-            </section>
+        <section className='flex flex-col items-center gap-2.5'>
+          {fileUrl ? (
+            <Avatar className='w-32 h-32'>
+              <AvatarImage src={fileUrl} />
+              <AvatarFallback className='bg-primary/25'>
+                <Skeleton className='rounded-full' />
+              </AvatarFallback>
+            </Avatar>
           ) : imageUrl ? (
-            <section className='relative w-32 h-32'>
-              <Image
-                priority
-                src={imageUrl}
-                alt='profile image'
-                fill
-                className='rounded-full object-cover'
-              />
-              <article
-                className='hover:opacity-90 cursor-pointer transition bg-black/60 rounded-full p-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
-                onClick={() => fileRef.current?.click()}
-              >
-                <ImagePlus size={18} className='text-secondary' />
-              </article>
-            </section>
+            <Avatar className='w-32 h-32'>
+              <AvatarImage src={imageUrl} />
+              <AvatarFallback className='bg-primary/25'>
+                <Skeleton className='rounded-full' />
+              </AvatarFallback>
+            </Avatar>
           ) : (
-            <section className='bg-primary/10 rounded-full w-32 h-32 flex justify-center items-center'>
-              <article
-                className='hover:opacity-90 cursor-pointer transition bg-black/60 rounded-full p-3'
-                onClick={() => fileRef.current?.click()}
-              >
-                <ImagePlus size={18} className='text-secondary' />
-              </article>
-            </section>
+            <section className='bg-background rounded-full w-32 h-32 flex justify-center items-center'></section>
           )}
+          <Input value={fileUrl} className='hidden' name='fileUrl' readOnly />
+          <UploadBtn setFileUrl={setFileUrl} />
         </section>
 
         <section className='space-y-2'>
@@ -153,22 +109,17 @@ export default function OnboardingForm({
           />
         </section>
         <SubmitButton
-          file={selectedFile}
+          file={fileUrl}
           username={username.trim()}
           name={name.trim()}
         />
-        {onboardingFailed && (
-          <p className='text-destructive text-center whitespace-pre-line text-sm'>
-            {state.message}
-          </p>
-        )}
       </form>
     </div>
   );
 }
 
 type SubmitButtonProps = {
-  file: File | null;
+  file: string;
   username: string;
   name: string;
 };
