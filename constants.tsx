@@ -21,3 +21,29 @@ export const sidebarLinks = [
     activeIcon: <Activity size='28' strokeWidth='2' className='text-primary' />,
   },
 ];
+
+export const feedTabItems = [
+  {
+    label: 'For You',
+    path: '/home',
+  },
+  {
+    label: 'Following',
+    path: '/following',
+  },
+];
+
+export const profileTabItems = [
+  {
+    label: 'Posts',
+    path: '/posts',
+  },
+  {
+    label: 'Replies',
+    path: '/with-replies',
+  },
+  {
+    label: 'Likes',
+    path: '/likes',
+  },
+];

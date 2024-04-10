@@ -77,7 +77,7 @@ export default function PostForm({
             </AvatarFallback>
           </Avatar>
         ) : (
-          <Link href={`/${username}`}>
+          <Link href={`/${username}/posts`}>
             <Avatar className='w-10 h-10 darker'>
               <AvatarImage src={profileImage} alt='profile picture' />
               <AvatarFallback className='bg-primary/10'>

@@ -60,7 +60,7 @@ export async function replyToPost(
   }
 }
 
-export async function readReplies(postId: string) {
+export async function readPostReplies(postId: string) {
   try {
     const replies = await db.reply.findMany({
       where: {
@@ -72,6 +72,55 @@ export async function readReplies(postId: string) {
     });
 
     return replies;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function readRepliesWithPost(userId: string) {
+  try {
+    const repliesWithPost = await db.reply.findMany({
+      where: {
+        authorId: userId,
+      },
+      include: {
+        author: true,
+        post: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return repliesWithPost;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function countPostReplies(postId: string) {
+  try {
+    const replyCount = await db.reply.count({
+      where: {
+        postId,
+      },
+    });
+
+    return replyCount;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function countUserReplies(userId: string) {
+  try {
+    const replyCount = await db.reply.count({
+      where: {
+        authorId: userId,
+      },
+    });
+
+    return replyCount;
   } catch (error: any) {
     throw new Error(error);
   }

@@ -5,6 +5,7 @@ import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { faker } from '@faker-js/faker';
+import { User } from '@prisma/client';
 
 const schema = z.object({
   id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
@@ -162,9 +163,6 @@ export async function follow(userId: string) {
         id: userId,
       },
       data: {
-        followers: {
-          increment: 1,
-        },
         hasActivity: true,
       },
     });
@@ -177,10 +175,8 @@ export async function follow(userId: string) {
 }
 
 export async function unfollow(userId: string) {
-  const user = await readCurrentUser();
-  const id = user?.id;
-  const followingIds = user?.followingIds;
-  const newFollowingIds = followingIds?.filter((name) => name !== userId);
+  const { id, followingIds } = (await readCurrentUser()) as User;
+  const newFollowingIds = followingIds.filter((name) => name !== userId);
 
   try {
     await db.user.update({
@@ -192,19 +188,24 @@ export async function unfollow(userId: string) {
       },
     });
 
-    await db.user.update({
+    revalidatePath('/home');
+    revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function countFollowers(userId: string) {
+  try {
+    const followers = await db.user.count({
       where: {
-        id: userId,
-      },
-      data: {
-        followers: {
-          decrement: 1,
+        followingIds: {
+          has: userId,
         },
       },
     });
 
-    revalidatePath('/home');
-    revalidatePath('/post');
+    return followers;
   } catch (error: any) {
     throw new Error(error);
   }
@@ -256,7 +257,6 @@ export async function createRandomUsers(userCount: number) {
         'user_2eGnPfeYXw69sgZScKvyrOWixhX',
       ],
       hasActivity: false,
-      followers: 0,
     };
 
     try {
@@ -266,5 +266,19 @@ export async function createRandomUsers(userCount: number) {
     } catch (error: any) {
       throw new Error(error);
     }
+  }
+}
+
+export async function readUserId(username: string) {
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    return user?.id;
+  } catch (error: any) {
+    throw new Error(error);
   }
 }

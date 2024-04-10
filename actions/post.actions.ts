@@ -5,6 +5,7 @@ import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { readCurrentUser } from './user.actions';
 import { User } from '@prisma/client';
+import { readRepliesWithPost } from './reply.action';
 
 export async function createPost(
   prevState: {
@@ -91,6 +92,20 @@ export async function readPost(postId: string) {
   }
 }
 
+export async function countPosts(userId: string) {
+  try {
+    const postCount = await db.post.count({
+      where: {
+        authorId: userId,
+      },
+    });
+
+    return postCount;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
 export async function readFollowingPosts() {
   const user = (await readCurrentUser()) as User;
   const followingIds = user.followingIds;
@@ -105,6 +120,22 @@ export async function readFollowingPosts() {
   posts.sort((a, b) => b!.createdAt.getTime() - a!.createdAt.getTime());
 
   return posts;
+}
+
+export async function readLikedPosts(userId: string) {
+  try {
+    const likedPosts = await db.post.findMany({
+      where: {
+        likedIds: {
+          has: userId,
+        },
+      },
+    });
+
+    return likedPosts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
 }
 
 export async function checkHasLiked(postId: string) {

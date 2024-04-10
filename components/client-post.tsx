@@ -7,13 +7,13 @@ import ProfileImage from './profile-image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import { useToggleLike } from '@/hooks/use-toggle-like';
 import { ChatBubble, FilledHeart, Heart } from '@/lib/icons';
 import ReplyDialog from './reply-dialog';
 
-type ClientPostProps = Omit<PostProps, 'createdAt'> & {
+export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   username: string;
   name: string;
   profileImage: string;
@@ -30,20 +30,20 @@ type ClientPostProps = Omit<PostProps, 'createdAt'> & {
 };
 
 export default function ClientPost({
+  text,
   id,
+  image,
+  createdAt,
+  authorId,
+  likedIds,
   username,
   name,
   profileImage,
   followers,
   isMyPost,
   isFollowing,
-  text,
-  image,
-  createdAt,
-  authorId,
   bio,
   followingIds,
-  likedIds,
   hasLiked,
   replyCount,
   myProfilePic,
@@ -63,49 +63,64 @@ export default function ClientPost({
     id,
     hasLiked
   );
+  const pathname = usePathname();
+  const isProfileReplies = pathname.includes('/with-replies');
 
   return (
     <div
-      className='border-b px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary/50 transition cursor-pointer'
+      className={cn(
+        'px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary/50 transition cursor-pointer',
+        !isProfileReplies ? 'border-b' : 'border-t'
+      )}
       onClick={() => router.push(`/post/${id}`)}
     >
       {isMyPost ? (
-        <Link href={`/${username}`}>
-          <Avatar className='w-10 h-10 darker'>
-            <AvatarImage src={profileImage} alt='profile picture' />
-            <AvatarFallback className='bg-primary/10'>
-              <Skeleton className='rounded-full' />
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <div className=''>
+          <Link href={`/${username}/posts`} className='h-fit'>
+            <Avatar className='w-10 h-10 darker'>
+              <AvatarImage src={profileImage} alt='profile picture' />
+              <AvatarFallback className='bg-primary/10'>
+                <Skeleton className='rounded-full' />
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+          {isProfileReplies && (
+            <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
+          )}
+        </div>
       ) : (
-        <ProfileImage
-          bio={bio}
-          followingIds={followingIds}
-          name={name}
-          username={username}
-          profileImage={profileImage}
-          btnText={btnText}
-          handleMouseOver={handleMouseOver}
-          handleMouseOut={handleMouseOut}
-          optimisticFollowers={optimisticFollowers}
-          optimisticFollow={optimisticFollow}
-          toggleFollow={toggleFollow}
-          isCurrentUser={isMyPost}
-        />
+        <div>
+          <ProfileImage
+            bio={bio}
+            followingIds={followingIds}
+            name={name}
+            username={username}
+            profileImage={profileImage}
+            btnText={btnText}
+            handleMouseOver={handleMouseOver}
+            handleMouseOut={handleMouseOut}
+            optimisticFollowers={optimisticFollowers}
+            optimisticFollow={optimisticFollow}
+            toggleFollow={toggleFollow}
+            isCurrentUser={isMyPost}
+          />
+          {isProfileReplies && (
+            <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
+          )}
+        </div>
       )}
 
       <div className='w-full'>
         <section className='flex text-sm gap-1.5 items-center'>
           <Link
-            href={`/${username}`}
+            href={`/${username}/posts`}
             className='font-bold hover:underline truncate max-w-32 xl:max-w-52'
             onClick={(e) => e.stopPropagation()}
           >
             {name}
           </Link>
           <Link
-            href={`/${username}`}
+            href={`/${username}/posts`}
             className='text-muted-foreground mb-0.5 truncate max-w-32 xl:max-w-52'
             onClick={(e) => e.stopPropagation()}
           >

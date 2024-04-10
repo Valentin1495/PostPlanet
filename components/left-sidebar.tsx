@@ -11,7 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 export default function LeftSidebar({ username }: { username?: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const isProfilePage = pathname === `/${username}`;
+  const isProfilePage = pathname.includes(username as string);
 
   return (
     <nav className='w-1/6 xl:w-1/4 py-5 flex flex-col gap-5 items-center xl:items-start sticky top-0 min-h-screen md:pl-10 xl:pl-24'>
@@ -24,7 +24,7 @@ export default function LeftSidebar({ username }: { username?: string }) {
 
       {sidebarLinks.map((link) => {
         const { activeIcon, href, icon, label } = link;
-        const active = pathname.includes(href);
+        const isActive = pathname.includes(href);
 
         return (
           <Link
@@ -32,11 +32,11 @@ export default function LeftSidebar({ username }: { username?: string }) {
             className='flex items-center gap-2 hover:bg-secondary p-3 rounded-full duration-300 max-w-fit'
             href={href === '/home' ? '/home' : href}
           >
-            {active ? activeIcon : icon}
+            {isActive ? activeIcon : icon}
             <span
               className={cn(
                 'text-lg hidden xl:inline',
-                active && 'font-bold text-primary'
+                isActive && 'font-bold text-primary'
               )}
             >
               {label}
@@ -45,7 +45,7 @@ export default function LeftSidebar({ username }: { username?: string }) {
         );
       })}
       <Link
-        href={`/${username}`}
+        href={`/${username}/posts`}
         className='flex items-center gap-2 hover:bg-secondary p-3 rounded-full duration-300 max-w-fit'
       >
         <CircleUser

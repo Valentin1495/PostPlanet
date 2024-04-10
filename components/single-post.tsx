@@ -81,10 +81,13 @@ export default function SinglePost({
             toggleFollow={toggleFollow}
           />
           <section className='text-sm flex flex-col'>
-            <Link href={`/${username}`} className='font-bold hover:underline'>
+            <Link
+              href={`/${username}/posts`}
+              className='font-bold hover:underline'
+            >
               {name}
             </Link>
-            <Link href={`/${username}`} className='text-muted-foreground'>
+            <Link href={`/${username}/posts`} className='text-muted-foreground'>
               @{username}
             </Link>
           </section>

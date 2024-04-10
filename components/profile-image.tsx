@@ -38,7 +38,7 @@ export default function ProfileImage({
   return (
     <HoverCard>
       <div>
-        <HoverCardTrigger href={`/${username}`}>
+        <HoverCardTrigger href={`/${username}/posts`}>
           <Avatar className='w-10 h-10 darker'>
             <AvatarImage src={profileImage} alt='profile picture' />
             <AvatarFallback className='bg-primary/10'>
@@ -51,7 +51,7 @@ export default function ProfileImage({
           onClick={(e) => e.stopPropagation()}
         >
           <section className='flex justify-between'>
-            <Link href={`/${username}`}>
+            <Link href={`/${username}/posts`}>
               <Avatar className='w-16 h-16 darker'>
                 <AvatarImage src={profileImage} alt='profile picture' />
                 <AvatarFallback className='bg-primary/10'>
@@ -72,13 +72,13 @@ export default function ProfileImage({
 
           <section>
             <Link
-              href={`/${username}`}
+              href={`/${username}/posts`}
               className='text-sm block w-fit font-bold hover:underline'
             >
               {name}
             </Link>
             <Link
-              href={`/${username}`}
+              href={`/${username}/posts`}
               className='text-sm block w-fit text-muted-foreground'
             >
               @{username}

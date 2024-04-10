@@ -1,10 +1,11 @@
 import { readCurrentUser } from '@/actions/user.actions';
 import { redirect } from 'next/navigation';
 import { readAllPosts } from '@/actions/post.actions';
-import FeedTab from '@/components/feed-tab';
+import Tabs from '@/components/tabs';
 import Post from '@/components/post';
 import PostForm from '@/components/post-form';
 import { Post as SinglePost, User } from '@prisma/client';
+import { feedTabItems } from '@/constants';
 
 export default async function Home() {
   const onboardedUser = (await readCurrentUser()) as User;
@@ -17,7 +18,7 @@ export default async function Home() {
 
   return (
     <main className='min-h-screen'>
-      <FeedTab />
+      <Tabs tabItems={feedTabItems} />
       <PostForm isForPost profileImage={profileImage} username={username} />
       {allPosts.map((post) => (
         <Post
@@ -27,7 +28,6 @@ export default async function Home() {
           myProfilePic={profileImage}
         />
       ))}
-      <p className='text-center py-10'>No more posts.</p>
     </main>
   );
 }

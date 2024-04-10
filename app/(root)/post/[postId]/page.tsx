@@ -1,6 +1,10 @@
 import { checkHasLiked, readPost } from '@/actions/post.actions';
-import { readReplies } from '@/actions/reply.action';
-import { readCurrentUser, readUser } from '@/actions/user.actions';
+import { readPostReplies } from '@/actions/reply.action';
+import {
+  countFollowers,
+  readCurrentUser,
+  readUser,
+} from '@/actions/user.actions';
 import Header from '@/components/header';
 import PostForm from '@/components/post-form';
 import Reply from '@/components/reply';
@@ -23,18 +27,20 @@ export default async function PostPage({ params }: PostPageProps) {
   const isFollowing = followingIds.includes(author.id);
   const isMyPost = post.authorId === id;
   const hasLiked = (await checkHasLiked(postId)) as boolean;
-  const replies = (await readReplies(postId)) as SingleReply[];
+  const replies = (await readPostReplies(postId)) as SingleReply[];
+  const followers = await countFollowers(post.authorId);
   const timestamp = getDetailedDate(post.createdAt);
 
   return (
     <main className='min-h-screen'>
-      <Header />
+      <Header isPostPage />
 
       <SinglePost
         {...post}
         {...author}
         id={postId}
         authorId={post.authorId}
+        followers={followers}
         isFollowing={isFollowing}
         isMyPost={isMyPost}
         hasLiked={hasLiked}
