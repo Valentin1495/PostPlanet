@@ -1,5 +1,5 @@
 import { readRepliesWithPost } from '@/actions/reply.action';
-import { readCurrentUser, readUserId } from '@/actions/user.actions';
+import { readUser, readUserId } from '@/actions/user.actions';
 import Post from '@/components/post';
 import Reply from '@/components/reply';
 import { groupRepliesByPost } from '@/lib/utils';
@@ -12,8 +12,8 @@ type ProfileRepliesProps = {
 };
 
 export default async function ProfileReplies({ params }: ProfileRepliesProps) {
-  const { id, profileImage, followingIds } = (await readCurrentUser()) as User;
   const userId = (await readUserId(params.username)) as string;
+  const { id, profileImage, followingIds } = (await readUser(userId)) as User;
   const repliesWithPost = await readRepliesWithPost(userId);
   const repliesByPostId = groupRepliesByPost(repliesWithPost);
 
@@ -24,7 +24,12 @@ export default async function ProfileReplies({ params }: ProfileRepliesProps) {
       {repliesByPostId.map(({ post, replies }) => {
         return (
           <div key={post.id}>
-            <Post {...post} currentUserId={id} myProfilePic={profileImage} />
+            <Post
+              {...post}
+              currentUserId={id}
+              myProfilePic={profileImage}
+              followingIds={followingIds}
+            />
             {replies.map((reply, i) => {
               return (
                 <Reply

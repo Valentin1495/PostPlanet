@@ -3,10 +3,12 @@
 import ProfileImage from './profile-image';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import Link from 'next/link';
-import { cn, getDetailedDate } from '@/lib/utils';
-import { ChatBubble, FilledHeart, Heart } from '@/lib/icons';
+import { cn } from '@/lib/utils';
 import { useToggleLike } from '@/hooks/use-toggle-like';
 import Image from 'next/image';
+import ChatBubble from './icons/chat-bubble';
+import FilledHeart from './icons/filled-heart';
+import Heart from './icons/heart';
 
 type SinglePostProps = {
   id: string;
@@ -20,7 +22,9 @@ type SinglePostProps = {
   name: string;
   bio: string | null;
   profileImage: string;
-  followingIds: string[];
+  myFollowingIds: string[];
+  authorFollowingIds: string[];
+  currentUserId: string;
   followers: number;
   isFollowing: boolean;
   isMyPost: boolean;
@@ -39,7 +43,9 @@ export default function SinglePost({
   name,
   bio,
   profileImage,
-  followingIds,
+  myFollowingIds,
+  authorFollowingIds,
+  currentUserId,
   followers,
   isFollowing,
   isMyPost,
@@ -53,12 +59,13 @@ export default function SinglePost({
     optimisticFollow,
     optimisticFollowers,
     toggleFollow,
-  } = useToggleFollow(followers, authorId, isFollowing);
+  } = useToggleFollow(followers, authorId, currentUserId, myFollowingIds);
 
   const likes = likedIds.length;
   const { optimisticHasLiked, optimisticLikes, toggleLike } = useToggleLike(
     likes,
     id,
+    currentUserId,
     hasLiked
   );
 
@@ -71,7 +78,7 @@ export default function SinglePost({
             name={name}
             username={username}
             bio={bio}
-            followingIds={followingIds}
+            followingIds={authorFollowingIds}
             isCurrentUser={isMyPost}
             btnText={btnText}
             handleMouseOver={handleMouseOver}
@@ -79,6 +86,7 @@ export default function SinglePost({
             optimisticFollow={optimisticFollow}
             optimisticFollowers={optimisticFollowers}
             toggleFollow={toggleFollow}
+            isFollowing={isFollowing}
           />
           <section className='text-sm flex flex-col'>
             <Link

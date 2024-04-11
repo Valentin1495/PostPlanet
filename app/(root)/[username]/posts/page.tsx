@@ -1,5 +1,5 @@
 import { readPosts } from '@/actions/post.actions';
-import { readCurrentUser, readUserId } from '@/actions/user.actions';
+import { readUser, readUserId } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import Post from '@/components/post';
 
@@ -10,8 +10,8 @@ type ProfilePostsProps = {
 };
 
 export default async function ProfilePosts({ params }: ProfilePostsProps) {
-  const { id, profileImage } = (await readCurrentUser()) as User;
   const userId = (await readUserId(params.username)) as string;
+  const { id, profileImage, followingIds } = (await readUser(userId)) as User;
   const posts = await readPosts(userId);
 
   if (!posts.length)
@@ -24,6 +24,7 @@ export default async function ProfilePosts({ params }: ProfilePostsProps) {
           key={post.id}
           currentUserId={id}
           myProfilePic={profileImage}
+          myFollowingIds={followingIds}
         />
       ))}
     </main>

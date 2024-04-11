@@ -1,11 +1,8 @@
 'use server';
 
 import db from '@/lib/db';
-import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
-import { readCurrentUser } from './user.actions';
-import { User } from '@prisma/client';
-import { readRepliesWithPost } from './reply.action';
+import { Post } from '@prisma/client';
 
 export async function createPost(
   prevState: {
@@ -16,14 +13,12 @@ export async function createPost(
   const image = formData.get('fileUrl') as string;
   let text = formData.get('text') as string;
   text = text.trim();
+  const userId = formData.get('userId') as string;
 
   if (!text && !image)
     return {
       message: "There's nothing to post 😢",
     };
-
-  const user = await currentUser();
-  const id = user?.id;
 
   try {
     await db.post.create({
@@ -32,7 +27,7 @@ export async function createPost(
         image,
         author: {
           connect: {
-            id,
+            id: userId,
           },
         },
       },
@@ -106,10 +101,7 @@ export async function countPosts(userId: string) {
   }
 }
 
-export async function readFollowingPosts() {
-  const user = (await readCurrentUser()) as User;
-  const followingIds = user.followingIds;
-
+export async function readFollowingPosts(followingIds: string[]) {
   const postPromises = followingIds.map(async (id) => {
     const promise = await readPosts(id);
     return promise;
@@ -138,20 +130,17 @@ export async function readLikedPosts(userId: string) {
   }
 }
 
-export async function checkHasLiked(postId: string) {
+export async function checkHasLiked(postId: string, userId: string) {
   const post = await readPost(postId);
-  const user = await currentUser();
-
-  const hasLiked = post?.likedIds.includes(user!.id);
+  const hasLiked = post?.likedIds.includes(userId);
 
   return hasLiked;
 }
 
-export async function likePost(postId: string) {
-  const post = await readPost(postId);
-  const user = await currentUser();
-  const likedIds = post?.likedIds;
-  likedIds?.push(user!.id);
+export async function likePost(postId: string, userId: string) {
+  const { likedIds, authorId, text } = (await readPost(postId)) as Post;
+
+  likedIds.push(userId);
 
   try {
     await db.post.update({
@@ -168,12 +157,25 @@ export async function likePost(postId: string) {
   } catch (error: any) {
     throw new Error(error);
   }
+
+  try {
+    await db.activity.create({
+      data: {
+        type: 'like',
+        postId,
+        text,
+        giverId: userId,
+        receiverId: authorId,
+      },
+    });
+  } catch (error: any) {
+    throw new Error(error);
+  }
 }
 
-export async function unlikePost(postId: string) {
+export async function unlikePost(postId: string, userId: string) {
   const post = await readPost(postId);
-  const user = await currentUser();
-  const newLikedIds = post?.likedIds.filter((id) => id !== user?.id);
+  const newLikedIds = post?.likedIds.filter((id) => id !== userId);
 
   try {
     await db.post.update({

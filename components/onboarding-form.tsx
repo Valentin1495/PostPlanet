@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { createUser } from '@/actions/user.actions';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { redirect } from 'next/navigation';
 import { Textarea } from './ui/textarea';
 import UploadBtn from './upload-btn';
@@ -17,6 +17,7 @@ type OnboardingFormProps = {
   imageUrl?: string;
   firstName?: string | null;
   lastName?: string | null;
+  userId: string;
 };
 
 const initialState = {
@@ -27,8 +28,9 @@ export default function OnboardingForm({
   imageUrl,
   firstName,
   lastName,
+  userId,
 }: OnboardingFormProps) {
-  const [state, formAction] = useFormState(createUser, initialState);
+  const [state, onboardUser] = useFormState(createUser, initialState);
   const [fileUrl, setFileUrl] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [name, setName] = useState<string>('');
@@ -53,7 +55,7 @@ export default function OnboardingForm({
       <h1 className='text-2xl text-center font-bold'>Onboarding</h1>
       <p className='mb-3 text-center font-medium'>Welcome to PostPlanet! 🥳</p>
       <form
-        action={formAction}
+        action={onboardUser}
         className='space-y-5 bg-primary/15 px-5 pb-5 pt-2 rounded-md'
       >
         <section className='flex flex-col items-center gap-2.5'>
@@ -108,6 +110,7 @@ export default function OnboardingForm({
             className='outline-none resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
           />
         </section>
+        <Input className='hidden' name='userId' value={userId} readOnly />
         <SubmitButton
           file={fileUrl}
           username={username.trim()}

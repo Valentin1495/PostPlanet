@@ -1,7 +1,6 @@
 'use server';
 
 import db from '@/lib/db';
-import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { faker } from '@faker-js/faker';
@@ -36,12 +35,10 @@ export async function createUser(
   let name = formData.get('name') as string;
   name = name.trim();
   const profileImage = formData.get('fileUrl') as string;
-
-  const user = await currentUser();
-  const id = user?.id;
+  const userId = formData.get('userId') as string;
 
   const parse = schema.safeParse({
-    id,
+    id: userId,
     username,
     bio,
     name,
@@ -88,22 +85,6 @@ export async function createUser(
   }
 }
 
-export async function readCurrentUser() {
-  const user = await currentUser();
-
-  try {
-    const currentUser = await db.user.findUnique({
-      where: {
-        id: user?.id,
-      },
-    });
-
-    return currentUser;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
 export async function readUser(userId: string) {
   try {
     const user = await db.user.findUnique({
@@ -118,40 +99,38 @@ export async function readUser(userId: string) {
   }
 }
 
-export async function readRandomUsers() {
-  const currentUser = await readCurrentUser();
+export async function readRandomUsers(loggedInUser: User) {
+  const { followingIds, id } = loggedInUser;
 
   try {
     const randomUsers = await db.user.findMany();
     const nonFollowers = randomUsers.filter(
-      (user) =>
-        !currentUser?.followingIds.includes(user.id) &&
-        user.id !== currentUser?.id
+      (user) => !followingIds.includes(user.id) && user.id !== id
     );
 
-    return nonFollowers.slice(-10);
+    const promises = nonFollowers.slice(-5).map(async (user) => {
+      const followers = await countFollowers(user.id);
+      return { ...user, followers };
+    });
+
+    const usersWithFollowers = await Promise.all(promises);
+    return usersWithFollowers;
   } catch (error: any) {
     throw new Error(error);
   }
 }
 
-export async function checkFollow(userId: string) {
-  const user = await readCurrentUser();
-  const isFollowing = user?.followingIds.includes(userId);
-
-  return isFollowing;
-}
-
-export async function follow(userId: string) {
-  const user = await readCurrentUser();
-  const id = user?.id;
-  const followingIds = user?.followingIds;
-  followingIds?.push(userId);
+export async function follow(
+  userId: string,
+  currentUserId: string,
+  followingIds: string[]
+) {
+  followingIds.push(userId);
 
   try {
     await db.user.update({
       where: {
-        id,
+        id: currentUserId,
       },
       data: {
         followingIds,
@@ -167,6 +146,14 @@ export async function follow(userId: string) {
       },
     });
 
+    await db.activity.create({
+      data: {
+        giverId: currentUserId,
+        receiverId: userId,
+        type: 'follow',
+      },
+    });
+
     revalidatePath('/home');
     revalidatePath('/post');
   } catch (error: any) {
@@ -174,14 +161,17 @@ export async function follow(userId: string) {
   }
 }
 
-export async function unfollow(userId: string) {
-  const { id, followingIds } = (await readCurrentUser()) as User;
-  const newFollowingIds = followingIds.filter((name) => name !== userId);
+export async function unfollow(
+  userId: string,
+  currentUserId: string,
+  followingIds: string[]
+) {
+  const newFollowingIds = followingIds.filter((id) => id !== userId);
 
   try {
     await db.user.update({
       where: {
-        id,
+        id: currentUserId,
       },
       data: {
         followingIds: newFollowingIds,
@@ -249,13 +239,6 @@ export async function createRandomUsers(userCount: number) {
       bio: faker.lorem.sentence(),
       createdAt: faker.date.past(),
       updatedAt: faker.date.past(),
-      followingIds: [
-        'user_2ZiTE2jqizA7RLyq1QOdw2eiGHu',
-        'user_2edjx2T39LOpGHfvjxesMuFKcFR',
-        'user_2edfm2kvCrndEhpy4fpCqDJg8sy',
-        'user_2ZiXhKpFc36P3SSE5rZm98JKRMf',
-        'user_2eGnPfeYXw69sgZScKvyrOWixhX',
-      ],
       hasActivity: false,
     };
 

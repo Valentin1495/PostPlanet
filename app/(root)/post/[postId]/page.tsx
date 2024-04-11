@@ -1,15 +1,13 @@
 import { checkHasLiked, readPost } from '@/actions/post.actions';
 import { readPostReplies } from '@/actions/reply.action';
-import {
-  countFollowers,
-  readCurrentUser,
-  readUser,
-} from '@/actions/user.actions';
+import { countFollowers, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
 import PostForm from '@/components/post-form';
 import Reply from '@/components/reply';
 import SinglePost from '@/components/single-post';
 import { getDetailedDate } from '@/lib/utils';
+import { currentUser } from '@clerk/nextjs';
+import { User as U } from '@clerk/nextjs/server';
 import { Post, Reply as SingleReply, User } from '@prisma/client';
 
 type PostPageProps = {
@@ -22,11 +20,13 @@ export default async function PostPage({ params }: PostPageProps) {
   const { postId } = params;
   const post = (await readPost(postId)) as Post;
   const author = (await readUser(post.authorId)) as User;
-  const { followingIds, id, profileImage, username } =
-    (await readCurrentUser()) as User;
+  const user = (await currentUser()) as U;
+  const { followingIds, id, profileImage, username } = (await readUser(
+    user.id
+  )) as User;
   const isFollowing = followingIds.includes(author.id);
   const isMyPost = post.authorId === id;
-  const hasLiked = (await checkHasLiked(postId)) as boolean;
+  const hasLiked = (await checkHasLiked(postId, user.id)) as boolean;
   const replies = (await readPostReplies(postId)) as SingleReply[];
   const followers = await countFollowers(post.authorId);
   const timestamp = getDetailedDate(post.createdAt);
@@ -46,6 +46,9 @@ export default async function PostPage({ params }: PostPageProps) {
         hasLiked={hasLiked}
         replyCount={replies.length}
         createdAt={timestamp}
+        currentUserId={id}
+        myFollowingIds={followingIds}
+        authorFollowingIds={author.followingIds}
       />
 
       <PostForm
@@ -53,6 +56,7 @@ export default async function PostPage({ params }: PostPageProps) {
         profileImage={profileImage}
         username={username}
         postId={postId}
+        userId={user.id}
       />
 
       {replies.map((reply) => (

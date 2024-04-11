@@ -16,6 +16,7 @@ type ReplyDialogProps = {
   createdAt: string;
   profileImage: string;
   myProfilePic?: string;
+  userId: string;
 };
 
 export default function ReplyDialog({
@@ -28,6 +29,7 @@ export default function ReplyDialog({
   createdAt,
   profileImage,
   myProfilePic,
+  userId,
 }: ReplyDialogProps) {
   return (
     <Dialog>
@@ -67,6 +69,7 @@ export default function ReplyDialog({
           postId={postId}
           profileImage={myProfilePic}
           username={username}
+          userId={userId}
         />
       </DialogContent>
     </Dialog>

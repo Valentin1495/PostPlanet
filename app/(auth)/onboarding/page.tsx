@@ -1,14 +1,13 @@
-import { readCurrentUser } from '@/actions/user.actions';
 import OnboardingForm from '@/components/onboarding-form';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
+import { User as U } from '@clerk/nextjs/server';
+import { readUser } from '@/actions/user.actions';
+import { User } from '@prisma/client';
 
 export default async function Onboarding() {
-  const onboardedUser = await readCurrentUser();
-  const user = await currentUser();
-  const imageUrl = user?.imageUrl;
-  const firstName = user?.firstName;
-  const lastName = user?.lastName;
+  const { id, imageUrl, firstName, lastName } = (await currentUser()) as U;
+  const onboardedUser = (await readUser(id)) as User;
 
   if (onboardedUser) redirect('/home');
   return (
@@ -17,6 +16,7 @@ export default async function Onboarding() {
         imageUrl={imageUrl}
         firstName={firstName}
         lastName={lastName}
+        userId={id}
       />
     </main>
   );

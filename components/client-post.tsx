@@ -10,7 +10,9 @@ import { Skeleton } from './ui/skeleton';
 import { usePathname, useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import { useToggleLike } from '@/hooks/use-toggle-like';
-import { ChatBubble, FilledHeart, Heart } from '@/lib/icons';
+import ChatBubble from '@/components/icons/chat-bubble';
+import FilledHeart from '@/components/icons/filled-heart';
+import Heart from '@/components/icons/heart';
 import ReplyDialog from './reply-dialog';
 
 export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
@@ -19,14 +21,16 @@ export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   profileImage: string;
   followers: number;
   isMyPost: boolean;
-  isFollowing?: boolean;
   bio: string | null;
-  followingIds: string[];
+  myFollowingIds: string[];
+  authorFollowingIds: string[];
+  currentUserId: string;
   likedIds: string[];
   hasLiked?: boolean;
   replyCount: number;
   createdAt: string;
   myProfilePic?: string;
+  isFollowing: boolean;
 };
 
 export default function ClientPost({
@@ -41,12 +45,14 @@ export default function ClientPost({
   profileImage,
   followers,
   isMyPost,
-  isFollowing,
   bio,
-  followingIds,
+  myFollowingIds,
+  authorFollowingIds,
+  currentUserId,
   hasLiked,
   replyCount,
   myProfilePic,
+  isFollowing,
 }: ClientPostProps) {
   const router = useRouter();
   const {
@@ -56,11 +62,12 @@ export default function ClientPost({
     optimisticFollow,
     optimisticFollowers,
     toggleFollow,
-  } = useToggleFollow(followers, authorId, isFollowing);
+  } = useToggleFollow(followers, authorId, currentUserId, myFollowingIds);
   const likes = likedIds.length;
   const { optimisticHasLiked, optimisticLikes, toggleLike } = useToggleLike(
     likes,
     id,
+    currentUserId,
     hasLiked
   );
   const pathname = usePathname();
@@ -74,41 +81,26 @@ export default function ClientPost({
       )}
       onClick={() => router.push(`/post/${id}`)}
     >
-      {isMyPost ? (
-        <div className=''>
-          <Link href={`/${username}/posts`} className='h-fit'>
-            <Avatar className='w-10 h-10 darker'>
-              <AvatarImage src={profileImage} alt='profile picture' />
-              <AvatarFallback className='bg-primary/10'>
-                <Skeleton className='rounded-full' />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
-          {isProfileReplies && (
-            <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
-          )}
-        </div>
-      ) : (
-        <div>
-          <ProfileImage
-            bio={bio}
-            followingIds={followingIds}
-            name={name}
-            username={username}
-            profileImage={profileImage}
-            btnText={btnText}
-            handleMouseOver={handleMouseOver}
-            handleMouseOut={handleMouseOut}
-            optimisticFollowers={optimisticFollowers}
-            optimisticFollow={optimisticFollow}
-            toggleFollow={toggleFollow}
-            isCurrentUser={isMyPost}
-          />
-          {isProfileReplies && (
-            <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
-          )}
-        </div>
-      )}
+      <div>
+        <ProfileImage
+          bio={bio}
+          followingIds={authorFollowingIds}
+          isFollowing={isFollowing}
+          name={name}
+          username={username}
+          profileImage={profileImage}
+          btnText={btnText}
+          handleMouseOver={handleMouseOver}
+          handleMouseOut={handleMouseOut}
+          optimisticFollowers={optimisticFollowers}
+          optimisticFollow={optimisticFollow}
+          toggleFollow={toggleFollow}
+          isCurrentUser={isMyPost}
+        />
+        {isProfileReplies && (
+          <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
+        )}
+      </div>
 
       <div className='w-full'>
         <section className='flex text-sm gap-1.5 items-center'>
@@ -147,6 +139,7 @@ export default function ClientPost({
             postId={id}
             name={name}
             username={username}
+            userId={currentUserId}
             profileImage={profileImage}
             createdAt={createdAt}
             text={text}

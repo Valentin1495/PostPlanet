@@ -1,4 +1,4 @@
-import { checkFollow, countFollowers, readUser } from '@/actions/user.actions';
+import { countFollowers, readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import ClientPost from './client-post';
 import { checkHasLiked } from '@/actions/post.actions';
@@ -12,8 +12,9 @@ export type PostProps = {
   createdAt: Date;
   likedIds: string[];
   authorId: string;
-  currentUserId?: string;
+  currentUserId: string;
   myProfilePic?: string;
+  myFollowingIds: string[];
 };
 
 export default async function Post({
@@ -25,11 +26,12 @@ export default async function Post({
   authorId,
   currentUserId,
   myProfilePic,
+  myFollowingIds,
 }: PostProps) {
   const author = (await readUser(authorId)) as User;
   const isMyPost = authorId === currentUserId;
-  const isFollowing = await checkFollow(authorId);
-  const hasLiked = await checkHasLiked(id);
+  const hasLiked = await checkHasLiked(id, currentUserId);
+  const isFollowing = myFollowingIds.includes(authorId);
   const replyCount = await countPostReplies(id);
   const followers = await countFollowers(authorId);
   const timestamp = getSimpleDate(createdAt);
@@ -40,7 +42,6 @@ export default async function Post({
       followers={followers}
       authorId={authorId}
       isMyPost={isMyPost}
-      isFollowing={isFollowing}
       id={id}
       text={text}
       image={image}
@@ -49,6 +50,10 @@ export default async function Post({
       hasLiked={hasLiked}
       replyCount={replyCount}
       myProfilePic={myProfilePic}
+      currentUserId={currentUserId}
+      myFollowingIds={myFollowingIds}
+      authorFollowingIds={author.followingIds}
+      isFollowing={isFollowing}
     />
   );
 }

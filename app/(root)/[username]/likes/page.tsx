@@ -1,5 +1,5 @@
 import { readLikedPosts } from '@/actions/post.actions';
-import { readCurrentUser, readUserId } from '@/actions/user.actions';
+import { readUser, readUserId } from '@/actions/user.actions';
 import Post from '@/components/post';
 import { Post as SinglePost, User } from '@prisma/client';
 
@@ -11,7 +11,7 @@ type ProfileLikesProps = {
 
 export default async function ProfileLikes({ params }: ProfileLikesProps) {
   const userId = (await readUserId(params.username)) as string;
-  const { id, profileImage } = (await readCurrentUser()) as User;
+  const { id, profileImage, followingIds } = (await readUser(userId)) as User;
   const likedPosts = (await readLikedPosts(userId)) as SinglePost[];
 
   if (!likedPosts.length)
@@ -24,6 +24,7 @@ export default async function ProfileLikes({ params }: ProfileLikesProps) {
           key={post.id}
           currentUserId={id}
           myProfilePic={profileImage}
+          myFollowingIds={followingIds}
         />
       ))}
     </main>

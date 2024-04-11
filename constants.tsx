@@ -15,8 +15,8 @@ export const sidebarLinks = [
     activeIcon: <Search size='28' strokeWidth='2' className='text-primary' />,
   },
   {
-    label: 'Activity',
-    href: '/activity',
+    label: 'Activities',
+    href: '/activities',
     icon: <Activity size='28' strokeWidth='1.5' />,
     activeIcon: <Activity size='28' strokeWidth='2' className='text-primary' />,
   },

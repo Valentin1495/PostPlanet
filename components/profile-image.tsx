@@ -12,13 +12,14 @@ type ProfileImageProps = {
   username: string;
   bio: string | null;
   followingIds: string[];
-  isCurrentUser: boolean;
+  isCurrentUser?: boolean;
   btnText: string;
   handleMouseOver: () => void;
   handleMouseOut: () => void;
   optimisticFollow?: boolean;
   optimisticFollowers: number;
   toggleFollow: () => Promise<void>;
+  isFollowing: boolean;
 };
 
 export default function ProfileImage({
@@ -34,10 +35,11 @@ export default function ProfileImage({
   optimisticFollow,
   optimisticFollowers,
   toggleFollow,
+  isFollowing,
 }: ProfileImageProps) {
   return (
     <HoverCard>
-      <div>
+      <div className='max-w-fit'>
         <HoverCardTrigger href={`/${username}/posts`}>
           <Avatar className='w-10 h-10 darker'>
             <AvatarImage src={profileImage} alt='profile picture' />

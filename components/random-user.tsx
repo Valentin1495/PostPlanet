@@ -1,7 +1,6 @@
 'use client';
 
 import ProfileImage from './profile-image';
-import { useUser } from '@clerk/nextjs';
 import ToggleFollowButton from './toggle-follow-button';
 import { useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
@@ -12,10 +11,10 @@ type RandomUserProps = {
   name: string;
   id: string;
   bio: string | null;
-  followingIds: string[];
+  myFollowingIds: string[];
+  userFollowingIds: string[];
+  currentUserId: string;
   followers: number;
-} & {
-  isFollowing?: boolean;
 };
 
 export default function RandomUser({
@@ -24,13 +23,15 @@ export default function RandomUser({
   name,
   id,
   bio,
-  followingIds,
+  myFollowingIds,
+  userFollowingIds,
+  currentUserId,
   followers,
-  isFollowing,
 }: RandomUserProps) {
-  const { user } = useUser();
-  const isCurrentUser = user?.id === id;
+  const isCurrentUser = currentUserId === id;
   const router = useRouter();
+  const isFollowing = myFollowingIds.includes(id);
+
   const {
     btnText,
     handleMouseOut,
@@ -38,19 +39,19 @@ export default function RandomUser({
     optimisticFollow,
     optimisticFollowers,
     toggleFollow,
-  } = useToggleFollow(followers, id, isFollowing);
+  } = useToggleFollow(followers, id, currentUserId, myFollowingIds);
 
   return (
     <div
       onClick={() => router.push(`/${username}/posts`)}
-      className='flex items-center gap-2 hover:bg-primary/5 p-3 last:rounded-b-md transition cursor-pointer'
+      className='flex items-center gap-2 hover:bg-slate-300 p-3 last:rounded-b-md transition cursor-pointer'
     >
       <ProfileImage
         profileImage={profileImage}
         username={username}
         name={name}
         bio={bio}
-        followingIds={followingIds}
+        followingIds={userFollowingIds}
         isCurrentUser={isCurrentUser}
         btnText={btnText}
         handleMouseOver={handleMouseOver}
@@ -58,11 +59,12 @@ export default function RandomUser({
         optimisticFollowers={optimisticFollowers}
         optimisticFollow={optimisticFollow}
         toggleFollow={toggleFollow}
+        isFollowing={isFollowing}
       />
 
       <section className='text-xs mr-auto'>
-        <h2 className='font-semibold truncate max-w-28'>{name}</h2>
-        <h3 className='truncate max-w-28'>@{username}</h3>
+        <h2 className='font-semibold truncate max-w-20 xl:max-w-28'>{name}</h2>
+        <h3 className='truncate max-w-20 xl:max-w-28'>@{username}</h3>
       </section>
 
       {!isCurrentUser && (

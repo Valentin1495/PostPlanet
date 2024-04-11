@@ -4,8 +4,10 @@ import { startTransition, useOptimistic, useState } from 'react';
 export function useToggleFollow(
   followers: number,
   userId: string,
-  isFollowing?: boolean
+  currentUserId: string,
+  followingIds: string[]
 ) {
+  const isFollowing = followingIds.includes(userId);
   const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
     followers,
     (state, amount) => state! + Number(amount)
@@ -23,23 +25,20 @@ export function useToggleFollow(
         updateOptimisticFollowers(-1);
         updateOptimisticFollow(false);
       });
-      await unfollow(userId);
+      await unfollow(userId, currentUserId, followingIds);
     } else {
       setBtnText('Unfollow');
       startTransition(() => {
         updateOptimisticFollowers(1);
         updateOptimisticFollow(true);
       });
-      await follow(userId);
+      await follow(userId, currentUserId, followingIds);
     }
   };
 
-  const handleMouseOver = () => {
-    setBtnText('Unfollow');
-  };
-  const handleMouseOut = () => {
-    setBtnText('Following');
-  };
+  const handleMouseOver = () => setBtnText('Unfollow');
+
+  const handleMouseOut = () => setBtnText('Following');
 
   return {
     optimisticFollowers,

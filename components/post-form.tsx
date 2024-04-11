@@ -27,6 +27,7 @@ type PostFormPorps = {
   postId?: string;
   isForDialog?: boolean;
   isForReply?: boolean;
+  userId: string;
 };
 
 export default function PostForm({
@@ -36,11 +37,12 @@ export default function PostForm({
   isForPost,
   isForDialog,
   isForReply,
+  userId,
 }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
-  const [state, formAction] = useFormState(
+  const [state, postAction] = useFormState(
     isForPost ? createPost : replyToPost,
     initialState
   );
@@ -60,7 +62,7 @@ export default function PostForm({
 
   return (
     <form
-      action={formAction}
+      action={postAction}
       className={cn(
         'space-y-2',
         !isForDialog && 'border-b',
@@ -130,6 +132,7 @@ export default function PostForm({
             readOnly
           />
         )}
+        <Input className='hidden' name='userId' value={userId} readOnly />
         <SubmitButton text={text} file={fileUrl} isForPost={isForPost} />
       </div>
     </form>

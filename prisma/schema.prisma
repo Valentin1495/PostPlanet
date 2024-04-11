@@ -14,30 +14,32 @@ datasource db {
 }
 
 model User {
-  id           String     @id @map("_id")
-  username     String     @unique
-  name         String
-  bio          String?
-  profileImage String
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  followingIds String[]   @default([])
-  hasActivity  Boolean    @default(false)
-  posts        Post[]
-  replies      Reply[]
-  actiivities  Activity[]
+  id                 String     @id @map("_id")
+  username           String     @unique
+  name               String
+  bio                String?
+  profileImage       String
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  followingIds       String[]   @default([])
+  hasActivity        Boolean    @default(false)
+  posts              Post[]
+  replies            Reply[]
+  givenActivities    Activity[] @relation(name: "giver")
+  receivedActivities Activity[] @relation(name: "receiver")
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  text      String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  likedIds  String[] @default([])
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  replies   Reply[]
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  text       String?
+  image      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  likedIds   String[]   @default([])
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  replies    Reply[]
+  activities Activity[]
 }
 
 model Reply {
@@ -53,9 +55,14 @@ model Reply {
 }
 
 model Activity {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  body      String
-  username  String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [username], references: [username], onDelete: Cascade)
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime @default(now())
+  postId     String?  @db.ObjectId
+  text       String?
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type       String
+  giverId    String
+  receiverId String
+  giver      User     @relation(name: "giver", fields: [giverId], references: [id], onDelete: Cascade)
+  receiver   User     @relation(name: "receiver", fields: [receiverId], references: [id], onDelete: Cascade)
 }

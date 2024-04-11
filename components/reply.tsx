@@ -38,6 +38,9 @@ export default async function Reply({
       text={text}
       image={image}
       isLast={isLast}
+      currentUserId={currentUserId}
+      myFollowingIds={followingIds}
+      authorFollowingIds={author.followingIds}
     />
   );
 }

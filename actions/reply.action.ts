@@ -1,9 +1,10 @@
 'use server';
 
 import db from '@/lib/db';
-import { currentUser } from '@clerk/nextjs';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { readPost } from './post.actions';
+import { Post } from '@prisma/client';
 
 export async function replyToPost(
   prevState: {
@@ -14,15 +15,15 @@ export async function replyToPost(
   const image = formData.get('fileUrl') as string;
   let text = formData.get('text') as string;
   text = text.trim();
+  const userId = formData.get('userId') as string;
 
   if (!text && !image)
     return {
       message: "There's nothing to reply 😢",
     };
 
-  const user = await currentUser();
-  const id = user?.id;
   const postId = formData.get('postId') as string;
+  const { authorId, text: postText } = (await readPost(postId)) as Post;
   const isForDialog = formData.get('isForDialog') as string;
   let redirectUrl = '';
 
@@ -33,7 +34,7 @@ export async function replyToPost(
         image,
         author: {
           connect: {
-            id,
+            id: userId,
           },
         },
         post: {
@@ -41,6 +42,16 @@ export async function replyToPost(
             id: postId,
           },
         },
+      },
+    });
+
+    await db.activity.create({
+      data: {
+        type: 'reply',
+        giverId: userId,
+        receiverId: authorId,
+        postId,
+        text: postText,
       },
     });
 

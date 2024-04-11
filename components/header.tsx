@@ -4,9 +4,15 @@ type HeaderProps = {
   postCount?: number;
   name?: string;
   isPostPage?: boolean;
+  isActivitiesPage?: boolean;
 };
 
-export default function Header({ postCount, name, isPostPage }: HeaderProps) {
+export default function Header({
+  postCount,
+  name,
+  isPostPage,
+  isActivitiesPage,
+}: HeaderProps) {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -21,6 +27,8 @@ export default function Header({ postCount, name, isPostPage }: HeaderProps) {
     >
       {isPostPage ? (
         <h1 className='text-lg font-bold'>Post</h1>
+      ) : isActivitiesPage ? (
+        <h1 className='text-lg font-bold'>Activities</h1>
       ) : (
         <>
           <h1 className='text-lg font-semibold'>{name}</h1>
