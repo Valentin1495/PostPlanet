@@ -7,6 +7,7 @@ import Link from 'next/link';
 import ToggleFollowButton from './toggle-follow-button';
 
 type ProfileImageProps = {
+  followingPage?: boolean;
   profileImage: string;
   name: string;
   username: string;
@@ -19,10 +20,10 @@ type ProfileImageProps = {
   optimisticFollow?: boolean;
   optimisticFollowers: number;
   toggleFollow: () => Promise<void>;
-  isFollowing: boolean;
 };
 
 export default function ProfileImage({
+  followingPage,
   profileImage,
   name,
   username,
@@ -35,7 +36,6 @@ export default function ProfileImage({
   optimisticFollow,
   optimisticFollowers,
   toggleFollow,
-  isFollowing,
 }: ProfileImageProps) {
   return (
     <HoverCard>
@@ -61,7 +61,7 @@ export default function ProfileImage({
                 </AvatarFallback>
               </Avatar>
             </Link>
-            {!isCurrentUser && (
+            {!isCurrentUser && !followingPage && (
               <ToggleFollowButton
                 btnText={btnText}
                 handleMouseOver={handleMouseOver}

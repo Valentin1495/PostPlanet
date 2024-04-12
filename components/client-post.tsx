@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import ProfileImage from './profile-image';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Skeleton } from './ui/skeleton';
 import { usePathname, useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import { useToggleLike } from '@/hooks/use-toggle-like';
@@ -30,7 +28,6 @@ export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   replyCount: number;
   createdAt: string;
   myProfilePic?: string;
-  isFollowing: boolean;
 };
 
 export default function ClientPost({
@@ -52,7 +49,6 @@ export default function ClientPost({
   hasLiked,
   replyCount,
   myProfilePic,
-  isFollowing,
 }: ClientPostProps) {
   const router = useRouter();
   const {
@@ -85,7 +81,6 @@ export default function ClientPost({
         <ProfileImage
           bio={bio}
           followingIds={authorFollowingIds}
-          isFollowing={isFollowing}
           name={name}
           username={username}
           profileImage={profileImage}

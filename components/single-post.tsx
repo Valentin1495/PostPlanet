@@ -86,7 +86,6 @@ export default function SinglePost({
             optimisticFollow={optimisticFollow}
             optimisticFollowers={optimisticFollowers}
             toggleFollow={toggleFollow}
-            isFollowing={isFollowing}
           />
           <section className='text-sm flex flex-col'>
             <Link

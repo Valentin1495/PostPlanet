@@ -7,7 +7,7 @@ export function useToggleFollow(
   currentUserId: string,
   followingIds: string[]
 ) {
-  const isFollowing = followingIds.includes(userId);
+  const isFollowing = followingIds?.includes(userId);
   const [optimisticFollowers, updateOptimisticFollowers] = useOptimistic(
     followers,
     (state, amount) => state! + Number(amount)

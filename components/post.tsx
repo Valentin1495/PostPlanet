@@ -31,7 +31,6 @@ export default async function Post({
   const author = (await readUser(authorId)) as User;
   const isMyPost = authorId === currentUserId;
   const hasLiked = await checkHasLiked(id, currentUserId);
-  const isFollowing = myFollowingIds.includes(authorId);
   const replyCount = await countPostReplies(id);
   const followers = await countFollowers(authorId);
   const timestamp = getSimpleDate(createdAt);
@@ -53,7 +52,6 @@ export default async function Post({
       currentUserId={currentUserId}
       myFollowingIds={myFollowingIds}
       authorFollowingIds={author.followingIds}
-      isFollowing={isFollowing}
     />
   );
 }

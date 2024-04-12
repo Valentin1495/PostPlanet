@@ -30,7 +30,6 @@ export default function RandomUser({
 }: RandomUserProps) {
   const isCurrentUser = currentUserId === id;
   const router = useRouter();
-  const isFollowing = myFollowingIds.includes(id);
 
   const {
     btnText,
@@ -44,7 +43,7 @@ export default function RandomUser({
   return (
     <div
       onClick={() => router.push(`/${username}/posts`)}
-      className='flex items-center gap-2 hover:bg-slate-300 p-3 last:rounded-b-md transition cursor-pointer'
+      className='flex items-center gap-2 hover:bg-primary/5 p-3 last:rounded-b-md transition cursor-pointer'
     >
       <ProfileImage
         profileImage={profileImage}
@@ -59,7 +58,6 @@ export default function RandomUser({
         optimisticFollowers={optimisticFollowers}
         optimisticFollow={optimisticFollow}
         toggleFollow={toggleFollow}
-        isFollowing={isFollowing}
       />
 
       <section className='text-xs mr-auto'>

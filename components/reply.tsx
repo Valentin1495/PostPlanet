@@ -24,7 +24,6 @@ export default async function Reply({
 }: ReplyProps) {
   const author = (await readUser(authorId)) as User;
   const followers = await countFollowers(authorId);
-  const isFollowing = followingIds.includes(authorId);
   const isCurrentUser = authorId === currentUserId;
   const simpleDate = getSimpleDate(createdAt);
 
@@ -33,7 +32,6 @@ export default async function Reply({
       {...author}
       followers={followers}
       isCurrentUser={isCurrentUser}
-      isFollowing={isFollowing}
       createdAt={simpleDate}
       text={text}
       image={image}

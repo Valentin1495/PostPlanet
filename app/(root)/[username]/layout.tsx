@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import '../../globals.css';
+import '@/app/globals.css';
 import { countPosts } from '@/actions/post.actions';
 import { countFollowers, readUser, readUserId } from '@/actions/user.actions';
 import { User } from '@prisma/client';

@@ -99,6 +99,31 @@ export async function readUser(userId: string) {
   }
 }
 
+export async function readFollowingUsers(userId: string) {
+  const { followingIds } = (await readUser(userId)) as User;
+
+  const promises = followingIds.reverse().map(async (id) => await readUser(id));
+  const followingUsers = await Promise.all(promises);
+
+  return followingUsers;
+}
+
+export async function readFollowers(userId: string) {
+  try {
+    const followers = await db.user.findMany({
+      where: {
+        followingIds: {
+          has: userId,
+        },
+      },
+    });
+
+    return followers;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
 export async function readRandomUsers(loggedInUser: User) {
   const { followingIds, id } = loggedInUser;
 

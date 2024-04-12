@@ -21,7 +21,6 @@ export default async function SingleActivity({
 }: SingleActivityProps) {
   const giver = (await readUser(giverId)) as User;
   const giverFollowers = await countFollowers(giverId);
-  const isFollowing = followingIds.includes(giverId);
 
   return (
     <ClientActivity
@@ -31,7 +30,6 @@ export default async function SingleActivity({
       postId={postId}
       text={text}
       giverFollowers={giverFollowers}
-      isFollowing={isFollowing}
       myFollowingIds={followingIds}
       giverFollowingIds={giver.followingIds}
       {...giver}

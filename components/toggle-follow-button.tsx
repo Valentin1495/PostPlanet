@@ -20,10 +20,13 @@ export default function ToggleFollowButton({
   if (optimisticFollow)
     return (
       <Button
-        variant='secondary'
+        variant='outline'
         size='sm'
         className='rounded-full hover:bg-destructive/10 hover:text-destructive'
-        onClick={toggleFollow}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (toggleFollow) toggleFollow();
+        }}
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
@@ -36,8 +39,8 @@ export default function ToggleFollowButton({
       size='sm'
       className='rounded-full text-white dark:text-black font-semibold bg-black hover:bg-black/75 dark:bg-white/75'
       onClick={(e) => {
-        if (toggleFollow) toggleFollow();
         e.stopPropagation();
+        if (toggleFollow) toggleFollow();
       }}
     >
       Follow

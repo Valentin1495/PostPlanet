@@ -20,11 +20,8 @@ type ClientActivityProps = {
   name: string;
   bio: string | null;
   profileImage: string;
-  createdAt: Date;
   myFollowingIds: string[];
   giverFollowingIds: string[];
-  hasActivity: boolean;
-  isFollowing: boolean;
   text: string | null;
 };
 
@@ -37,12 +34,9 @@ export default function ClientActivity({
   name,
   bio,
   profileImage,
-  createdAt,
   myFollowingIds,
   giverFollowingIds,
   giverFollowers,
-  hasActivity,
-  isFollowing,
   text,
 }: ClientActivityProps) {
   const {
@@ -90,7 +84,6 @@ export default function ClientActivity({
             optimisticFollow={optimisticFollow}
             toggleFollow={toggleFollow}
             isCurrentUser={isGiverReceiver}
-            isFollowing={isFollowing}
           />
 
           <p className='text-sm'>

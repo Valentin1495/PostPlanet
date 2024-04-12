@@ -3,14 +3,11 @@
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import ProfileImage from './profile-image';
 import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Skeleton } from './ui/skeleton';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 type ClientReplyProps = {
-  isFollowing: boolean;
   isCurrentUser: boolean;
   id: string;
   username: string;
@@ -29,7 +26,6 @@ type ClientReplyProps = {
 
 export default function ClientReply({
   isCurrentUser,
-  isFollowing,
   id: authorId,
   username,
   name,
@@ -71,7 +67,6 @@ export default function ClientReply({
           toggleFollow={toggleFollow}
           username={username}
           optimisticFollow={optimisticFollow}
-          isFollowing={isFollowing}
         />
         {isProfileReplies && !isLast && (
           <div className='w-[2px] mx-auto h-full bg-primary/25'></div>
