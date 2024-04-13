@@ -101,6 +101,26 @@ export async function countPosts(userId: string) {
   }
 }
 
+export async function searchPosts(q: string) {
+  let query = q?.trim();
+  query = query.replace(/\s+/g, ' ');
+
+  try {
+    const posts = await db.post.findMany({
+      where: {
+        text: {
+          contains: query,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    return posts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
 export async function readFollowingPosts(followingIds: string[]) {
   const postPromises = followingIds.map(async (id) => {
     const promise = await readPosts(id);

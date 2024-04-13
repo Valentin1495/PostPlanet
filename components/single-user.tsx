@@ -1,4 +1,4 @@
-import { countFollowers, readUser } from '@/actions/user.actions';
+import { countFollowers } from '@/actions/user.actions';
 import ClientUser from './client-user';
 
 export type SingleUserProps = {

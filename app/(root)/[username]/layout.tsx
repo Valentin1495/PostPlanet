@@ -5,7 +5,7 @@ import { countFollowers, readUser, readUserId } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import Header from '@/components/header';
 import ProfileInfo from '@/components/profile-info';
-import Tabs from '@/components/tabs';
+import ProfileTabs from '@/components/profile-tabs';
 import { profileTabItems } from '@/constants';
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function ProfileLayout({
     <div>
       <Header postCount={postCount} name={user.name} isPostPage={false} />
       <ProfileInfo {...user} followers={followers} />
-      <Tabs username={user.username} tabItems={profileTabItems} />
+      <ProfileTabs username={user.username} tabItems={profileTabItems} />
       {children}
     </div>
   );

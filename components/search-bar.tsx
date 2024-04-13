@@ -20,7 +20,7 @@ export default function SearchBar() {
         router.push(`/search?q=${searchQuery}`);
       }}
       className={cn(
-        'rounded-full flex pl-5 pr-1 py-3 items-center border',
+        'rounded-full flex pl-5 pr-1 py-3 items-center border mx-5 mb-5',
         focus
           ? 'bg-background border-primary'
           : 'bg-secondary border-transparent'

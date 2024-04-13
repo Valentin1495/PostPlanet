@@ -1,15 +1,20 @@
 import { redirect } from 'next/navigation';
-import { readAllPosts } from '@/actions/post.actions';
-import Tabs from '@/components/tabs';
+import { readAllPosts, readFollowingPosts } from '@/actions/post.actions';
 import Post from '@/components/post';
 import PostForm from '@/components/post-form';
 import { Post as SinglePost, User } from '@prisma/client';
-import { feedTabItems } from '@/constants';
 import { currentUser } from '@clerk/nextjs';
 import { readUser } from '@/actions/user.actions';
 import { User as U } from '@clerk/nextjs/server';
+import FeedTabs from '@/components/feed-tabs';
 
-export default async function Home() {
+type HomeProps = {
+  searchParams: {
+    f: string;
+  };
+};
+
+export default async function Home({ searchParams }: HomeProps) {
   const user = (await currentUser()) as U;
   const {
     profileImage,
@@ -17,30 +22,41 @@ export default async function Home() {
     username,
     followingIds,
   } = (await readUser(user.id)) as User;
-  const allPosts = (await readAllPosts()) as SinglePost[];
+  let posts;
 
   if (!onboardedUserId) {
     redirect('/onboarding');
   }
 
+  const { f } = searchParams;
+  if (f === 'following') {
+    posts = (await readFollowingPosts(followingIds)) as SinglePost[];
+  } else {
+    posts = (await readAllPosts()) as SinglePost[];
+  }
+
   return (
     <main className='min-h-screen'>
-      <Tabs tabItems={feedTabItems} />
+      <FeedTabs f={f} />
       <PostForm
         isForPost
         profileImage={profileImage}
         username={username}
         userId={onboardedUserId}
       />
-      {allPosts.map((post) => (
-        <Post
-          {...post}
-          key={post.id}
-          currentUserId={onboardedUserId}
-          myProfilePic={profileImage}
-          myFollowingIds={followingIds}
-        />
-      ))}
+      {posts.length ? (
+        posts.map((post) => (
+          <Post
+            {...post}
+            key={post.id}
+            currentUserId={onboardedUserId}
+            myProfilePic={profileImage}
+            myFollowingIds={followingIds}
+          />
+        ))
+      ) : (
+        <p className='text-center py-10'>No posts.</p>
+      )}
     </main>
   );
 }

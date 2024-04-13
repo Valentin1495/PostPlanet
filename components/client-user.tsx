@@ -71,13 +71,15 @@ export default function ClientUser({
               @{username}
             </Link>
           </section>
-          <ToggleFollowButton
-            btnText={btnText}
-            handleMouseOut={handleMouseOut}
-            handleMouseOver={handleMouseOver}
-            optimisticFollow={optimisticFollow}
-            toggleFollow={toggleFollow}
-          />
+          {!isCurrentUser && (
+            <ToggleFollowButton
+              btnText={btnText}
+              handleMouseOut={handleMouseOut}
+              handleMouseOver={handleMouseOver}
+              optimisticFollow={optimisticFollow}
+              toggleFollow={toggleFollow}
+            />
+          )}
         </div>
         {bio && <p className='text-sm'>{bio}</p>}
       </div>

@@ -22,17 +22,6 @@ export const sidebarLinks = [
   },
 ];
 
-export const feedTabItems = [
-  {
-    label: 'For You',
-    path: '/home',
-  },
-  {
-    label: 'Following',
-    path: '/following',
-  },
-];
-
 export const profileTabItems = [
   {
     label: 'Posts',

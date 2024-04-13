@@ -29,11 +29,17 @@ export async function createUser(
   formData: FormData
 ) {
   let username = formData.get('username') as string;
-  username = username.trim();
+  if (username.includes(' ')) {
+    username = username.replace(/ /g, '');
+  }
+
   let bio = formData.get('bio') as string;
   bio = bio.trim();
+
   let name = formData.get('name') as string;
   name = name.trim();
+  name = name.replace(/\s+/g, ' ');
+
   const profileImage = formData.get('fileUrl') as string;
   const userId = formData.get('userId') as string;
 
@@ -286,6 +292,28 @@ export async function readUserId(username: string) {
     });
 
     return user?.id;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function searchPeople(q: string) {
+  let query = q;
+  if (query?.includes(' ')) {
+    query = query.replace(/ /g, '');
+  }
+
+  try {
+    const people = db.user.findMany({
+      where: {
+        username: {
+          contains: query,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    return people;
   } catch (error: any) {
     throw new Error(error);
   }
