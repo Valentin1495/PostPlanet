@@ -9,6 +9,8 @@ import Image from 'next/image';
 import ChatBubble from './icons/chat-bubble';
 import FilledHeart from './icons/filled-heart';
 import Heart from './icons/heart';
+import DeleteDialog from './delete-dialog';
+import { Trash2 } from 'lucide-react';
 
 type SinglePostProps = {
   id: string;
@@ -26,10 +28,10 @@ type SinglePostProps = {
   authorFollowingIds: string[];
   currentUserId: string;
   followers: number;
-  isFollowing: boolean;
   isMyPost: boolean;
   hasLiked: boolean;
   replyCount: number;
+  deletePost: (postId: string) => Promise<void>;
 };
 
 export default function SinglePost({
@@ -47,10 +49,10 @@ export default function SinglePost({
   authorFollowingIds,
   currentUserId,
   followers,
-  isFollowing,
   isMyPost,
   hasLiked,
   replyCount,
+  deletePost,
 }: SinglePostProps) {
   const {
     btnText,
@@ -110,18 +112,18 @@ export default function SinglePost({
 
         <span className='text-sm text-muted-foreground'>{createdAt}</span>
 
-        <section className='-ml-2 flex items-center gap-14 border-y-[0.5px] mt-3.5 py-1.5'>
-          <section className='flex items-center -space-x-1 group w-fit cursor-pointer'>
+        <section className='relative -ml-2 flex items-center gap-14 border-y-[0.5px] mt-3.5 py-1.5 h-12'>
+          <section className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-0'>
             <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
               <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
             </section>
             <span className='text-sm font-medium text-slate-400 group-hover:text-primary transition'>
-              {replyCount}
+              {replyCount ? replyCount : null}
             </span>
           </section>
 
           <section
-            className='flex items-center -space-x-1 group w-fit cursor-pointer'
+            className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'
             onClick={toggleLike}
           >
             <section className='rounded-full p-2 group-hover:bg-rose-500/5 transition'>
@@ -142,6 +144,21 @@ export default function SinglePost({
               {optimisticLikes ? optimisticLikes : null}
             </span>
           </section>
+
+          <DeleteDialog
+            handleClick={(e) => e.stopPropagation()}
+            postId={id}
+            username={username}
+            deletePost={deletePost}
+          >
+            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
+              {isMyPost && (
+                <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
+                  <Trash2 className='w-6 h-6 text-slate-400 group-hover:text-destructive transition' />
+                </section>
+              )}
+            </section>
+          </DeleteDialog>
         </section>
       </div>
     </div>

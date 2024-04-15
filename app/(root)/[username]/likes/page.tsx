@@ -25,6 +25,7 @@ export default async function ProfileLikes({ params }: ProfileLikesProps) {
           currentUserId={id}
           myProfilePic={profileImage}
           myFollowingIds={followingIds}
+          isProfilePage
         />
       ))}
     </main>

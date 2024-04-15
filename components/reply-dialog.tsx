@@ -5,6 +5,7 @@ import { MouseEvent, ReactNode } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import PostForm from './post-form';
+import DialogHide from './dialog-hide';
 
 type ReplyDialogProps = {
   children: ReactNode;
@@ -71,6 +72,8 @@ export default function ReplyDialog({
           username={username}
           userId={userId}
         />
+
+        <DialogHide />
       </DialogContent>
     </Dialog>
   );

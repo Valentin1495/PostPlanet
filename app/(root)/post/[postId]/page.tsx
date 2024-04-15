@@ -1,4 +1,4 @@
-import { checkHasLiked, readPost } from '@/actions/post.actions';
+import { checkHasLiked, deletePost, readPost } from '@/actions/post.actions';
 import { readPostReplies } from '@/actions/reply.action';
 import { countFollowers, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
@@ -9,6 +9,7 @@ import { getDetailedDate } from '@/lib/utils';
 import { currentUser } from '@clerk/nextjs';
 import { User as U } from '@clerk/nextjs/server';
 import { Post, Reply as SingleReply, User } from '@prisma/client';
+import { notFound } from 'next/navigation';
 
 type PostPageProps = {
   params: {
@@ -19,12 +20,15 @@ type PostPageProps = {
 export default async function PostPage({ params }: PostPageProps) {
   const { postId } = params;
   const post = (await readPost(postId)) as Post;
+  if (!post) {
+    notFound();
+  }
+
   const author = (await readUser(post.authorId)) as User;
   const user = (await currentUser()) as U;
   const { followingIds, id, profileImage, username } = (await readUser(
     user.id
   )) as User;
-  const isFollowing = followingIds.includes(author.id);
   const isMyPost = post.authorId === id;
   const hasLiked = (await checkHasLiked(postId, user.id)) as boolean;
   const replies = (await readPostReplies(postId)) as SingleReply[];
@@ -41,7 +45,6 @@ export default async function PostPage({ params }: PostPageProps) {
         id={postId}
         authorId={post.authorId}
         followers={followers}
-        isFollowing={isFollowing}
         isMyPost={isMyPost}
         hasLiked={hasLiked}
         replyCount={replies.length}
@@ -49,6 +52,7 @@ export default async function PostPage({ params }: PostPageProps) {
         currentUserId={id}
         myFollowingIds={followingIds}
         authorFollowingIds={author.followingIds}
+        deletePost={deletePost}
       />
 
       <PostForm

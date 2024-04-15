@@ -12,6 +12,9 @@ import ChatBubble from '@/components/icons/chat-bubble';
 import FilledHeart from '@/components/icons/filled-heart';
 import Heart from '@/components/icons/heart';
 import ReplyDialog from './reply-dialog';
+import { Trash2 } from 'lucide-react';
+import { deletePost } from '@/actions/post.actions';
+import DeleteDialog from './delete-dialog';
 
 export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   username: string;
@@ -28,6 +31,8 @@ export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   replyCount: number;
   createdAt: string;
   myProfilePic?: string;
+  isProfilePage?: boolean;
+  deletePost: (postId: string) => Promise<void>;
 };
 
 export default function ClientPost({
@@ -49,6 +54,8 @@ export default function ClientPost({
   hasLiked,
   replyCount,
   myProfilePic,
+  isProfilePage,
+  deletePost,
 }: ClientPostProps) {
   const router = useRouter();
   const {
@@ -128,7 +135,7 @@ export default function ClientPost({
           )}
         </section>
 
-        <section className='-ml-2 flex items-center gap-14'>
+        <section className='-ml-2 relative h-10'>
           <ReplyDialog
             handleClick={(e) => e.stopPropagation()}
             postId={id}
@@ -140,7 +147,7 @@ export default function ClientPost({
             text={text}
             myProfilePic={myProfilePic}
           >
-            <section className='flex items-center -space-x-1 group w-fit'>
+            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
               <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
                 <ChatBubble chatBubbleProps='w-[18px] h-[18px] text-slate-400 group-hover:text-primary transition' />
               </section>
@@ -151,7 +158,7 @@ export default function ClientPost({
           </ReplyDialog>
 
           <section
-            className='flex items-center -space-x-1 group w-fit'
+            className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 left-1/4'
             onClick={(e) => {
               e.stopPropagation();
               toggleLike();
@@ -175,6 +182,20 @@ export default function ClientPost({
               {optimisticLikes ? optimisticLikes : null}
             </span>
           </section>
+
+          <DeleteDialog
+            handleClick={(e) => e.stopPropagation()}
+            postId={id}
+            deletePost={deletePost}
+          >
+            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
+              {isMyPost && (
+                <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
+                  <Trash2 className='w-[18px] h-[18px] text-slate-400 group-hover:text-destructive transition' />
+                </section>
+              )}
+            </section>
+          </DeleteDialog>
         </section>
       </div>
     </div>

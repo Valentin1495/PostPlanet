@@ -28,7 +28,8 @@ export default async function ProfileReplies({ params }: ProfileRepliesProps) {
               {...post}
               currentUserId={id}
               myProfilePic={profileImage}
-              followingIds={followingIds}
+              myFollowingIds={followingIds}
+              isProfilePage
             />
             {replies.map((reply, i) => {
               return (

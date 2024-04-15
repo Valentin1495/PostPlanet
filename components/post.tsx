@@ -1,7 +1,7 @@
 import { countFollowers, readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import ClientPost from './client-post';
-import { checkHasLiked } from '@/actions/post.actions';
+import { checkHasLiked, deletePost } from '@/actions/post.actions';
 import { countPostReplies } from '@/actions/reply.action';
 import { getSimpleDate } from '@/lib/utils';
 
@@ -15,6 +15,7 @@ export type PostProps = {
   currentUserId: string;
   myProfilePic?: string;
   myFollowingIds: string[];
+  isProfilePage?: boolean;
 };
 
 export default async function Post({
@@ -27,6 +28,7 @@ export default async function Post({
   currentUserId,
   myProfilePic,
   myFollowingIds,
+  isProfilePage,
 }: PostProps) {
   const author = (await readUser(authorId)) as User;
   const isMyPost = authorId === currentUserId;
@@ -52,6 +54,8 @@ export default async function Post({
       currentUserId={currentUserId}
       myFollowingIds={myFollowingIds}
       authorFollowingIds={author.followingIds}
+      isProfilePage={isProfilePage}
+      deletePost={deletePost}
     />
   );
 }

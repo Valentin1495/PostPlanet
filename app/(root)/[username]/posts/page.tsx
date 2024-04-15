@@ -25,6 +25,7 @@ export default async function ProfilePosts({ params }: ProfilePostsProps) {
           currentUserId={id}
           myProfilePic={profileImage}
           myFollowingIds={followingIds}
+          isProfilePage
         />
       ))}
     </main>

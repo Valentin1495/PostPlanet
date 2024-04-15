@@ -15,11 +15,6 @@ export async function createPost(
   text = text.trim();
   const userId = formData.get('userId') as string;
 
-  if (!text && !image)
-    return {
-      message: "There's nothing to post 😢",
-    };
-
   try {
     await db.post.create({
       data: {
@@ -64,6 +59,9 @@ export async function readPosts(userId: string) {
     const posts = await db.post.findMany({
       where: {
         authorId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 
@@ -209,6 +207,20 @@ export async function unlikePost(postId: string, userId: string) {
 
     revalidatePath('/home');
     revalidatePath('/post');
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function deletePost(postId: string) {
+  try {
+    await db.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }
