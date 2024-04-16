@@ -36,7 +36,7 @@ export default async function Home({ searchParams }: HomeProps) {
   }
 
   return (
-    <main className='min-h-screen'>
+    <main className='min-h-screen w-full'>
       <FeedTabs f={f} />
       <PostForm
         isForPost

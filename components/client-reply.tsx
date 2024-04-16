@@ -52,7 +52,7 @@ export default function ClientReply({
   const isProfileReplies = pathname.includes('/with-replies');
 
   return (
-    <div className={cn(!isProfileReplies && 'border-b', 'p-3 flex gap-2')}>
+    <div className='p-3 flex gap-2'>
       <div>
         <ProfileImage
           bio={bio}
@@ -74,7 +74,7 @@ export default function ClientReply({
       </div>
 
       <div className='w-full'>
-        <section className='flex text-sm gap-1.5 items-center'>
+        <section className='flex gap-1.5 items-center'>
           <Link
             href={`/${username}/posts`}
             className='font-bold hover:underline truncate max-w-32 xl:max-w-52'
@@ -94,7 +94,7 @@ export default function ClientReply({
         </section>
 
         <section className='space-y-2'>
-          <p className='text-sm'>{text}</p>
+          <p>{text}</p>
           {image && (
             <article className='relative aspect-video rounded-xl overflow-hidden'>
               <Image src={image} alt='image' fill className='object-cover' />

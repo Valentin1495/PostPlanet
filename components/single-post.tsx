@@ -31,7 +31,6 @@ type SinglePostProps = {
   isMyPost: boolean;
   hasLiked: boolean;
   replyCount: number;
-  deletePost: (postId: string) => Promise<void>;
 };
 
 export default function SinglePost({
@@ -52,7 +51,6 @@ export default function SinglePost({
   isMyPost,
   hasLiked,
   replyCount,
-  deletePost,
 }: SinglePostProps) {
   const {
     btnText,
@@ -102,7 +100,7 @@ export default function SinglePost({
           </section>
         </div>
 
-        <p className='mt-3 text-sm'>{text}</p>
+        <p className='mt-3'>{text}</p>
 
         {image && (
           <section className='relative aspect-video overflow-hidden rounded-xl my-3.5'>
@@ -112,7 +110,7 @@ export default function SinglePost({
 
         <span className='text-sm text-muted-foreground'>{createdAt}</span>
 
-        <section className='relative -ml-2 flex items-center gap-14 border-y-[0.5px] mt-3.5 py-1.5 h-12'>
+        <section className='relative -ml-2 flex items-center gap-14 border-y mt-3.5 py-1.5 h-12'>
           <section className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-0'>
             <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
               <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
@@ -145,12 +143,7 @@ export default function SinglePost({
             </span>
           </section>
 
-          <DeleteDialog
-            handleClick={(e) => e.stopPropagation()}
-            postId={id}
-            username={username}
-            deletePost={deletePost}
-          >
+          <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
             <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
               {isMyPost && (
                 <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>

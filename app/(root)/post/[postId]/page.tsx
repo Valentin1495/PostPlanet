@@ -1,4 +1,4 @@
-import { checkHasLiked, deletePost, readPost } from '@/actions/post.actions';
+import { checkHasLiked, readPost } from '@/actions/post.actions';
 import { readPostReplies } from '@/actions/reply.action';
 import { countFollowers, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
@@ -52,7 +52,6 @@ export default async function PostPage({ params }: PostPageProps) {
         currentUserId={id}
         myFollowingIds={followingIds}
         authorFollowingIds={author.followingIds}
-        deletePost={deletePost}
       />
 
       <PostForm

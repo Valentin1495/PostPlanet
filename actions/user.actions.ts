@@ -173,7 +173,9 @@ export async function follow(
         id: userId,
       },
       data: {
-        hasActivity: true,
+        activities: {
+          increment: 1,
+        },
       },
     });
 

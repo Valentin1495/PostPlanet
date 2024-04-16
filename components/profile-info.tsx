@@ -40,8 +40,8 @@ export default function ProfileInfo({
       </Link>
 
       <section className='text-center'>
-        <h1 className='font-bold text-lg'>{name}</h1>
-        <h2 className='text-muted-foreground text-sm'>@{username}</h2>
+        <h1 className='font-bold text-xl'>{name}</h1>
+        <h2 className='text-muted-foreground'>@{username}</h2>
       </section>
 
       <section className='flex items-center text-muted-foreground text-sm gap-1.5'>

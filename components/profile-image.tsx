@@ -20,6 +20,7 @@ type ProfileImageProps = {
   optimisticFollow?: boolean;
   optimisticFollowers: number;
   toggleFollow: () => Promise<void>;
+  randomUser?: boolean;
 };
 
 export default function ProfileImage({
@@ -36,6 +37,7 @@ export default function ProfileImage({
   optimisticFollow,
   optimisticFollowers,
   toggleFollow,
+  randomUser,
 }: ProfileImageProps) {
   return (
     <HoverCard>
@@ -61,7 +63,7 @@ export default function ProfileImage({
                 </AvatarFallback>
               </Avatar>
             </Link>
-            {!isCurrentUser && !followingPage && (
+            {!isCurrentUser && !followingPage && !randomUser && (
               <ToggleFollowButton
                 btnText={btnText}
                 handleMouseOver={handleMouseOver}
@@ -75,7 +77,7 @@ export default function ProfileImage({
           <section>
             <Link
               href={`/${username}/posts`}
-              className='text-sm block w-fit font-bold hover:underline'
+              className='block w-fit font-bold hover:underline'
             >
               {name}
             </Link>
@@ -85,7 +87,7 @@ export default function ProfileImage({
             >
               @{username}
             </Link>
-            <p className='text-sm my-2'>{bio}</p>
+            <p className='my-2'>{bio}</p>
             <section className='text-sm space-x-5'>
               <span>
                 <span className='font-bold'>{followingIds.length}</span>{' '}

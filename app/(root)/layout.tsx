@@ -23,17 +23,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = (await currentUser()) as U;
-  const { username } = (await readUser(user.id)) as User;
+  const { username, profileImage, id } = (await readUser(user.id)) as User;
 
   return (
     <ClerkProvider>
       <html lang='en'>
         <body className={inter.className}>
-          <div className='max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-6xl mx-auto flex items-start'>
-            <LeftSidebar username={username} />
-            <div className='w-full md:w-2/3 border-l sm:border-r'>
-              {children}
-            </div>
+          <div className='flex items-start lg:pr-24 xl:px-10'>
+            <LeftSidebar
+              username={username}
+              userId={id}
+              profileImage={profileImage}
+            />
+            <div className='flex-item2 border-l sm:border-r'>{children}</div>
             <RightSidebar />
           </div>
           <Toaster />

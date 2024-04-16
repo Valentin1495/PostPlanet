@@ -4,6 +4,7 @@ import ProfileImage from './profile-image';
 import ToggleFollowButton from './toggle-follow-button';
 import { useRouter } from 'next/navigation';
 import { useToggleFollow } from '@/hooks/use-toggle-follow';
+import Link from 'next/link';
 
 type RandomUserProps = {
   profileImage: string;
@@ -46,6 +47,7 @@ export default function RandomUser({
       className='flex items-center gap-2 hover:bg-primary/5 p-3 last:rounded-b-md transition cursor-pointer'
     >
       <ProfileImage
+        randomUser
         profileImage={profileImage}
         username={username}
         name={name}
@@ -60,9 +62,19 @@ export default function RandomUser({
         toggleFollow={toggleFollow}
       />
 
-      <section className='text-xs mr-auto'>
-        <h2 className='font-semibold truncate max-w-20 xl:max-w-28'>{name}</h2>
-        <h3 className='truncate max-w-20 xl:max-w-28'>@{username}</h3>
+      <section className='mr-auto flex flex-col'>
+        <Link
+          href={`/${username}/posts`}
+          className='font-semibold hover:underline truncate max-w-40 xl:max-w-44'
+        >
+          {name}
+        </Link>
+        <Link
+          href={`/${username}/posts`}
+          className='truncate text-sm max-w-40 xl:max-w-44'
+        >
+          @{username}
+        </Link>
       </section>
 
       {!isCurrentUser && (

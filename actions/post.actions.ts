@@ -28,10 +28,10 @@ export async function createPost(
       },
     });
 
-    revalidatePath('/home');
+    revalidatePath('/');
 
     return {
-      message: '',
+      message: 'Success',
     };
   } catch (error) {
     return {

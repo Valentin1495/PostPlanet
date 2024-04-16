@@ -13,7 +13,6 @@ import FilledHeart from '@/components/icons/filled-heart';
 import Heart from '@/components/icons/heart';
 import ReplyDialog from './reply-dialog';
 import { Trash2 } from 'lucide-react';
-import { deletePost } from '@/actions/post.actions';
 import DeleteDialog from './delete-dialog';
 
 export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
@@ -78,10 +77,7 @@ export default function ClientPost({
 
   return (
     <div
-      className={cn(
-        'px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary/50 transition cursor-pointer',
-        !isProfileReplies ? 'border-b' : 'border-t'
-      )}
+      className='px-3 pt-3 pb-0.5 flex gap-2 hover:bg-secondary/50 transition cursor-pointer'
       onClick={() => router.push(`/post/${id}`)}
     >
       <div>
@@ -105,7 +101,7 @@ export default function ClientPost({
       </div>
 
       <div className='w-full'>
-        <section className='flex text-sm gap-1.5 items-center'>
+        <section className='flex gap-1.5 items-center'>
           <Link
             href={`/${username}/posts`}
             className='font-bold hover:underline truncate max-w-32 xl:max-w-52'
@@ -127,7 +123,7 @@ export default function ClientPost({
         </section>
 
         <section className='space-y-2'>
-          <p className='text-sm'>{text}</p>
+          <p>{text}</p>
           {image && (
             <article className='relative aspect-video rounded-xl overflow-hidden'>
               <Image src={image} alt='image' fill />
@@ -183,11 +179,7 @@ export default function ClientPost({
             </span>
           </section>
 
-          <DeleteDialog
-            handleClick={(e) => e.stopPropagation()}
-            postId={id}
-            deletePost={deletePost}
-          >
+          <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
             <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
               {isMyPost && (
                 <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>

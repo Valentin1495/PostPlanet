@@ -20,7 +20,7 @@ export function useToggleFollow(
 
   const toggleFollow = async () => {
     if (optimisticFollow) {
-      setBtnText('Follow');
+      setBtnText('Following');
       startTransition(() => {
         updateOptimisticFollowers(-1);
         updateOptimisticFollow(false);

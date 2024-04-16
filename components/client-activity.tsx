@@ -50,12 +50,12 @@ export default function ClientActivity({
   const follow = type === 'follow';
   const like = type === 'like';
   const router = useRouter();
-  const url = follow ? `/${username}/followers` : `/post/${postId}`;
+  const url = follow ? `/${username}/following` : `/post/${postId}`;
   const isGiverReceiver = giverId === receiverId;
 
   return (
     <div
-      className='border-b p-3 cursor-pointer hover:bg-secondary/50 transition'
+      className='p-3 cursor-pointer hover:bg-secondary/50 transition'
       onClick={() => router.push(url)}
     >
       <div className='flex gap-1.5 items-start'>
@@ -86,7 +86,7 @@ export default function ClientActivity({
             isCurrentUser={isGiverReceiver}
           />
 
-          <p className='text-sm'>
+          <p>
             <span className='font-semibold'>{name}</span>{' '}
             <span className='text-muted-foreground'>
               {' '}

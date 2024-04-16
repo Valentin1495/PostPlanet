@@ -55,7 +55,7 @@ export default function ClientUser({
       />
       <div className='space-y-1.5 w-full'>
         <div className='flex justify-between'>
-          <section className='text-sm flex flex-col'>
+          <section className='flex flex-col text-sm'>
             <Link
               href={`/${username}/posts`}
               onClick={(e) => e.stopPropagation()}
@@ -81,7 +81,7 @@ export default function ClientUser({
             />
           )}
         </div>
-        {bio && <p className='text-sm'>{bio}</p>}
+        {bio && <p>{bio}</p>}
       </div>
     </div>
   );

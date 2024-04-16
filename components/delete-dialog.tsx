@@ -11,21 +11,18 @@ import {
 } from './ui/dialog';
 import DeleteButton from './delete-button';
 import { useRouter } from 'next/navigation';
+import { deletePost } from '@/actions/post.actions';
 
 type DeleteDialogProps = {
   children: ReactNode;
   handleClick: (e: MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
   postId: string;
-  username?: string;
-  deletePost: (postId: string) => Promise<void>;
 };
 
 export default function DeleteDialog({
   children,
   handleClick,
   postId,
-  username,
-  deletePost,
 }: DeleteDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -34,20 +31,20 @@ export default function DeleteDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger onClick={handleClick}>{children}</DialogTrigger>
       <DialogContent className='w-72'>
-        <DialogTitle>Delete post?</DialogTitle>
-        <DialogDescription>
+        <DialogTitle className='text-xl'>Delete post?</DialogTitle>
+        <DialogDescription className='text-muted-foreground'>
           This can’t be undone and it will be removed from your profile, the
           timeline of any accounts that follow you, and from search results.
         </DialogDescription>
         <form
           action={() => {
             deletePost(postId).then(() => setOpen(false));
-            username && router.push(`/${username}/posts`);
+            router.push('/home');
           }}
         >
           <DeleteButton />
         </form>
-        <DialogClose className='rounded-full w-full border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 transition-colors'>
+        <DialogClose className='text-sm font-bold rounded-full w-full border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 transition-colors'>
           Cancel
         </DialogClose>
       </DialogContent>

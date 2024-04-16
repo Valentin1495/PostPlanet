@@ -7,7 +7,7 @@ export default function DeleteButton() {
   return (
     <Button
       type='submit'
-      className='rounded-full w-full'
+      className='rounded-full w-full font-bold'
       variant='destructive'
       disabled={pending}
     >

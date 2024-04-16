@@ -15,7 +15,7 @@ export default function SearchTabs({ f, q }: SearchTabsProps) {
     <div className='flex h-12'>
       <Link
         className={cn(
-          'relative border-b-[0.5px] w-1/2 text-center hover:bg-secondary transition-colors duration-300',
+          'relative border-b w-1/2 text-center hover:bg-secondary transition-colors duration-300',
           !isUserTab ? 'font-bold' : 'font-medium'
         )}
         href={`?q=${q}`}
@@ -29,7 +29,7 @@ export default function SearchTabs({ f, q }: SearchTabsProps) {
       </Link>
       <Link
         className={cn(
-          'relative border-b-[0.5px] w-1/2 text-center hover:bg-secondary transition-colors duration-300',
+          'relative border-b w-1/2 text-center hover:bg-secondary transition-colors duration-300',
           isUserTab ? 'font-bold' : 'font-medium'
         )}
         href={`?q=${q}&f=user`}

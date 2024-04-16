@@ -4,7 +4,7 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { Button } from './ui/button';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useFormState, useFormStatus } from 'react-dom';
 import { X } from 'lucide-react';
@@ -28,6 +28,7 @@ type PostFormPorps = {
   isForDialog?: boolean;
   isForReply?: boolean;
   userId: string;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function PostForm({
@@ -38,27 +39,30 @@ export default function PostForm({
   isForDialog,
   isForReply,
   userId,
+  setOpen,
 }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [fileUrl, setFileUrl] = useState('');
   const [state, postAction] = useFormState(
-    isForPost ? createPost : replyToPost,
+    isForReply ? replyToPost : createPost,
     initialState
   );
 
+  const { message } = state;
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (state.message) {
-      toast(state.message);
-    } else {
+    if (message === 'Success') {
       setText('');
       setFileUrl('');
+      setOpen && setOpen(false);
+    } else if (message) {
+      toast(message);
     }
-  }, [state]);
+  }, [message]);
 
   return (
     <form
@@ -90,11 +94,12 @@ export default function PostForm({
         )}
         {mounted && (
           <TextareaAutosize
-            className='resize-none w-full outline-none my-auto text-lg hide-scrollbar'
+            className='resize-none w-full outline-none my-auto text-xl hide-scrollbar'
             minRows={isForDialog ? 3 : 1}
             placeholder={
-              isForPost ? 'What is happening?!' : 'Post your reply...'
+              isForReply ? 'Post your reply...' : 'What is happening?!'
             }
+            autoFocus
             id='text'
             name='text'
             value={text}
@@ -133,7 +138,7 @@ export default function PostForm({
           />
         )}
         <Input className='hidden' name='userId' value={userId} readOnly />
-        <SubmitButton text={text} file={fileUrl} isForPost={isForPost} />
+        <SubmitButton text={text} file={fileUrl} isForReply={isForReply} />
       </div>
     </form>
   );
@@ -142,24 +147,24 @@ export default function PostForm({
 type SubmitButtonProps = {
   text: string;
   file: string;
-  isForPost?: boolean;
+  isForReply?: boolean;
 };
 
-function SubmitButton({ text, file, isForPost }: SubmitButtonProps) {
+function SubmitButton({ text, file, isForReply }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button
-      className='rounded-full h-8'
+      className='rounded-full h-8 text-base font-semibold'
       disabled={(!text.trim() && !file) || pending}
     >
-      {isForPost
+      {isForReply
         ? pending
-          ? 'Posting...'
-          : 'Post'
+          ? 'Replying...'
+          : 'Reply'
         : pending
-        ? 'Replying...'
-        : 'Reply'}
+        ? 'Posting...'
+        : 'Post'}
     </Button>
   );
 }

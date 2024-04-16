@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef, useState } from 'react';
 
 export default function SearchBar() {
@@ -11,13 +11,19 @@ export default function SearchBar() {
   const [preventBlur, setPreventBlur] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('f');
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (!searchQuery.trim()) return;
-        router.push(`/search?q=${searchQuery}`);
+        router.push(
+          filter
+            ? `/search?q=${searchQuery}&f=user`
+            : `/search?q=${searchQuery}`
+        );
       }}
       className={cn(
         'rounded-full flex pl-5 pr-1 py-3 items-center border mx-5 mb-5',
