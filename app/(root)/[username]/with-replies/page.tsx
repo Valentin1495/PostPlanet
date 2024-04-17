@@ -20,7 +20,7 @@ export async function generateMetadata({
   const { name } = (await readUser(userId)) as User;
 
   return {
-    title: `${name} (@${username}) / PostPlanet `,
+    title: `Posts with replies by ${name} (@${username}) / PostPlanet `,
   };
 }
 

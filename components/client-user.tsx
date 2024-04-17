@@ -59,7 +59,7 @@ export default function ClientUser({
             <Link
               href={`/${username}/posts`}
               onClick={(e) => e.stopPropagation()}
-              className='font-semibold'
+              className='font-semibold hover:underline'
             >
               {name}
             </Link>
