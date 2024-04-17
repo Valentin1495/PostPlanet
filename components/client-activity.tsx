@@ -63,7 +63,7 @@ export default function ClientActivity({
           <User fill='rgb(22 163 74)' strokeWidth={0} size={40} />
         ) : like ? (
           <section>
-            <FilledHeart filledHeartProps='w-10 h-10 text-rose-500' />
+            <FilledHeart filledHeartProps='w-10 h-10 text-rose-700' />
           </section>
         ) : (
           <section>

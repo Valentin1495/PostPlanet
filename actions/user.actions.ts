@@ -187,8 +187,7 @@ export async function follow(
       },
     });
 
-    revalidatePath('/home');
-    revalidatePath('/post');
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -211,8 +210,7 @@ export async function unfollow(
       },
     });
 
-    revalidatePath('/home');
-    revalidatePath('/post');
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -316,6 +314,21 @@ export async function searchPeople(q: string) {
     });
 
     return people;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function resetActivities(userId: string) {
+  try {
+    await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        activities: 0,
+      },
+    });
   } catch (error: any) {
     throw new Error(error);
   }

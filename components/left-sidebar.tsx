@@ -7,8 +7,10 @@ import { CircleUser, LogOut, PenTool } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Button } from './ui/button';
 import PostDialog from './post-dialog';
+import { useEffect, useState } from 'react';
+import { readUser } from '@/actions/user.actions';
+import { User } from '@prisma/client';
 
 type LeftSidebarProps = {
   username?: string;
@@ -24,9 +26,16 @@ export default function LeftSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const isProfilePage = pathname.includes(username as string);
+  const [activityCount, setActivityCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUser = async () => (await readUser(userId)) as User;
+
+    fetchUser().then((user) => setActivityCount(user.activities));
+  }, [pathname]);
 
   return (
-    <nav className='flex flex-col items-end flex-item1 sticky top-0 min-h-screen py-5 md:pr-4 xl:pr-8 max-w-fit px-2.5 sm:px-5 md:max-w-none'>
+    <nav className='flex flex-col items-end sticky top-0 min-h-screen py-5 md:pr-4 xl:pr-8 px-2.5 sm:px-5 lg:w-44 xl:w-[500px]'>
       <div className='flex flex-col gap-5 md:items-end xl:items-start min-h-[calc(100vh-40px)] w-full'>
         <Link
           className='inline-block p-2.5 hover:bg-secondary shadow-secondary rounded-full duration-300'
@@ -39,6 +48,29 @@ export default function LeftSidebar({
           const { activeIcon, href, icon, label } = link;
           const isActive = pathname.includes(href);
 
+          if (label === 'Activities')
+            return (
+              <Link
+                key={label}
+                className='relative flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300 max-w-fit'
+                href={href === '/home' ? '/home' : href}
+              >
+                {isActive ? activeIcon : icon}
+                <span
+                  className={cn(
+                    'text-xl hidden xl:inline',
+                    isActive && 'font-semibold text-primary'
+                  )}
+                >
+                  {label}
+                </span>
+                {activityCount ? (
+                  <span className='rounded-full text-xs w-[18px] h-[18px] text-center leading-[18px] bg-primary text-background absolute top-1 right-0.5 xl:-right-0.5 xl:left-7'>
+                    {activityCount}
+                  </span>
+                ) : null}
+              </Link>
+            );
           return (
             <Link
               key={label}

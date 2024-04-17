@@ -65,13 +65,13 @@ export default function RandomUser({
       <section className='mr-auto flex flex-col'>
         <Link
           href={`/${username}/posts`}
-          className='font-semibold hover:underline truncate max-w-40 xl:max-w-44'
+          className='font-semibold hover:underline truncate lg:max-w-28 xl:max-w-44'
         >
           {name}
         </Link>
         <Link
           href={`/${username}/posts`}
-          className='truncate text-sm max-w-40 xl:max-w-44'
+          className='truncate text-sm lg:max-w-28 xl:max-w-44'
         >
           @{username}
         </Link>

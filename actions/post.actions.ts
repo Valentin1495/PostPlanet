@@ -170,8 +170,7 @@ export async function likePost(postId: string, userId: string) {
       },
     });
 
-    revalidatePath('/home');
-    revalidatePath('/post');
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -184,6 +183,17 @@ export async function likePost(postId: string, userId: string) {
         text,
         giverId: userId,
         receiverId: authorId,
+      },
+    });
+
+    await db.user.update({
+      where: {
+        id: authorId,
+      },
+      data: {
+        activities: {
+          increment: 1,
+        },
       },
     });
   } catch (error: any) {
@@ -205,8 +215,7 @@ export async function unlikePost(postId: string, userId: string) {
       },
     });
 
-    revalidatePath('/home');
-    revalidatePath('/post');
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }

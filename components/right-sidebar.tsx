@@ -10,7 +10,7 @@ export default async function RightSidebar() {
   const randomUsers = await readRandomUsers(loggedInUser);
 
   return (
-    <div className='flex-item3 sticky top-0 pl-8 pt-5 hidden md:block'>
+    <div className='lg:w-[500px] xl:w-[750px] sticky top-0 pl-5 xl:pl-8 pt-5 hidden md:block'>
       <div className='bg-secondary rounded-lg hidden lg:block'>
         <h1 className='font-bold text-xl p-3'>Who to follow</h1>
         <div className='space-y-2'>

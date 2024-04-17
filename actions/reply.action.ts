@@ -55,8 +55,18 @@ export async function replyToPost(
       },
     });
 
-    revalidatePath('/post');
-    revalidatePath('/home');
+    await db.user.update({
+      where: {
+        id: authorId,
+      },
+      data: {
+        activities: {
+          increment: 1,
+        },
+      },
+    });
+
+    revalidatePath('/');
     redirectUrl = `/post/${postId}`;
 
     return {

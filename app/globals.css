@@ -69,46 +69,6 @@
     transition: filter 0.3s;
   }
 
-  .flex-item1 {
-    flex: 1 1 0px;
-  }
-
-  .flex-item2 {
-    flex: 2.5 1 0px;
-  }
-
-  .flex-item3 {
-    flex: 1.5 1 0px;
-  }
-
-  @media (max-width: 1280px) {
-    .flex-item1 {
-      flex: 0.8 1 0px;
-    }
-
-    .flex-item2 {
-      flex: 3 1 0px;
-    }
-
-    .flex-item3 {
-      flex: 1.7 1 0px;
-    }
-  }
-
-  @media (min-width: 768px) and (max-width: 1024px) {
-    .flex-item1 {
-      flex: 1 1 0px;
-    }
-
-    .flex-item2 {
-      flex: 4 1 0px;
-    }
-
-    .flex-item3 {
-      flex: 1 1 0px;
-    }
-  }
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   .hide-scrollbar::-webkit-scrollbar {
     display: none;

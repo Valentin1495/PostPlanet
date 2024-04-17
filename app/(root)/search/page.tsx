@@ -30,14 +30,18 @@ export default async function Search({ searchParams }: SearchProps) {
     return (
       <main>
         <SearchTabs q={q} f={f} />
-        {searchResults.map((user) => (
-          <SingleUser
-            key={user.id}
-            {...user}
-            currentUserId={currentUserId}
-            myFollowingIds={followingIds}
-          />
-        ))}
+        {searchResults.length ? (
+          searchResults.map((user) => (
+            <SingleUser
+              key={user.id}
+              {...user}
+              currentUserId={currentUserId}
+              myFollowingIds={followingIds}
+            />
+          ))
+        ) : (
+          <p className='text-center mt-10 text-lg'>No results.</p>
+        )}
       </main>
     );
   }
@@ -48,15 +52,19 @@ export default async function Search({ searchParams }: SearchProps) {
     return (
       <main>
         <SearchTabs q={q} f={f} />
-        {searchResults.map((post) => (
-          <Post
-            key={post.id}
-            {...post}
-            currentUserId={currentUserId}
-            myProfilePic={profileImage}
-            myFollowingIds={followingIds}
-          />
-        ))}
+        {searchResults.length ? (
+          searchResults.map((post) => (
+            <Post
+              key={post.id}
+              {...post}
+              currentUserId={currentUserId}
+              myProfilePic={profileImage}
+              myFollowingIds={followingIds}
+            />
+          ))
+        ) : (
+          <p className='text-center mt-10 text-lg'>No results.</p>
+        )}
       </main>
     );
   }

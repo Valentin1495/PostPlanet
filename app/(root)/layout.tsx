@@ -29,13 +29,13 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang='en'>
         <body className={inter.className}>
-          <div className='flex items-start lg:pr-24 xl:px-10'>
+          <div className='flex items-start max-w-3xl lg:max-w-6xl xl:max-w-7xl mx-auto lg:pr-8 xl:px-5'>
             <LeftSidebar
               username={username}
               userId={id}
               profileImage={profileImage}
             />
-            <div className='flex-item2 border-l sm:border-r'>{children}</div>
+            <div className='w-full border-l sm:border-r'>{children}</div>
             <RightSidebar />
           </div>
           <Toaster />

@@ -124,18 +124,18 @@ export default function SinglePost({
             className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'
             onClick={toggleLike}
           >
-            <section className='rounded-full p-2 group-hover:bg-rose-500/5 transition'>
+            <section className='rounded-full p-2 group-hover:bg-rose-700/10 transition'>
               {optimisticHasLiked ? (
-                <FilledHeart filledHeartProps='w-6 h-6 text-rose-500' />
+                <FilledHeart filledHeartProps='w-6 h-6 text-rose-700' />
               ) : (
-                <Heart heartProps='w-6 h-6 text-slate-400 group-hover:text-rose-500 transition' />
+                <Heart heartProps='w-6 h-6 text-slate-400 group-hover:text-rose-700 transition' />
               )}
             </section>
             <span
               className={cn(
                 optimisticHasLiked
-                  ? 'text-rose-500'
-                  : 'group-hover:text-rose-500 transition',
+                  ? 'text-rose-700'
+                  : 'group-hover:text-rose-700 transition',
                 'text-sm font-medium'
               )}
             >

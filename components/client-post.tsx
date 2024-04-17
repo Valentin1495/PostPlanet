@@ -160,18 +160,18 @@ export default function ClientPost({
               toggleLike();
             }}
           >
-            <section className='rounded-full p-2 group-hover:bg-rose-500/5 transition'>
+            <section className='rounded-full p-2 group-hover:bg-rose-700/10 transition'>
               {optimisticHasLiked ? (
-                <FilledHeart filledHeartProps='w-[18px] h-[18px] text-rose-500' />
+                <FilledHeart filledHeartProps='w-[18px] h-[18px] text-rose-700' />
               ) : (
-                <Heart heartProps='w-[18px] h-[18px] text-slate-400 group-hover:text-rose-500 transition' />
+                <Heart heartProps='w-[18px] h-[18px] text-slate-400 group-hover:text-rose-700 transition' />
               )}
             </section>
             <span
               className={cn(
                 optimisticHasLiked
-                  ? 'text-rose-500'
-                  : 'group-hover:text-rose-500 transition',
+                  ? 'text-rose-700'
+                  : 'group-hover:text-rose-700 transition',
                 'text-sm font-medium'
               )}
             >
