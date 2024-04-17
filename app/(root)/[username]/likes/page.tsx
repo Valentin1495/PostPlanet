@@ -2,12 +2,25 @@ import { readLikedPosts } from '@/actions/post.actions';
 import { readUser, readUserId } from '@/actions/user.actions';
 import Post from '@/components/post';
 import { Post as SinglePost, User } from '@prisma/client';
+import { Metadata } from 'next';
 
 type ProfileLikesProps = {
   params: {
     username: string;
   };
 };
+
+export async function generateMetadata({
+  params,
+}: ProfileLikesProps): Promise<Metadata> {
+  const { username } = params;
+  const userId = (await readUserId(username)) as string;
+  const { name } = (await readUser(userId)) as User;
+
+  return {
+    title: `${name} (@${username}) / PostPlanet `,
+  };
+}
 
 export default async function ProfileLikes({ params }: ProfileLikesProps) {
   const userId = (await readUserId(params.username)) as string;

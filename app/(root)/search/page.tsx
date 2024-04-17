@@ -6,13 +6,32 @@ import { User as U } from '@clerk/nextjs/server';
 import { searchPosts } from '@/actions/post.actions';
 import Post from '@/components/post';
 import SearchTabs from '@/components/search-tabs';
+import { Metadata } from 'next';
 
 type SearchProps = {
   searchParams: {
-    q: string;
-    f: string;
+    q?: string;
+    f?: string;
   };
 };
+
+export async function generateMetadata({
+  searchParams,
+}: SearchProps): Promise<Metadata> {
+  const { q } = searchParams;
+
+  if (!q)
+    return {
+      title: 'Search / PostPlanet',
+    };
+
+  let query = q.trim();
+  query = query.replace(/\s+/g, ' ');
+
+  return {
+    title: `${query} - Search / PostPlanet`,
+  };
+}
 
 export default async function Search({ searchParams }: SearchProps) {
   const { q, f } = searchParams;
@@ -25,11 +44,11 @@ export default async function Search({ searchParams }: SearchProps) {
   let searchResults;
 
   if (f === 'user') {
-    searchResults = (await searchPeople(q)) as User[];
+    searchResults = (await searchPeople(q as string)) as User[];
 
     return (
       <main>
-        <SearchTabs q={q} f={f} />
+        <SearchTabs q={q as string} f={f} />
         {searchResults.length ? (
           searchResults.map((user) => (
             <SingleUser

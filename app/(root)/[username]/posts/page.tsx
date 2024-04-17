@@ -2,12 +2,25 @@ import { readPosts } from '@/actions/post.actions';
 import { readUser, readUserId } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import Post from '@/components/post';
+import { Metadata } from 'next';
 
 type ProfilePostsProps = {
   params: {
     username: string;
   };
 };
+
+export async function generateMetadata({
+  params,
+}: ProfilePostsProps): Promise<Metadata> {
+  const { username } = params;
+  const userId = (await readUserId(username)) as string;
+  const { name } = (await readUser(userId)) as User;
+
+  return {
+    title: `${name} (@${username}) / PostPlanet `,
+  };
+}
 
 export default async function ProfilePosts({ params }: ProfilePostsProps) {
   const userId = (await readUserId(params.username)) as string;

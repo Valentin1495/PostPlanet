@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 type SearchTabsProps = {
-  f: string;
+  f?: string;
   q: string;
 };
 

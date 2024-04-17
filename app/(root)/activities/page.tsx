@@ -5,6 +5,11 @@ import SingleActivity from '@/components/single-activity';
 import { currentUser } from '@clerk/nextjs';
 import { User as U } from '@clerk/nextjs/server';
 import { readUser, resetActivities } from '@/actions/user.actions';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Activities / PostPlanet',
+};
 
 export default async function Activities() {
   const user = (await currentUser()) as U;

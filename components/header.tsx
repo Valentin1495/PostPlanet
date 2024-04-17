@@ -43,7 +43,9 @@ export default function Header({
         ) : (
           <>
             <h1 className='text-xl font-semibold'>{name}</h1>
-            <h3 className='text-sm text-muted-foreground'>{postCount} posts</h3>
+            <h3 className='text-sm text-muted-foreground'>
+              {postCount} {postCount === 1 ? 'post' : 'posts'}
+            </h3>
           </>
         )}
       </section>

@@ -52,7 +52,7 @@ export default function ClientReply({
   const isProfileReplies = pathname.includes('/with-replies');
 
   return (
-    <div className='p-3 flex gap-2'>
+    <div className='p-3 flex gap-2 last:border-b'>
       <div>
         <ProfileImage
           bio={bio}

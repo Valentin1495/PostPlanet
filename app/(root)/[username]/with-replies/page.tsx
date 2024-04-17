@@ -4,12 +4,25 @@ import Post from '@/components/post';
 import Reply from '@/components/reply';
 import { groupRepliesByPost } from '@/lib/utils';
 import { User } from '@prisma/client';
+import { Metadata } from 'next';
 
 type ProfileRepliesProps = {
   params: {
     username: string;
   };
 };
+
+export async function generateMetadata({
+  params,
+}: ProfileRepliesProps): Promise<Metadata> {
+  const { username } = params;
+  const userId = (await readUserId(username)) as string;
+  const { name } = (await readUser(userId)) as User;
+
+  return {
+    title: `${name} (@${username}) / PostPlanet `,
+  };
+}
 
 export default async function ProfileReplies({ params }: ProfileRepliesProps) {
   const userId = (await readUserId(params.username)) as string;

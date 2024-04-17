@@ -7,12 +7,26 @@ import SingleUser from '@/components/single-user';
 import { currentUser } from '@clerk/nextjs';
 import { User } from '@prisma/client';
 import { User as U } from '@clerk/nextjs/server';
+import { Metadata } from 'next';
 
 type FollowingProps = {
   params: {
     username: string;
   };
 };
+
+export async function generateMetadata({
+  params,
+}: FollowingProps): Promise<Metadata> {
+  const { username } = params;
+  const userId = (await readUserId(username)) as string;
+  const { name } = (await readUser(userId)) as User;
+
+  return {
+    title: `${name} (@${username}) / PostPlanet `,
+  };
+}
+
 export default async function Following({ params }: FollowingProps) {
   const { id } = (await currentUser()) as U;
   const { followingIds } = (await readUser(id)) as User;

@@ -140,6 +140,9 @@ export async function readLikedPosts(userId: string) {
           has: userId,
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     return likedPosts;
