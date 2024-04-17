@@ -32,7 +32,7 @@ export default function LeftSidebar({
     const fetchUser = async () => (await readUser(userId)) as User;
 
     fetchUser().then((user) => setActivityCount(user.activities));
-  }, [pathname]);
+  }, [pathname, userId]);
 
   return (
     <nav className='flex flex-col items-end sticky top-0 min-h-screen py-5 md:pr-4 xl:pr-8 px-2.5 sm:px-5 lg:w-44 xl:w-[500px]'>
@@ -114,14 +114,12 @@ export default function LeftSidebar({
           <PenTool size='28' strokeWidth='1.5' className='text-background' />
         </PostDialog>
         <div className='mt-auto max-w-fit cursor-pointer'>
-          <SignedIn>
-            <SignOutButton signOutCallback={() => router.push('/sign-in')}>
-              <div className='flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300'>
-                <LogOut size='28' strokeWidth='1.5' />
-                <span className='text-xl hidden xl:inline'>Log out</span>
-              </div>
-            </SignOutButton>
-          </SignedIn>
+          <SignOutButton signOutCallback={() => router.push('/sign-in')}>
+            <div className='flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300'>
+              <LogOut size='28' strokeWidth='1.5' />
+              <span className='text-xl hidden xl:inline'>Log out</span>
+            </div>
+          </SignOutButton>
         </div>
       </div>
     </nav>

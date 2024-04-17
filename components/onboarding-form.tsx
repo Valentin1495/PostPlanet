@@ -41,13 +41,13 @@ export default function OnboardingForm({
   useEffect(() => {
     const defaultName = firstName && lastName ? `${firstName} ${lastName}` : '';
     setName(defaultName);
-  }, []);
+  }, [firstName, lastName]);
 
   useEffect(() => {
     if (onboardingFailed) {
       toast(state.message);
     }
-  }, [state]);
+  }, [state, onboardingFailed]);
 
   if (onboarded) redirect('/home');
   return (

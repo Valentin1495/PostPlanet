@@ -62,7 +62,7 @@ export default function PostForm({
     } else if (message) {
       toast(message);
     }
-  }, [message]);
+  }, [message, setOpen]);
 
   return (
     <form
