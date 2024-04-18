@@ -1,7 +1,7 @@
 'use client';
 
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { MouseEvent, ReactNode } from 'react';
+import { MouseEvent, ReactNode, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import PostForm from './post-form';
@@ -32,8 +32,10 @@ export default function ReplyDialog({
   myProfilePic,
   userId,
 }: ReplyDialogProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger onClick={handleClick}>{children}</DialogTrigger>
       <DialogContent className='flex flex-col'>
         <div className='flex gap-2'>
@@ -67,10 +69,12 @@ export default function ReplyDialog({
 
         <PostForm
           isForDialog
+          isForReply
           postId={postId}
           profileImage={myProfilePic}
           username={username}
           userId={userId}
+          setOpen={setOpen}
         />
 
         <DialogHide />

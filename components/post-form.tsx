@@ -48,8 +48,8 @@ export default function PostForm({
     isForReply ? replyToPost : createPost,
     initialState
   );
-
   const { message } = state;
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -71,7 +71,7 @@ export default function PostForm({
         'space-y-2',
         !isForDialog && 'border-b',
         isForPost && 'p-3',
-        isForReply && 'pb-3 pt-1.5 px-3'
+        isForReply && !isForDialog && 'pb-3 pt-1.5 px-3'
       )}
     >
       <section className='flex gap-2'>

@@ -6,8 +6,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Trash2 } from 'lucide-react';
+import DeleteDialog from './delete-dialog';
 
 type ClientReplyProps = {
+  replyId: string;
   isCurrentUser: boolean;
   id: string;
   username: string;
@@ -25,6 +28,7 @@ type ClientReplyProps = {
 };
 
 export default function ClientReply({
+  replyId,
   isCurrentUser,
   id: authorId,
   username,
@@ -50,9 +54,12 @@ export default function ClientReply({
   } = useToggleFollow(followers, authorId, currentUserId, myFollowingIds);
   const pathname = usePathname();
   const isProfileReplies = pathname.includes('/with-replies');
+  const isMyReply = authorId === currentUserId;
 
   return (
-    <div className='p-3 flex gap-2 last:border-b'>
+    <div
+      className={cn('p-3 flex gap-2', isProfileReplies && isLast && 'border-b')}
+    >
       <div>
         <ProfileImage
           bio={bio}
@@ -88,9 +95,21 @@ export default function ClientReply({
             @{username}
           </Link>
           <span className='text-muted-foreground mb-0.5'>·</span>
-          <span className='text-muted-foreground mb-0.5 min-w-fit'>
+          <span className='text-muted-foreground mb-0.5 min-w-fit mr-auto'>
             {createdAt}
           </span>
+
+          {isMyReply && (
+            <DeleteDialog
+              handleClick={(e) => e.stopPropagation()}
+              postId={replyId}
+              forReply
+            >
+              <section className='hover:text-destructive text-slate-400 transition hover:bg-destructive/10 p-1.5 rounded-full'>
+                <Trash2 size={16} />
+              </section>
+            </DeleteDialog>
+          )}
         </section>
 
         <section className='space-y-2'>

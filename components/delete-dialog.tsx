@@ -12,17 +12,20 @@ import {
 import DeleteButton from './delete-button';
 import { useRouter } from 'next/navigation';
 import { deletePost } from '@/actions/post.actions';
+import { deleteReply } from '@/actions/reply.action';
 
 type DeleteDialogProps = {
   children: ReactNode;
   handleClick: (e: MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
   postId: string;
+  forReply?: boolean;
 };
 
 export default function DeleteDialog({
   children,
   handleClick,
   postId,
+  forReply,
 }: DeleteDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -38,8 +41,12 @@ export default function DeleteDialog({
         </DialogDescription>
         <form
           action={() => {
-            deletePost(postId).then(() => setOpen(false));
-            router.push('/home');
+            if (forReply) {
+              deleteReply(postId).then(() => setOpen(false));
+            } else {
+              deletePost(postId).then(() => setOpen(false));
+              router.push('/home');
+            }
           }}
         >
           <DeleteButton />

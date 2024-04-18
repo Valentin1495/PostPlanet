@@ -5,10 +5,11 @@ import Header from '@/components/header';
 import PostForm from '@/components/post-form';
 import Reply from '@/components/reply';
 import SinglePost from '@/components/single-post';
-import { getDetailedDate } from '@/lib/utils';
+import { getDetailedDate, getSimpleDate } from '@/lib/utils';
 import { currentUser } from '@clerk/nextjs';
 import { User as U } from '@clerk/nextjs/server';
 import { Post, Reply as SingleReply, User } from '@prisma/client';
+import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 type PostPageProps = {
@@ -16,6 +17,22 @@ type PostPageProps = {
     postId: string;
   };
 };
+
+export async function generateMetadata({
+  params,
+}: PostPageProps): Promise<Metadata> {
+  const { postId } = params;
+  const { text, authorId, image } = (await readPost(postId)) as Post;
+  const { name } = (await readUser(authorId)) as User;
+
+  if (!text)
+    return {
+      title: `${name} on PostPlanet: "${image}" / PostPlanet`,
+    };
+  return {
+    title: `${name} on PostPlanet: "${text}" / PostPlanet`,
+  };
+}
 
 export default async function PostPage({ params }: PostPageProps) {
   const { postId } = params;
@@ -34,6 +51,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const replies = (await readPostReplies(postId)) as SingleReply[];
   const followers = await countFollowers(post.authorId);
   const timestamp = getDetailedDate(post.createdAt);
+  const simpleTimestamp = getSimpleDate(post.createdAt);
 
   return (
     <main className='min-h-screen'>
@@ -49,9 +67,11 @@ export default async function PostPage({ params }: PostPageProps) {
         hasLiked={hasLiked}
         replyCount={replies.length}
         createdAt={timestamp}
+        simpleCreatedAt={simpleTimestamp}
         currentUserId={id}
         myFollowingIds={followingIds}
         authorFollowingIds={author.followingIds}
+        myProfilePic={profileImage}
       />
 
       <PostForm

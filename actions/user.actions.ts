@@ -168,17 +168,6 @@ export async function follow(
       },
     });
 
-    await db.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        activities: {
-          increment: 1,
-        },
-      },
-    });
-
     await db.activity.create({
       data: {
         giverId: currentUserId,
@@ -314,21 +303,6 @@ export async function searchPeople(q: string) {
     });
 
     return people;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function resetActivities(userId: string) {
-  try {
-    await db.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        activities: 0,
-      },
-    });
   } catch (error: any) {
     throw new Error(error);
   }

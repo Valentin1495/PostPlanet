@@ -188,17 +188,6 @@ export async function likePost(postId: string, userId: string) {
         receiverId: authorId,
       },
     });
-
-    await db.user.update({
-      where: {
-        id: authorId,
-      },
-      data: {
-        activities: {
-          increment: 1,
-        },
-      },
-    });
   } catch (error: any) {
     throw new Error(error);
   }

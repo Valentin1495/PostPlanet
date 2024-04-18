@@ -2,7 +2,6 @@
 
 import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { readPost } from './post.actions';
 import { Post } from '@prisma/client';
 
@@ -24,8 +23,6 @@ export async function replyToPost(
 
   const postId = formData.get('postId') as string;
   const { authorId, text: postText } = (await readPost(postId)) as Post;
-  const isForDialog = formData.get('isForDialog') as string;
-  let redirectUrl = '';
 
   try {
     await db.reply.create({
@@ -55,29 +52,15 @@ export async function replyToPost(
       },
     });
 
-    await db.user.update({
-      where: {
-        id: authorId,
-      },
-      data: {
-        activities: {
-          increment: 1,
-        },
-      },
-    });
-
     revalidatePath('/');
-    redirectUrl = `/post/${postId}`;
 
     return {
-      message: '',
+      message: 'Success',
     };
   } catch (error: any) {
     return {
       message: 'Failed to reply 😢',
     };
-  } finally {
-    if (redirectUrl && isForDialog === 'true') redirect(redirectUrl);
   }
 }
 
@@ -114,6 +97,20 @@ export async function readRepliesWithPost(userId: string) {
     });
 
     return repliesWithPost;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function deleteReply(replyId: string) {
+  try {
+    await db.reply.delete({
+      where: {
+        id: replyId,
+      },
+    });
+
+    revalidatePath('/');
   } catch (error: any) {
     throw new Error(error);
   }

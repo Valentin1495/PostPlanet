@@ -11,12 +11,14 @@ import FilledHeart from './icons/filled-heart';
 import Heart from './icons/heart';
 import DeleteDialog from './delete-dialog';
 import { Trash2 } from 'lucide-react';
+import ReplyDialog from './reply-dialog';
 
 type SinglePostProps = {
   id: string;
   text: string | null;
   image: string | null;
   createdAt: string;
+  simpleCreatedAt: string;
   updatedAt: Date;
   likedIds: string[];
   authorId: string;
@@ -31,12 +33,14 @@ type SinglePostProps = {
   isMyPost: boolean;
   hasLiked: boolean;
   replyCount: number;
+  myProfilePic: string;
 };
 
 export default function SinglePost({
   id,
   text,
   image,
+  simpleCreatedAt,
   createdAt,
   likedIds,
   authorId,
@@ -51,6 +55,7 @@ export default function SinglePost({
   isMyPost,
   hasLiked,
   replyCount,
+  myProfilePic,
 }: SinglePostProps) {
   const {
     btnText,
@@ -111,14 +116,26 @@ export default function SinglePost({
         <span className='text-sm text-muted-foreground'>{createdAt}</span>
 
         <section className='relative -ml-2 flex items-center gap-14 border-y mt-3.5 py-1.5 h-12'>
-          <section className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-0'>
-            <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
-              <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
+          <ReplyDialog
+            handleClick={(e) => e.stopPropagation()}
+            postId={id}
+            name={name}
+            username={username}
+            userId={currentUserId}
+            profileImage={profileImage}
+            createdAt={simpleCreatedAt}
+            text={text}
+            myProfilePic={myProfilePic}
+          >
+            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
+              <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
+                <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
+              </section>
+              <span className='text-sm font-medium group-hover:text-primary transition'>
+                {replyCount ? replyCount : null}
+              </span>
             </section>
-            <span className='text-sm font-medium text-slate-400 group-hover:text-primary transition'>
-              {replyCount ? replyCount : null}
-            </span>
-          </section>
+          </ReplyDialog>
 
           <section
             className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'

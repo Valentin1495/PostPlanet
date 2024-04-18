@@ -4,6 +4,7 @@ import { countFollowers, readUser } from '@/actions/user.actions';
 import { getSimpleDate } from '@/lib/utils';
 
 type ReplyProps = {
+  id: string;
   text: string | null;
   image: string | null;
   createdAt: Date;
@@ -14,6 +15,7 @@ type ReplyProps = {
 };
 
 export default async function Reply({
+  id,
   authorId,
   followingIds,
   currentUserId,
@@ -29,6 +31,7 @@ export default async function Reply({
 
   return (
     <ClientReply
+      replyId={id}
       {...author}
       followers={followers}
       isCurrentUser={isCurrentUser}

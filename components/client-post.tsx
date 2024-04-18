@@ -179,15 +179,15 @@ export default function ClientPost({
             </span>
           </section>
 
-          <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
-            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
-              {isMyPost && (
+          {isMyPost && (
+            <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
+              <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
                 <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
                   <Trash2 className='w-[18px] h-[18px] text-slate-400 group-hover:text-destructive transition' />
                 </section>
-              )}
-            </section>
-          </DeleteDialog>
+              </section>
+            </DeleteDialog>
+          )}
         </section>
       </div>
     </div>
