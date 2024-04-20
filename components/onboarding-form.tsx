@@ -133,10 +133,18 @@ function SubmitButton({ file, username, name }: SubmitButtonProps) {
   return (
     <Button
       type='submit'
-      className='w-full'
+      className='w-[66px]'
       disabled={pending || !username || !name || !file}
     >
-      {pending ? 'Saving...' : 'Save'}
+      {pending ? (
+        <span className='pending'>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      ) : (
+        'Save'
+      )}
     </Button>
   );
 }

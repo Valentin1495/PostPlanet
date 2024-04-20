@@ -155,16 +155,28 @@ function SubmitButton({ text, file, isForReply }: SubmitButtonProps) {
 
   return (
     <Button
-      className='rounded-full h-8 text-base font-semibold'
+      className='rounded-full h-8 w-[66px] text-base font-semibold'
       disabled={(!text.trim() && !file) || pending}
     >
-      {isForReply
-        ? pending
-          ? 'Replying...'
-          : 'Reply'
-        : pending
-        ? 'Posting...'
-        : 'Post'}
+      {isForReply ? (
+        pending ? (
+          <span className='pending'>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        ) : (
+          'Reply'
+        )
+      ) : pending ? (
+        <span className='pending'>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      ) : (
+        'Post'
+      )}
     </Button>
   );
 }

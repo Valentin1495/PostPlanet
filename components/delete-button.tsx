@@ -11,7 +11,15 @@ export default function DeleteButton() {
       variant='destructive'
       disabled={pending}
     >
-      {pending ? 'Deleting...' : 'Delete'}
+      {pending ? (
+        <span className='pending'>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      ) : (
+        'Delete'
+      )}
     </Button>
   );
 }

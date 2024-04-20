@@ -23,7 +23,7 @@ export default function FeedTabs({ f }: FeedTabsProps) {
           For You
         </span>
         {!isFollowingTab && (
-          <div className='h-1 w-14 bg-primary absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full'></div>
+          <div className='h-1 w-16 bg-primary absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full'></div>
         )}
       </Link>
       <Link
@@ -37,7 +37,7 @@ export default function FeedTabs({ f }: FeedTabsProps) {
           Following
         </span>
         {isFollowingTab && (
-          <div className='h-1 w-[68px] bg-primary absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full'></div>
+          <div className='h-1 w-20 bg-primary absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full'></div>
         )}
       </Link>
     </div>

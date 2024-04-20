@@ -7,6 +7,7 @@ import { searchPosts } from '@/actions/post.actions';
 import Post from '@/components/post';
 import SearchTabs from '@/components/search-tabs';
 import { Metadata } from 'next';
+import SearchBar from '@/components/search-bar';
 
 type SearchProps = {
   searchParams: {
@@ -47,8 +48,11 @@ export default async function Search({ searchParams }: SearchProps) {
     searchResults = (await searchPeople(q as string)) as User[];
 
     return (
-      <main>
-        <SearchTabs q={q as string} f={f} />
+      <main className='min-h-screen'>
+        <div className='bg-background z-10 sticky top-0 pt-5'>
+          <SearchBar />
+          <SearchTabs q={q as string} f={f} />
+        </div>
         {searchResults.length ? (
           searchResults.map((user) => (
             <SingleUser
@@ -69,8 +73,11 @@ export default async function Search({ searchParams }: SearchProps) {
     searchResults = (await searchPosts(q)) as SinglePost[];
 
     return (
-      <main>
-        <SearchTabs q={q} f={f} />
+      <main className='min-h-screen'>
+        <div className='bg-background z-10 sticky top-0 pt-5'>
+          <SearchBar />
+          <SearchTabs q={q} f={f} />
+        </div>
         {searchResults.length ? (
           searchResults.map((post) => (
             <Post
@@ -88,5 +95,11 @@ export default async function Search({ searchParams }: SearchProps) {
     );
   }
 
-  return null;
+  return (
+    <main className='min-h-screen'>
+      <div className='bg-background pt-5'>
+        <SearchBar />
+      </div>
+    </main>
+  );
 }

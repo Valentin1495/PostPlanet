@@ -26,7 +26,7 @@ export default function SearchBar() {
         );
       }}
       className={cn(
-        'rounded-full flex pl-5 pr-1 py-3 items-center border mx-5 mb-5',
+        'rounded-full flex pl-5 pr-1 py-3 items-center border mx-5 mb-2.5',
         focus
           ? 'bg-background border-primary'
           : 'bg-secondary border-transparent'
