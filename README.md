@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+![homepage](/public/homepage.png)
 
-## Getting Started
+<h1 align="center">PostPlanet</h1>
 
-First, run the development server:
+<p align="center">
+  소셜 미디어 플랫폼
+</p>
+<br/>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Clerk](https://clerk.com/)
+- [Prisma](https://www.prisma.io/)
+- [MongoDB](https://www.mongodb.com/)
+- [UploadThing](https://uploadthing.com/)
+- [Zod](https://zod.dev/)
+- [Vercel](https://vercel.com/)
+- [Lucide](https://lucide.dev/)
+- [`next/font`](https://nextjs.org/docs/basic-features/font-optimization)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **회원 인증**: Clerk을 활용한 이메일/소셜 로그인 (Google and GitHub)
 
-## Learn More
+- **홈 페이지**: 모든 게시물/내가 팔로우하는 사람들의 게시물 조회
 
-To learn more about Next.js, take a look at the following resources:
+- **검색 페이지**: 게시물/사용자 조회
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **알림 페이지**: 팔로우/답글/좋아요 받을 시 알림
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- **프로필 페이지**: 나의 게시물/내가 답글 단 게시물/내가 좋아한 게시물/팔로워/팔로우 중 조회
 
-## Deploy on Vercel
+- **백엔드**: Prisma & MongoDB를 활용한 복잡한 스키마와 다중 데이터 관리
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **콘텐츠 게시**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **답글**
+
+- **좋아요**
+
+- **팔로우**
+
+- **서버 사이드 렌더링**
+
+- **Next.js Layout Route Groups**
+
+- **미들웨어 with Clerk**
+
+- **파일 업로드 with UploadThing**
+
+- **데이터 검증 with Zod**
+
+- **반응형 디자인 with Tailwind CSS**

@@ -4,6 +4,11 @@ import { redirect } from 'next/navigation';
 import { User as U } from '@clerk/nextjs/server';
 import { readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Activities / PostPlanet',
+};
 
 export default async function Onboarding() {
   const { id, imageUrl, firstName, lastName } = (await currentUser()) as U;
