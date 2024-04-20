@@ -176,7 +176,7 @@ export async function follow(
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -199,7 +199,7 @@ export async function unfollow(
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }

@@ -28,7 +28,7 @@ export async function createPost(
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
 
     return {
       message: 'Success',
@@ -173,7 +173,7 @@ export async function likePost(postId: string, userId: string) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -207,7 +207,7 @@ export async function unlikePost(postId: string, userId: string) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }
@@ -221,7 +221,7 @@ export async function deletePost(postId: string) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }

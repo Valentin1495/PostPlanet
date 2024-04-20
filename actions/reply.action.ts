@@ -52,7 +52,7 @@ export async function replyToPost(
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
 
     return {
       message: 'Success',
@@ -110,7 +110,7 @@ export async function deleteReply(replyId: string) {
       },
     });
 
-    revalidatePath('/');
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }
