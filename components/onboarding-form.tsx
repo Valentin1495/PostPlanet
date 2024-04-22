@@ -36,7 +36,7 @@ export default function OnboardingForm({
   const [name, setName] = useState<string>('');
 
   const onboarded = state.message === 'Onboarded.';
-  const onboardingFailed = state.message && state.message !== 'Onboarded.';
+  const onboardingFailed = state.message && !onboarded;
 
   useEffect(() => {
     const defaultName = firstName && lastName ? `${firstName} ${lastName}` : '';
