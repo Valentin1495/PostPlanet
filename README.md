@@ -1,4 +1,4 @@
-![homepage](/public/homepage.png)
+![homepage](/public/postplanet.png)
 
 <h1 align="center">PostPlanet</h1>
 
@@ -27,13 +27,15 @@
 
 - 홈 페이지: 모든 게시물/내가 팔로우하는 사람들의 게시물 조회
 
+- 온보딩 페이지: 사용자 프로필 등록
+
 - 검색 페이지: 게시물/사용자 검색
 
 - 알림 페이지: 팔로우/답글/좋아요 받을 시 알림
 
 - 프로필 페이지: 나의 게시물/내가 답글 단 게시물/내가 좋아한 게시물/팔로워/팔로우 중 조회
 
-- 백엔드: Prisma & MongoDB를 활용하여 복잡한 스키마와 다중 데이터 관리
+- 백엔드: Prisma & MongoDB를 활용하여 스키마와 데이터 관리
 
 - 콘텐츠 게시
 
@@ -43,7 +45,7 @@
 
 - 팔로우
 
-- 서버 사이드 렌더링
+- Server-side Rendering
 
 - Next.js Layout Route Groups
 
