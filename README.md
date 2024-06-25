@@ -1,5 +1,3 @@
-![homepage](/public/postplanet.png)
-
 <h1 align="center">PostPlanet</h1>
 
 <p align="center">
@@ -7,19 +5,11 @@
 </p>
 <br/>
 
-## Tech Stack
+## Demo
 
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Clerk](https://clerk.com/)
-- [Prisma](https://www.prisma.io/)
-- [MongoDB](https://www.mongodb.com/)
-- [UploadThing](https://uploadthing.com/)
-- [Zod](https://zod.dev/)
-- [Vercel](https://vercel.com/)
-- [Lucide](https://lucide.dev/)
-- [`next/font`](https://nextjs.org/docs/basic-features/font-optimization)
+https://github.com/Valentin1495/PostPlanet/assets/69514169/64bf240c-cc13-493c-b8c3-63f7876ba659
+
+https://github.com/Valentin1495/PostPlanet/assets/69514169/8dca007b-0337-4ad8-b7c5-4b2030ed7473
 
 ## Features
 
@@ -58,3 +48,17 @@
 - 데이터 검증 with Zod
 
 - 반응형 디자인 with Tailwind CSS
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Clerk](https://clerk.com/)
+- [Prisma](https://www.prisma.io/)
+- [MongoDB](https://www.mongodb.com/)
+- [UploadThing](https://uploadthing.com/)
+- [Zod](https://zod.dev/)
+- [Vercel](https://vercel.com/)
+- [Lucide](https://lucide.dev/)
+- [`next/font`](https://nextjs.org/docs/basic-features/font-optimization)
