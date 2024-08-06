@@ -13,7 +13,7 @@ export default function UploadBtn({ setFileUrl }: UploadBtnProps) {
       appearance={{
         allowedContent: 'hidden',
         button:
-          'bg-secondary ut-uploading:text-primary text-secondary-foreground hover:bg-secondary/80 focus-within:ring-primary font-semibold after:bg-primary/10',
+          'bg-secondary ut-uploading:text-primary hover:bg-secondary/80 focus-within:ring-primary font-semibold after:bg-primary/10',
       }}
       content={{
         button({ isUploading }) {

@@ -28,7 +28,6 @@ export default async function Post({
   currentUserId,
   myProfilePic,
   myFollowingIds,
-  isProfilePage,
 }: PostProps) {
   const author = (await readUser(authorId)) as User;
   const isMyPost = authorId === currentUserId;
@@ -54,8 +53,6 @@ export default async function Post({
       currentUserId={currentUserId}
       myFollowingIds={myFollowingIds}
       authorFollowingIds={author.followingIds}
-      isProfilePage={isProfilePage}
-      deletePost={deletePost}
     />
   );
 }

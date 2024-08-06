@@ -50,6 +50,7 @@ export default function OnboardingForm({
   }, [state, onboardingFailed]);
 
   if (onboarded) redirect('/home');
+
   return (
     <div className='w-1/2 xl:w-1/3'>
       <h1 className='text-2xl text-center font-bold'>Onboarding</h1>

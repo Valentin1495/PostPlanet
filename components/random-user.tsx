@@ -44,7 +44,7 @@ export default function RandomUser({
   return (
     <div
       onClick={() => router.push(`/${username}/posts`)}
-      className='flex items-center gap-2 hover:bg-primary/5 p-3 last:rounded-b-md transition cursor-pointer'
+      className='flex items-center gap-2 hover:bg-primary/5 p-3 last:rounded-b-lg transition cursor-pointer'
     >
       <ProfileImage
         randomUser

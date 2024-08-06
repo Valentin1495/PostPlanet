@@ -30,8 +30,6 @@ export type ClientPostProps = Omit<PostProps, 'createdAt'> & {
   replyCount: number;
   createdAt: string;
   myProfilePic?: string;
-  isProfilePage?: boolean;
-  deletePost: (postId: string) => Promise<void>;
 };
 
 export default function ClientPost({
@@ -53,8 +51,6 @@ export default function ClientPost({
   hasLiked,
   replyCount,
   myProfilePic,
-  isProfilePage,
-  deletePost,
 }: ClientPostProps) {
   const router = useRouter();
   const {

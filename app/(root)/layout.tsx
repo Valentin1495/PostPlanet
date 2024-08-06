@@ -3,11 +3,9 @@ import { Inter } from 'next/font/google';
 import '../globals.css';
 import LeftSidebar from '@/components/left-sidebar';
 import RightSidebar from '@/components/right-sidebar';
-import { ClerkProvider, currentUser } from '@clerk/nextjs';
+import { auth, ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from '@/components/ui/sonner';
 import { readUser } from '@/actions/user.actions';
-import { User as U } from '@clerk/nextjs/server';
-import { User } from '@prisma/client';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,8 +20,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = (await currentUser()) as U;
-  const { username, profileImage, id } = (await readUser(user.id)) as User;
+  const { userId } = auth();
+
+  let username;
+  let profileImage;
+  let id;
+
+  if (userId) {
+    const user = await readUser(userId);
+
+    username = user?.username;
+    profileImage = user?.profileImage;
+    id = user?.id;
+  }
 
   return (
     <ClerkProvider>

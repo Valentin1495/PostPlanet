@@ -145,6 +145,24 @@ export async function readRandomUsers(loggedInUser: User) {
     });
 
     const usersWithFollowers = await Promise.all(promises);
+
+    return usersWithFollowers;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function fetchRandomUsers() {
+  try {
+    const randomUsers = await db.user.findMany();
+
+    const promises = randomUsers.slice(-5).map(async (user) => {
+      const followers = await countFollowers(user.id);
+      return { ...user, followers };
+    });
+
+    const usersWithFollowers = await Promise.all(promises);
+
     return usersWithFollowers;
   } catch (error: any) {
     throw new Error(error);

@@ -1,30 +1,55 @@
-import { readRandomUsers, readUser } from '@/actions/user.actions';
-import { User } from '@prisma/client';
+import {
+  fetchRandomUsers,
+  readRandomUsers,
+  readUser,
+} from '@/actions/user.actions';
 import RandomUser from './random-user';
-import { currentUser } from '@clerk/nextjs';
-import { User as U } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs';
+import FakeUser from './fake-user';
 
 export default async function RightSidebar() {
-  const user = (await currentUser()) as U;
-  const loggedInUser = (await readUser(user.id)) as User;
-  const randomUsers = await readRandomUsers(loggedInUser);
+  const { userId } = auth();
 
-  return (
-    <div className='lg:w-[500px] xl:w-[750px] sticky top-0 pl-5 xl:pl-8 pt-5 hidden md:block'>
-      <div className='bg-secondary rounded-lg hidden lg:block'>
-        <h1 className='font-bold text-xl p-3'>Who to follow</h1>
-        <div className='space-y-2'>
-          {randomUsers.map((user) => (
-            <RandomUser
-              key={user.id}
-              {...user}
-              currentUserId={loggedInUser.id}
-              myFollowingIds={loggedInUser.followingIds}
-              userFollowingIds={user.followingIds}
-            />
-          ))}
+  if (userId) {
+    const loggedInUser = await readUser(userId);
+
+    if (!loggedInUser) {
+      throw new Error('User not found');
+    }
+    const randomUsers = await readRandomUsers(loggedInUser);
+
+    return (
+      <div className='lg:w-[500px] xl:w-[750px] sticky top-0 pl-5 xl:pl-8 pt-5 hidden md:block'>
+        <div className='bg-secondary rounded-lg hidden lg:block'>
+          <h1 className='font-bold text-xl p-3'>Who to follow</h1>
+          <div className='space-y-2'>
+            {randomUsers.map((user) => (
+              <RandomUser
+                key={user.id}
+                {...user}
+                currentUserId={loggedInUser.id}
+                myFollowingIds={loggedInUser.followingIds}
+                userFollowingIds={user.followingIds}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    const randomUsers = await fetchRandomUsers();
+
+    return (
+      <div className='lg:w-[500px] xl:w-[750px] sticky top-0 pl-5 xl:pl-8 pt-5 hidden md:block'>
+        <div className='bg-secondary rounded-lg hidden lg:block'>
+          <h1 className='font-bold text-xl p-3'>Who to follow</h1>
+          <div className='space-y-2'>
+            {randomUsers.map((user) => (
+              <FakeUser key={user.id} {...user} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 }

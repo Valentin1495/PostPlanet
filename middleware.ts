@@ -10,9 +10,10 @@ export default authMiddleware({
       const onboarding = new URL('/onboarding', req.url);
       return NextResponse.redirect(onboarding);
     }
-    if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
-    }
+
+    // if (!auth.userId && !auth.isPublicRoute) {
+    //   return redirectToSignIn({ returnBackUrl: req.url });
+    // }
   },
   // An array of public routes that don't require authentication.
   publicRoutes: ['/api/uploadthing'],
