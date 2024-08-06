@@ -11,12 +11,17 @@ export default authMiddleware({
       return NextResponse.redirect(onboarding);
     }
 
-    // if (!auth.userId && !auth.isPublicRoute) {
-    //   return redirectToSignIn({ returnBackUrl: req.url });
-    // }
+    if (!auth.userId && req.nextUrl.pathname === '/') {
+      const home = new URL('/home', req.url);
+      return NextResponse.redirect(home);
+    }
+
+    if (!auth.userId && !auth.isPublicRoute) {
+      return redirectToSignIn({ returnBackUrl: req.url });
+    }
   },
   // An array of public routes that don't require authentication.
-  publicRoutes: ['/api/uploadthing'],
+  publicRoutes: ['/api/uploadthing', '/home', '/'],
 
   // An array of routes to be ignored by the authentication middleware.
   ignoredRoutes: [],
