@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Activities / PostPlanet',
+  title: 'Onboarding / PostPlanet',
 };
 
 export default async function Onboarding() {
