@@ -83,3 +83,55 @@ export function groupRepliesByPost(replies: ReplyWithPost) {
 
   return Object.values(repliesByPostId);
 }
+
+export const generateRandomUsername = () => {
+  const prefix = 'user-';
+  const length = 8;
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters[randomIndex];
+  }
+
+  return prefix + randomString;
+};
+
+export const generateRandomColor = () => {
+  const arr = [
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    'a',
+    'b',
+    'c',
+    'd',
+    'e',
+    'f',
+  ];
+
+  let hexNum = '';
+
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    hexNum += arr[randomIndex];
+  }
+
+  return `#${hexNum}`;
+};
+
+export const removeAllSpaces = (str: string) => {
+  return str.replace(/ /g, '');
+};
+
+export const leaveSingleSpace = (str: string) => {
+  return str.trim().replace(/\s+/g, ' ');
+};

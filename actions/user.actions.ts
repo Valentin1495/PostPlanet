@@ -2,89 +2,146 @@
 
 import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import { faker } from '@faker-js/faker';
 import { User } from '@prisma/client';
+import { SignJWT, jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import {
+  generateRandomColor,
+  generateRandomUsername,
+  leaveSingleSpace,
+  removeAllSpaces,
+} from '@/lib/utils';
 
-const schema = z.object({
-  id: z.string().min(1, { message: 'Id must contain at least 1 character.' }),
-  username: z
-    .string()
-    .trim()
-    .min(1, { message: 'Username must contain at least 1 character.' }),
-  bio: z.string(),
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: 'Name must contain at least 1 character.' }),
-  profileImage: z.string().min(1, {
-    message: 'Profile image url must contain at least 1 character.',
-  }),
-});
+const secretKey = 'secret';
+const key = new TextEncoder().encode(secretKey);
 
-export async function createUser(
-  prevState: {
-    message: string;
-  },
-  formData: FormData
-) {
-  let username = formData.get('username') as string;
-  if (username.includes(' ')) {
-    username = username.replace(/ /g, '');
+export async function encrypt(payload: any) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('2h')
+    .sign(key);
+}
+
+export async function decrypt(input: string): Promise<any> {
+  const { payload } = await jwtVerify(input, key, {
+    algorithms: ['HS256'],
+  });
+  return payload;
+}
+
+export async function login() {
+  const imageUrl = generateRandomColor();
+  const fullName = generateRandomUsername();
+  const user = { id: uuidv4(), imageUrl, fullName };
+
+  // Create the session
+  const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const session = await encrypt({ user, expires });
+
+  // Save the session in a cookie
+  cookies().set('session', session, { expires, httpOnly: true });
+}
+
+export async function logout() {
+  // Destroy the session
+  cookies().set('session', '', { expires: new Date(0) });
+  redirect('/');
+}
+
+export async function getSession() {
+  const session = cookies().get('session')?.value;
+  if (!session) return null;
+  return await decrypt(session);
+}
+
+export async function updateSession(request: NextRequest) {
+  const session = request.cookies.get('session')?.value;
+  if (!session) return;
+
+  // Refresh the session so it doesn't expire
+  const parsed = await decrypt(session);
+  parsed.expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  const res = NextResponse.next();
+  res.cookies.set({
+    name: 'session',
+    value: await encrypt(parsed),
+    httpOnly: true,
+    expires: parsed.expires,
+  });
+  return res;
+}
+
+export async function fetchUserId(): Promise<string> {
+  let userId;
+  const authentication = auth();
+  userId = authentication.userId;
+
+  if (!userId) {
+    const session = await getSession();
+
+    if (!session) {
+      redirect('/');
+    }
+    userId = session.user.id;
   }
+
+  return userId;
+}
+
+export async function fetchCurrentUser() {
+  const session = await getSession();
+
+  if (session) {
+    return session.user;
+  } else {
+    const user = await currentUser();
+    return user;
+  }
+}
+
+export async function createUser(prevState: any, formData: FormData) {
+  let username = formData.get('username') as string;
+  username = removeAllSpaces(username);
 
   let bio = formData.get('bio') as string;
   bio = bio.trim();
 
   let name = formData.get('name') as string;
-  name = name.trim();
-  name = name.replace(/\s+/g, ' ');
+  name = leaveSingleSpace(name);
 
-  const profileImage = formData.get('fileUrl') as string;
-  const userId = formData.get('userId') as string;
+  let profileImage = formData.get('fileUrl') as string | null;
 
-  const parse = schema.safeParse({
-    id: userId,
-    username,
-    bio,
-    name,
-    profileImage,
-  });
-
-  if (!parse.success) {
-    let message = '';
-    parse.error.issues.map((issue) => {
-      message += issue.message + '\n';
-    });
-    return {
-      message,
-    };
+  if (!profileImage) {
+    profileImage = formData.get('image') as string;
   }
 
-  const data = parse.data;
+  const id = await fetchUserId();
   const userList = await db.user.findMany();
-  const sameUserList = userList.filter((el) => el.username === data.username);
+  const sameUserList = userList.filter((el) => el.username === username);
+
   if (sameUserList[0]) {
     return {
-      message: 'That username has been taken.\nPlease choose another.',
+      message: 'That username has been taken. Please choose another.',
     };
   }
 
   try {
     await db.user.create({
-      data: {
-        id: data.id,
-        username: data.username,
-        name: data.name,
-        bio: data.bio,
-        profileImage: data.profileImage,
-      },
+      data: { id, username, name, bio, profileImage },
     });
 
     return {
-      message: 'Onboarded.',
+      message: 'Success',
     };
   } catch (error) {
+    console.error(error);
+
     return {
       message: 'Onboarding failed 😢',
     };
@@ -130,8 +187,8 @@ export async function readFollowers(userId: string) {
   }
 }
 
-export async function readRandomUsers(loggedInUser: User) {
-  const { followingIds, id } = loggedInUser;
+export async function readRandomUsers(user: User) {
+  const { followingIds, id } = user;
 
   try {
     const randomUsers = await db.user.findMany();
@@ -140,23 +197,6 @@ export async function readRandomUsers(loggedInUser: User) {
     );
 
     const promises = nonFollowers.slice(-5).map(async (user) => {
-      const followers = await countFollowers(user.id);
-      return { ...user, followers };
-    });
-
-    const usersWithFollowers = await Promise.all(promises);
-
-    return usersWithFollowers;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function fetchRandomUsers() {
-  try {
-    const randomUsers = await db.user.findMany();
-
-    const promises = randomUsers.slice(-5).map(async (user) => {
       const followers = await countFollowers(user.id);
       return { ...user, followers };
     });

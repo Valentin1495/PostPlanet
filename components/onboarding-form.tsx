@@ -6,18 +6,16 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { createUser } from '@/actions/user.actions';
 import { useEffect, useState } from 'react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Textarea } from './ui/textarea';
-import UploadBtn from './upload-btn';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Skeleton } from './ui/skeleton';
 import { toast } from 'sonner';
+import { FileType } from '@/lib/types';
+import { AvatarPicture } from './avatar-picture';
+import UploadProfilePic from './upload/upload-profile-pic';
 
 type OnboardingFormProps = {
-  imageUrl?: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  userId: string;
+  imageUrl: string;
+  fullName: string;
 };
 
 const initialState = {
@@ -26,60 +24,103 @@ const initialState = {
 
 export default function OnboardingForm({
   imageUrl,
-  firstName,
-  lastName,
-  userId,
+  fullName,
 }: OnboardingFormProps) {
   const [state, onboardUser] = useFormState(createUser, initialState);
-  const [fileUrl, setFileUrl] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [name, setName] = useState<string>('');
-
-  const onboarded = state.message === 'Onboarded.';
-  const onboardingFailed = state.message && !onboarded;
-
-  useEffect(() => {
-    const defaultName = firstName && lastName ? `${firstName} ${lastName}` : '';
-    setName(defaultName);
-  }, [firstName, lastName]);
+  const [file, setFile] = useState<FileType | null>(null);
+  const [image, setImage] = useState(imageUrl);
+  const [username, setUsername] = useState('');
+  const [mouseEnter, setMouseEnter] = useState(false);
+  const [name, setName] = useState('');
+  const router = useRouter();
+  const successful = state.message === 'Success';
+  const failed = state.message && !successful;
 
   useEffect(() => {
-    if (onboardingFailed) {
-      toast(state.message);
+    setName(fullName);
+  }, [fullName]);
+
+  useEffect(() => {
+    if (successful) {
+      router.push('/home');
     }
-  }, [state, onboardingFailed]);
 
-  if (onboarded) redirect('/home');
+    if (failed) {
+      toast.error(state.message);
+    }
+  }, [state, router]);
 
   return (
     <div className='w-1/2 xl:w-1/3'>
-      <h1 className='text-2xl text-center font-bold'>Onboarding</h1>
-      <p className='mb-3 text-center font-medium'>Welcome to PostPlanet! 🥳</p>
+      <p className='text-xl text-center font-bold mb-5'>
+        Welcome to PostPlanet! 🥳
+      </p>
       <form
         action={onboardUser}
-        className='space-y-5 bg-primary/15 px-5 pb-5 pt-2 rounded-md'
+        className='space-y-5 bg-violet-50 px-5 pb-5 pt-2 rounded-md'
       >
-        <section className='flex flex-col items-center gap-2.5'>
-          {fileUrl ? (
-            <Avatar className='w-32 h-32'>
-              <AvatarImage src={fileUrl} />
-              <AvatarFallback className='bg-primary/25'>
-                <Skeleton className='rounded-full' />
-              </AvatarFallback>
-            </Avatar>
-          ) : imageUrl ? (
-            <Avatar className='w-32 h-32'>
-              <AvatarImage src={imageUrl} />
-              <AvatarFallback className='bg-primary/25'>
-                <Skeleton className='rounded-full' />
-              </AvatarFallback>
-            </Avatar>
-          ) : (
-            <section className='bg-background rounded-full w-32 h-32 flex justify-center items-center'></section>
-          )}
-          <Input value={fileUrl} className='hidden' name='fileUrl' readOnly />
-          <UploadBtn setFileUrl={setFileUrl} />
-        </section>
+        {file ? (
+          <div
+            onMouseEnter={() => setMouseEnter(true)}
+            onMouseLeave={() => setMouseEnter(false)}
+            onClick={() => {
+              setFile(null);
+            }}
+            className='relative rounded-full size-32 center cursor-pointer mx-auto'
+          >
+            <AvatarPicture src={file.url} alt={file.name} className='size-32' />
+            <Input
+              value={file.url}
+              className='hidden'
+              name='fileUrl'
+              type='hidden'
+              readOnly
+            />
+
+            {mouseEnter && (
+              <section className='absolute inset-0 bg-black/50 rounded-full flex items-center justify-center'>
+                <h3 className='text-xs text-center font-bold text-primary-foreground dark:text-foreground'>
+                  CHANGE <br /> PICTURE
+                </h3>
+              </section>
+            )}
+          </div>
+        ) : image ? (
+          <div
+            onMouseEnter={() => setMouseEnter(true)}
+            onMouseLeave={() => setMouseEnter(false)}
+            onClick={() => {
+              setImage('');
+            }}
+            className='relative rounded-full size-32 center cursor-pointer mx-auto'
+          >
+            <section
+              className='size-32 rounded-full mx-auto'
+              style={{
+                backgroundColor: image,
+              }}
+            />
+            <Input
+              value={image}
+              className='hidden'
+              name='image'
+              type='hidden'
+              readOnly
+            />
+            {mouseEnter && (
+              <section className='absolute inset-0 bg-black/50 rounded-full flex items-center justify-center'>
+                <h3 className='text-xs text-center font-bold text-primary-foreground dark:text-foreground'>
+                  CHANGE <br /> PICTURE
+                </h3>
+              </section>
+            )}
+          </div>
+        ) : (
+          <UploadProfilePic
+            handleFile={setFile}
+            handleMouseEnter={setMouseEnter}
+          />
+        )}
 
         <section className='space-y-2'>
           <Label htmlFor='username'>Username</Label>
@@ -91,6 +132,7 @@ export default function OnboardingForm({
             value={username}
           />
         </section>
+
         <section className='space-y-2'>
           <Label htmlFor='name'>Name</Label>
           <Input
@@ -101,6 +143,7 @@ export default function OnboardingForm({
             value={name}
           />
         </section>
+
         <section className='gap-y-2 flex flex-col'>
           <Label htmlFor='bio'>Bio (optional)</Label>
           <Textarea
@@ -111,31 +154,34 @@ export default function OnboardingForm({
             className='outline-none resize-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
           />
         </section>
-        <Input className='hidden' name='userId' value={userId} readOnly />
-        <SubmitButton
-          file={fileUrl}
-          username={username.trim()}
-          name={name.trim()}
-        />
+
+        <div className='text-end'>
+          <SubmitButton
+            fileUrl={file?.url}
+            image={image}
+            username={username.trim()}
+            name={name.trim()}
+          />
+        </div>
       </form>
     </div>
   );
 }
 
 type SubmitButtonProps = {
-  file: string;
+  fileUrl?: string;
+  image: string;
   username: string;
   name: string;
 };
 
-function SubmitButton({ file, username, name }: SubmitButtonProps) {
+function SubmitButton({ fileUrl, username, name, image }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button
-      type='submit'
       className='w-[66px]'
-      disabled={pending || !username || !name || !file}
+      disabled={pending || !username || !name || (!fileUrl && !image)}
     >
       {pending ? (
         <span className='pending'>

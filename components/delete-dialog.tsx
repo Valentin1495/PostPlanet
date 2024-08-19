@@ -34,7 +34,9 @@ export default function DeleteDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger onClick={handleClick}>{children}</DialogTrigger>
       <DialogContent className='w-72'>
-        <DialogTitle className='text-xl'>Delete post?</DialogTitle>
+        <DialogTitle className='text-xl'>
+          Delete {forReply ? 'reply' : 'post'}?
+        </DialogTitle>
         <DialogDescription className='text-muted-foreground'>
           This can’t be undone and it will be removed from your profile, the
           timeline of any accounts that follow you, and from search results.

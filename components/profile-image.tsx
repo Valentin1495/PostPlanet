@@ -43,12 +43,21 @@ export default function ProfileImage({
     <HoverCard>
       <div className='max-w-fit'>
         <HoverCardTrigger href={`/${username}/posts`}>
-          <Avatar className='w-10 h-10 darker'>
-            <AvatarImage src={profileImage} alt='profile picture' />
-            <AvatarFallback className='bg-primary/10'>
-              <Skeleton className='rounded-full' />
-            </AvatarFallback>
-          </Avatar>
+          {profileImage.includes('#') ? (
+            <section
+              style={{
+                backgroundColor: profileImage,
+              }}
+              className='rounded-full size-10 darker'
+            />
+          ) : (
+            <Avatar className='size-10 darker'>
+              <AvatarImage src={profileImage} alt='profile picture' />
+              <AvatarFallback className='bg-primary/10'>
+                <Skeleton className='rounded-full' />
+              </AvatarFallback>
+            </Avatar>
+          )}
         </HoverCardTrigger>
         <HoverCardContent
           className='space-y-2 cursor-default'
@@ -56,12 +65,21 @@ export default function ProfileImage({
         >
           <section className='flex justify-between'>
             <Link href={`/${username}/posts`}>
-              <Avatar className='w-16 h-16 darker'>
-                <AvatarImage src={profileImage} alt='profile picture' />
-                <AvatarFallback className='bg-primary/10'>
-                  <Skeleton className='rounded-full' />
-                </AvatarFallback>
-              </Avatar>
+              {profileImage.includes('#') ? (
+                <section
+                  style={{
+                    backgroundColor: profileImage,
+                  }}
+                  className='rounded-full size-16 darker'
+                />
+              ) : (
+                <Avatar className='size-16 darker'>
+                  <AvatarImage src={profileImage} alt='profile picture' />
+                  <AvatarFallback className='bg-primary/10'>
+                    <Skeleton className='rounded-full' />
+                  </AvatarFallback>
+                </Avatar>
+              )}
             </Link>
             {!isCurrentUser && !followingPage && !randomUser && (
               <ToggleFollowButton

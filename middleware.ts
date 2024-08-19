@@ -1,32 +1,18 @@
-// Resource: https://clerk.com/docs/nextjs/middleware#auth-middleware
+// Resource: https://clerk.com/docs/references/nextjs/clerk-middleware
 // Copy the middleware code as it is from the above resource
 
-import { authMiddleware, redirectToSignIn } from '@clerk/nextjs';
-import { NextResponse } from 'next/server';
+import { clerkMiddleware } from '@clerk/nextjs/server';
+import { updateSession } from './actions/user.actions';
 
-export default authMiddleware({
-  afterAuth(auth, req) {
-    if (auth.userId && req.nextUrl.pathname === '/') {
-      const onboarding = new URL('/onboarding', req.url);
-      return NextResponse.redirect(onboarding);
-    }
-
-    if (!auth.userId && req.nextUrl.pathname === '/') {
-      const home = new URL('/home', req.url);
-      return NextResponse.redirect(home);
-    }
-
-    if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
-    }
-  },
-  // An array of public routes that don't require authentication.
-  publicRoutes: ['/api/uploadthing', '/home', '/'],
-
-  // An array of routes to be ignored by the authentication middleware.
-  ignoredRoutes: [],
+export default clerkMiddleware(async (_, req) => {
+  return await updateSession(req);
 });
 
 export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };

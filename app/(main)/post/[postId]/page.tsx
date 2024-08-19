@@ -1,13 +1,11 @@
 import { checkHasLiked, readPost } from '@/actions/post.actions';
 import { readPostReplies } from '@/actions/reply.action';
-import { countFollowers, readUser } from '@/actions/user.actions';
+import { countFollowers, fetchUserId, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
 import PostForm from '@/components/post-form';
 import Reply from '@/components/reply';
 import SinglePost from '@/components/single-post';
 import { getDetailedDate, getSimpleDate } from '@/lib/utils';
-import { currentUser } from '@clerk/nextjs';
-import { User as U } from '@clerk/nextjs/server';
 import { Post, Reply as SingleReply, User } from '@prisma/client';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -42,12 +40,12 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const author = (await readUser(post.authorId)) as User;
-  const user = (await currentUser()) as U;
+  const userId = await fetchUserId();
   const { followingIds, id, profileImage, username } = (await readUser(
-    user.id
+    userId
   )) as User;
   const isMyPost = post.authorId === id;
-  const hasLiked = (await checkHasLiked(postId, user.id)) as boolean;
+  const hasLiked = (await checkHasLiked(postId, userId)) as boolean;
   const replies = (await readPostReplies(postId)) as SingleReply[];
   const followers = await countFollowers(post.authorId);
   const timestamp = getDetailedDate(post.createdAt);
@@ -79,7 +77,7 @@ export default async function PostPage({ params }: PostPageProps) {
         profileImage={profileImage}
         username={username}
         postId={postId}
-        userId={user.id}
+        userId={userId}
       />
 
       {replies.map((reply) => (

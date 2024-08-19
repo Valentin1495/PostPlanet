@@ -61,6 +61,18 @@
 }
 
 @layer components {
+  .center {
+    @apply flex justify-center items-center;
+  }
+
+  .button-uploading {
+    @apply bg-primary/50 cursor-not-allowed !important;
+  }
+
+  .button-uploading::after {
+    @apply bg-violet-500  !important;
+  }
+
   .darker {
     cursor: pointer;
   }

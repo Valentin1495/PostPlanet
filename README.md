@@ -13,7 +13,10 @@ https://github.com/Valentin1495/PostPlanet/assets/69514169/8dca007b-0337-4ad8-b7
 
 ## Features
 
-- 회원 인증: Clerk을 활용한 이메일/소셜 로그인 (Google & GitHub)
+- 사용자 인증
+
+  - 이메일/소셜 로그인 (Google & GitHub) - Clerk
+  - 쿠키를 통한 세션(JWT) 기반 로그인 - jose
 
 - 홈 페이지: 모든 게시물/내가 팔로우하는 사람들의 게시물 조회
 
@@ -32,7 +35,7 @@ https://github.com/Valentin1495/PostPlanet/assets/69514169/8dca007b-0337-4ad8-b7
 - 코어: React, TypeScript, Next.js
 - 스타일링: Tailwind CSS
 - UI 컴포넌트: shadcn/ui
-- 사용자 인증: Clerk
+- 사용자 인증: Clerk, jose
 - 파일 업로드: UploadThing
 - ORM: Prisma
 - 데이터베이스: MongoDB

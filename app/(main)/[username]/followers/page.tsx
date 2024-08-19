@@ -1,8 +1,11 @@
-import { readFollowers, readUser, readUserId } from '@/actions/user.actions';
+import {
+  fetchUserId,
+  readFollowers,
+  readUser,
+  readUserId,
+} from '@/actions/user.actions';
 import SingleUser from '@/components/single-user';
-import { currentUser } from '@clerk/nextjs';
 import { User } from '@prisma/client';
-import { User as U } from '@clerk/nextjs/server';
 import { Metadata } from 'next';
 
 type FollowersProps = {
@@ -24,8 +27,10 @@ export async function generateMetadata({
 }
 
 export default async function Followers({ params }: FollowersProps) {
-  const { id } = (await currentUser()) as U;
-  const { followingIds: myFollowingIds } = (await readUser(id)) as User;
+  const currentUserId = await fetchUserId();
+  const { followingIds: myFollowingIds } = (await readUser(
+    currentUserId
+  )) as User;
   const userId = (await readUserId(params.username)) as string;
   const followers = (await readFollowers(userId)) as User[];
 
@@ -38,7 +43,7 @@ export default async function Followers({ params }: FollowersProps) {
           key={user.id}
           {...user}
           myFollowingIds={myFollowingIds}
-          currentUserId={id}
+          currentUserId={currentUserId}
         />
       ))}
     </main>

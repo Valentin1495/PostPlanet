@@ -26,18 +26,27 @@ export default function ProfileInfo({
 
   return (
     <div className='flex flex-col items-center p-3 gap-4'>
-      <Link
-        href={profileImage}
-        target='_blank'
-        className='mx-auto inline-block'
-      >
-        <Avatar className='w-32 h-32 darker'>
-          <AvatarImage src={profileImage} alt='profile picture' />
-          <AvatarFallback className='bg-primary/10'>
-            <Skeleton className='rounded-full' />
-          </AvatarFallback>
-        </Avatar>
-      </Link>
+      {profileImage.includes('#') ? (
+        <section
+          className='size-32 rounded-full'
+          style={{
+            backgroundColor: profileImage,
+          }}
+        />
+      ) : (
+        <Link
+          href={profileImage}
+          target='_blank'
+          className='mx-auto inline-block'
+        >
+          <Avatar className='size-32 darker'>
+            <AvatarImage src={profileImage} alt='profile picture' />
+            <AvatarFallback className='bg-primary/10'>
+              <Skeleton className='rounded-full' />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      )}
 
       <section className='text-center'>
         <h1 className='font-bold text-xl'>{name}</h1>

@@ -1,8 +1,6 @@
-import { readUser, searchPeople } from '@/actions/user.actions';
+import { fetchUserId, readUser, searchPeople } from '@/actions/user.actions';
 import SingleUser from '@/components/single-user';
-import { currentUser } from '@clerk/nextjs';
 import { Post as SinglePost, User } from '@prisma/client';
-import { User as U } from '@clerk/nextjs/server';
 import { searchPosts } from '@/actions/post.actions';
 import Post from '@/components/post';
 import SearchTabs from '@/components/search-tabs';
@@ -36,12 +34,12 @@ export async function generateMetadata({
 
 export default async function Search({ searchParams }: SearchProps) {
   const { q, f } = searchParams;
-  const { id } = (await currentUser()) as U;
+  const userId = await fetchUserId();
   const {
     id: currentUserId,
     followingIds,
     profileImage,
-  } = (await readUser(id)) as User;
+  } = (await readUser(userId)) as User;
   let searchResults;
 
   if (f === 'user') {
