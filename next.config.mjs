@@ -16,15 +16,6 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config, { _, dev }) => {
-    if (dev) {
-      config.stats = {
-        logging: 'verbose',
-      };
-    }
-
-    return config;
-  },
 };
 
 export default nextConfig;
