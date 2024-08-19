@@ -8,7 +8,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Onboarding() {
-  const { id, imageUrl, fullName } = await fetchCurrentUser();
+  const user = await fetchCurrentUser();
+
+  if (!user) {
+    redirect('/');
+  }
+
+  const { id, imageUrl, fullName } = user;
   const onboardedUser = await readUser(id);
 
   if (onboardedUser) redirect('/home');

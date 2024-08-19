@@ -4,6 +4,7 @@ import LeftSidebar from '@/components/left-sidebar';
 import RightSidebar from '@/components/right-sidebar';
 import { fetchUserId, readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Home / PostPlanet',
@@ -17,6 +18,11 @@ export default async function MainLayout({
   children: React.ReactNode;
 }>) {
   const userId = await fetchUserId();
+
+  if (!userId) {
+    redirect('/');
+  }
+
   const { username, profileImage } = (await readUser(userId)) as User;
 
   return (
@@ -27,7 +33,7 @@ export default async function MainLayout({
         profileImage={profileImage}
       />
       <div className='w-full border-l sm:border-r'>{children}</div>
-      <RightSidebar />
+      <RightSidebar userId={userId} />
     </div>
   );
 }

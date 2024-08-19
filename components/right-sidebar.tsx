@@ -1,9 +1,12 @@
-import { fetchUserId, readRandomUsers, readUser } from '@/actions/user.actions';
+import { readRandomUsers, readUser } from '@/actions/user.actions';
 import { User } from '@prisma/client';
 import RandomUser from './random-user';
 
-export default async function RightSidebar() {
-  const userId = await fetchUserId();
+type RightSidebarProps = {
+  userId: string;
+};
+
+export default async function RightSidebar({ userId }: RightSidebarProps) {
   const onboardedUser = (await readUser(userId)) as User;
   const randomUsers = await readRandomUsers(onboardedUser);
 
