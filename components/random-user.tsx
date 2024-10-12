@@ -1,9 +1,7 @@
 'use client';
 
 import ProfileImage from './profile-image';
-import ToggleFollowButton from './toggle-follow-button';
 import { useRouter } from 'next/navigation';
-import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import Link from 'next/link';
 
 type RandomUserProps = {
@@ -24,22 +22,10 @@ export default function RandomUser({
   name,
   id,
   bio,
-  myFollowingIds,
-  userFollowingIds,
   currentUserId,
-  followers,
 }: RandomUserProps) {
   const isCurrentUser = currentUserId === id;
   const router = useRouter();
-
-  const {
-    btnText,
-    handleMouseOut,
-    handleMouseOver,
-    optimisticFollow,
-    optimisticFollowers,
-    toggleFollow,
-  } = useToggleFollow(followers, id, currentUserId, myFollowingIds);
 
   return (
     <div
@@ -52,14 +38,7 @@ export default function RandomUser({
         username={username}
         name={name}
         bio={bio}
-        followingIds={userFollowingIds}
         isCurrentUser={isCurrentUser}
-        btnText={btnText}
-        handleMouseOver={handleMouseOver}
-        handleMouseOut={handleMouseOut}
-        optimisticFollowers={optimisticFollowers}
-        optimisticFollow={optimisticFollow}
-        toggleFollow={toggleFollow}
       />
 
       <section className='mr-auto flex flex-col'>
@@ -76,16 +55,6 @@ export default function RandomUser({
           @{username}
         </Link>
       </section>
-
-      {!isCurrentUser && (
-        <ToggleFollowButton
-          btnText={btnText}
-          handleMouseOver={handleMouseOver}
-          handleMouseOut={handleMouseOut}
-          toggleFollow={toggleFollow}
-          optimisticFollow={optimisticFollow}
-        />
-      )}
     </div>
   );
 }

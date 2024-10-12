@@ -1,12 +1,11 @@
 import { checkHasLiked, readPost } from '@/actions/post.actions';
-import { readPostReplies } from '@/actions/reply.action';
 import { countFollowers, fetchUserId, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
 import PostForm from '@/components/post-form';
-import Reply from '@/components/reply';
+import Replies from '@/components/replies';
 import SinglePost from '@/components/single-post';
 import { getDetailedDate, getSimpleDate } from '@/lib/utils';
-import { Post, Reply as SingleReply, User } from '@prisma/client';
+import { Post, User } from '@prisma/client';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
@@ -34,7 +33,7 @@ export async function generateMetadata({
 
 export default async function PostPage({ params }: PostPageProps) {
   const { postId } = params;
-  const post = (await readPost(postId)) as Post;
+  const post = await readPost(postId);
   if (!post) {
     notFound();
   }
@@ -46,7 +45,6 @@ export default async function PostPage({ params }: PostPageProps) {
   )) as User;
   const isMyPost = post.authorId === id;
   const hasLiked = (await checkHasLiked(postId, userId)) as boolean;
-  const replies = (await readPostReplies(postId)) as SingleReply[];
   const followers = await countFollowers(post.authorId);
   const timestamp = getDetailedDate(post.createdAt);
   const simpleTimestamp = getSimpleDate(post.createdAt);
@@ -63,7 +61,6 @@ export default async function PostPage({ params }: PostPageProps) {
         followers={followers}
         isMyPost={isMyPost}
         hasLiked={hasLiked}
-        replyCount={replies.length}
         createdAt={timestamp}
         simpleCreatedAt={simpleTimestamp}
         currentUserId={id}
@@ -80,14 +77,7 @@ export default async function PostPage({ params }: PostPageProps) {
         userId={userId}
       />
 
-      {replies.map((reply) => (
-        <Reply
-          key={reply.id}
-          {...reply}
-          followingIds={followingIds}
-          currentUserId={id}
-        />
-      ))}
+      <Replies currentUserId={id} postId={postId} />
     </main>
   );
 }

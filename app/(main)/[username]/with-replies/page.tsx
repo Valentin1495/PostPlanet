@@ -1,8 +1,5 @@
-import { readRepliesWithPost } from '@/actions/reply.action';
-import { readUser, readUserId } from '@/actions/user.actions';
-import Post from '@/components/post';
-import Reply from '@/components/reply';
-import { groupRepliesByPost } from '@/lib/utils';
+import { fetchUserId, readUser, readUserId } from '@/actions/user.actions';
+import RepliesByPost from '@/components/replies-by-post';
 import { User } from '@prisma/client';
 import { Metadata } from 'next';
 
@@ -26,38 +23,16 @@ export async function generateMetadata({
 
 export default async function ProfileReplies({ params }: ProfileRepliesProps) {
   const userId = (await readUserId(params.username)) as string;
-  const { id, profileImage, followingIds } = (await readUser(userId)) as User;
-  const repliesWithPost = await readRepliesWithPost(userId);
-  const repliesByPostId = groupRepliesByPost(repliesWithPost);
+  const { profileImage } = (await readUser(userId)) as User;
+  const currentUserId = await fetchUserId();
 
-  if (!repliesWithPost.length)
-    return <p className='min-h-screen text-center mt-10'>No replies.</p>;
   return (
     <main className='min-h-screen'>
-      {repliesByPostId.map(({ post, replies }) => {
-        return (
-          <div key={post.id}>
-            <Post
-              {...post}
-              currentUserId={id}
-              myProfilePic={profileImage}
-              myFollowingIds={followingIds}
-              isProfilePage
-            />
-            {replies.map((reply, i) => {
-              return (
-                <Reply
-                  key={reply.id}
-                  {...reply}
-                  followingIds={followingIds}
-                  currentUserId={id}
-                  isLast={replies.length === i + 1}
-                />
-              );
-            })}
-          </div>
-        );
-      })}
+      <RepliesByPost
+        currentUserId={currentUserId}
+        userId={userId}
+        profileImage={profileImage}
+      />
     </main>
   );
 }

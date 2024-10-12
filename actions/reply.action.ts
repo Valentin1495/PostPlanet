@@ -81,27 +81,6 @@ export async function readPostReplies(postId: string) {
   }
 }
 
-export async function readRepliesWithPost(userId: string) {
-  try {
-    const repliesWithPost = await db.reply.findMany({
-      where: {
-        authorId: userId,
-      },
-      include: {
-        author: true,
-        post: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    return repliesWithPost;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
 export async function deleteReply(replyId: string) {
   try {
     await db.reply.delete({

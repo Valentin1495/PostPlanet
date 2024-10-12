@@ -19,33 +19,37 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-function has24HoursPassed(date: Date) {
+function has24HoursPassed(date: string | Date) {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
   const currentDate = new Date();
-  const differenceInMilliseconds = currentDate.getTime() - date.getTime();
+  const differenceInMilliseconds = currentDate.getTime() - parsedDate.getTime();
   const hoursPassed = differenceInMilliseconds / (1000 * 60 * 60);
 
   return hoursPassed >= 24;
 }
 
-function isPastYear(date: Date) {
+function isPastYear(date: string | Date) {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
   const currentYear = new Date().getFullYear();
-  const givenYear = date.getFullYear();
+  const givenYear = parsedDate.getFullYear();
 
   // Check if the given year is before the current year
   return givenYear < currentYear;
 }
 
-export function getSimpleDate(date: Date) {
-  if (isPastYear(date)) {
-    return date.toLocaleDateString('en-US', {
+export function getSimpleDate(date: string | Date) {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+
+  if (isPastYear(parsedDate)) {
+    return parsedDate.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     });
   }
 
-  if (has24HoursPassed(date)) {
-    return date.toLocaleDateString('en-US', {
+  if (has24HoursPassed(parsedDate)) {
+    return parsedDate.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
@@ -54,8 +58,11 @@ export function getSimpleDate(date: Date) {
   return formatDistanceToNowStrict(date);
 }
 
-export function getDetailedDate(date: Date) {
-  const formattedDate = format(date, 'h:mm a · MMM d, yyyy');
+export function getDetailedDate(date: string | Date) {
+  const formattedDate = format(
+    typeof date === 'string' ? new Date(date) : date,
+    'h:mm a · MMM d, yyyy'
+  );
 
   return formattedDate;
 }
@@ -134,4 +141,11 @@ export const removeAllSpaces = (str: string) => {
 
 export const leaveSingleSpace = (str: string) => {
   return str.trim().replace(/\s+/g, ' ');
+};
+
+export const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
 };

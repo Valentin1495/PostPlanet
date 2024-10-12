@@ -162,16 +162,38 @@ export async function readUser(userId: string) {
   }
 }
 
-export async function readFollowingUsers(userId: string) {
+export async function readFollowingUsers({
+  userId,
+  limit,
+  page,
+}: {
+  userId: string;
+  limit: number;
+  page: number;
+}) {
   const { followingIds } = (await readUser(userId)) as User;
 
-  const promises = followingIds.reverse().map(async (id) => await readUser(id));
+  const startIndex = page * limit;
+  const paginatedFollowingIds = followingIds.slice(
+    startIndex,
+    startIndex + limit
+  );
+
+  const promises = paginatedFollowingIds.map(async (id) => await readUser(id));
   const followingUsers = await Promise.all(promises);
 
   return followingUsers;
 }
 
-export async function readFollowers(userId: string) {
+export async function readFollowers({
+  userId,
+  limit,
+  page,
+}: {
+  userId: string;
+  limit: number;
+  page: number;
+}) {
   try {
     const followers = await db.user.findMany({
       where: {
@@ -179,6 +201,8 @@ export async function readFollowers(userId: string) {
           has: userId,
         },
       },
+      take: limit,
+      skip: limit * page,
     });
 
     return followers;
@@ -209,63 +233,9 @@ export async function readRandomUsers(user: User) {
   }
 }
 
-export async function follow(
-  userId: string,
-  currentUserId: string,
-  followingIds: string[]
-) {
-  followingIds.push(userId);
-
-  try {
-    await db.user.update({
-      where: {
-        id: currentUserId,
-      },
-      data: {
-        followingIds,
-      },
-    });
-
-    await db.activity.create({
-      data: {
-        giverId: currentUserId,
-        receiverId: userId,
-        type: 'follow',
-      },
-    });
-
-    revalidatePath('/', 'layout');
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function unfollow(
-  userId: string,
-  currentUserId: string,
-  followingIds: string[]
-) {
-  const newFollowingIds = followingIds.filter((id) => id !== userId);
-
-  try {
-    await db.user.update({
-      where: {
-        id: currentUserId,
-      },
-      data: {
-        followingIds: newFollowingIds,
-      },
-    });
-
-    revalidatePath('/', 'layout');
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
 export async function countFollowers(userId: string) {
   try {
-    const followers = await db.user.count({
+    const followersCount = await db.user.count({
       where: {
         followingIds: {
           has: userId,
@@ -273,7 +243,7 @@ export async function countFollowers(userId: string) {
       },
     });
 
-    return followers;
+    return followersCount;
   } catch (error: any) {
     throw new Error(error);
   }
@@ -344,23 +314,55 @@ export async function readUserId(username: string) {
   }
 }
 
-export async function searchPeople(q: string) {
-  let query = q;
-  if (query?.includes(' ')) {
-    query = query.replace(/ /g, '');
-  }
+export async function follow(
+  userId: string,
+  currentUserId: string,
+  followingIds: string[]
+) {
+  followingIds.push(userId);
 
   try {
-    const people = db.user.findMany({
+    await db.user.update({
       where: {
-        username: {
-          contains: query,
-          mode: 'insensitive',
-        },
+        id: currentUserId,
+      },
+      data: {
+        followingIds,
       },
     });
 
-    return people;
+    await db.activity.create({
+      data: {
+        giverId: currentUserId,
+        receiverId: userId,
+        type: 'follow',
+      },
+    });
+
+    revalidatePath('/', 'layout');
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function unfollow(
+  userId: string,
+  currentUserId: string,
+  followingIds: string[]
+) {
+  const newFollowingIds = followingIds.filter((id) => id !== userId);
+
+  try {
+    await db.user.update({
+      where: {
+        id: currentUserId,
+      },
+      data: {
+        followingIds: newFollowingIds,
+      },
+    });
+
+    revalidatePath('/', 'layout');
   } catch (error: any) {
     throw new Error(error);
   }

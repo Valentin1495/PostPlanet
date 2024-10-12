@@ -39,6 +39,7 @@ export default function PostDialog({
         </section>
         <PostForm
           isForDialog
+          isForPost
           profileImage={profileImage}
           userId={userId}
           setOpen={setOpen}

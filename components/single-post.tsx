@@ -1,10 +1,8 @@
 'use client';
 
 import ProfileImage from './profile-image';
-import { useToggleFollow } from '@/hooks/use-toggle-follow';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useToggleLike } from '@/hooks/use-toggle-like';
 import Image from 'next/image';
 import ChatBubble from './icons/chat-bubble';
 import FilledHeart from './icons/filled-heart';
@@ -12,6 +10,11 @@ import Heart from './icons/heart';
 import DeleteDialog from './delete-dialog';
 import { Trash2 } from 'lucide-react';
 import ReplyDialog from './reply-dialog';
+import { queryOptions, useQuery } from '@tanstack/react-query';
+import { usePostInfoOptions } from '@/hooks/use-post-info-options';
+import { useOptimisticLike } from '@/hooks/use-optimistic-like';
+import { useLikePost } from '@/hooks/use-like-post';
+import { useUnlikePost } from '@/hooks/use-unlike-post';
 
 type SinglePostProps = {
   id: string;
@@ -19,7 +22,6 @@ type SinglePostProps = {
   image: string | null;
   createdAt: string;
   simpleCreatedAt: string;
-  updatedAt: Date;
   likedIds: string[];
   authorId: string;
   username: string;
@@ -32,7 +34,6 @@ type SinglePostProps = {
   followers: number;
   isMyPost: boolean;
   hasLiked: boolean;
-  replyCount: number;
   myProfilePic: string;
 };
 
@@ -42,37 +43,45 @@ export default function SinglePost({
   image,
   simpleCreatedAt,
   createdAt,
-  likedIds,
   authorId,
   username,
   name,
   bio,
   profileImage,
-  myFollowingIds,
-  authorFollowingIds,
   currentUserId,
-  followers,
   isMyPost,
-  hasLiked,
-  replyCount,
   myProfilePic,
 }: SinglePostProps) {
-  const {
-    btnText,
-    handleMouseOut,
-    handleMouseOver,
-    optimisticFollow,
-    optimisticFollowers,
-    toggleFollow,
-  } = useToggleFollow(followers, authorId, currentUserId, myFollowingIds);
+  const repliesOptions = queryOptions({
+    queryKey: ['repliesCount', id],
+    queryFn: async () => {
+      const response = await fetch(`/api/countReplies/${id}`);
+      const { repliesCount } = await response.json();
+      return repliesCount as number;
+    },
+  });
 
-  const likes = likedIds.length;
-  const { optimisticHasLiked, optimisticLikes, toggleLike } = useToggleLike(
-    likes,
-    id,
+  const { postInfoOptions } = usePostInfoOptions({
+    postId: id,
+    authorId,
     currentUserId,
-    hasLiked
-  );
+  });
+  const likeMutation = useLikePost(currentUserId, postInfoOptions);
+  const unlikeMutation = useUnlikePost(currentUserId, postInfoOptions);
+  const {
+    hasLiked,
+    likesCount,
+    isPending: isLoading,
+  } = useOptimisticLike(postInfoOptions);
+  const toggleLike = () => {
+    if (hasLiked) {
+      unlikeMutation.mutate({ postId: id, userId: currentUserId });
+    } else {
+      likeMutation.mutate({ postId: id, userId: currentUserId });
+    }
+  };
+
+  const { data: repliesCount, isPending } = useQuery(repliesOptions);
 
   return (
     <div>
@@ -83,14 +92,7 @@ export default function SinglePost({
             name={name}
             username={username}
             bio={bio}
-            followingIds={authorFollowingIds}
             isCurrentUser={isMyPost}
-            btnText={btnText}
-            handleMouseOver={handleMouseOver}
-            handleMouseOut={handleMouseOut}
-            optimisticFollow={optimisticFollow}
-            optimisticFollowers={optimisticFollowers}
-            toggleFollow={toggleFollow}
           />
           <section className='text-sm flex flex-col'>
             <Link
@@ -108,7 +110,7 @@ export default function SinglePost({
         <p className='mt-3'>{text}</p>
 
         {image && (
-          <section className='relative aspect-video overflow-hidden rounded-xl my-3.5'>
+          <section className='relative aspect-square w-1/2 mx-auto overflow-hidden rounded-xl my-3.5'>
             <Image src={image} alt='image' fill className='object-cover' />
           </section>
         )}
@@ -116,49 +118,60 @@ export default function SinglePost({
         <span className='text-sm text-muted-foreground'>{createdAt}</span>
 
         <section className='relative -ml-2 flex items-center gap-14 border-y mt-3.5 py-1.5 h-12'>
-          <ReplyDialog
-            handleClick={(e) => e.stopPropagation()}
-            postId={id}
-            name={name}
-            username={username}
-            userId={currentUserId}
-            profileImage={profileImage}
-            createdAt={simpleCreatedAt}
-            text={text}
-            myProfilePic={myProfilePic}
-          >
-            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
-              <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
-                <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
+          {isPending ? (
+            <div className='text-center ml-3 leading-[20px]'>
+              <span className='small-loading'></span>
+            </div>
+          ) : (
+            <ReplyDialog
+              handleClick={(e) => e.stopPropagation()}
+              postId={id}
+              name={name}
+              username={username}
+              userId={currentUserId}
+              profileImage={profileImage}
+              createdAt={simpleCreatedAt}
+              text={text}
+              myProfilePic={myProfilePic}
+            >
+              <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
+                <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
+                  <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
+                </section>
+                <span className='text-sm font-medium group-hover:text-primary transition'>
+                  {repliesCount ? repliesCount : null}
+                </span>
               </section>
-              <span className='text-sm font-medium group-hover:text-primary transition'>
-                {replyCount ? replyCount : null}
+            </ReplyDialog>
+          )}
+          {isLoading ? (
+            <div className='text-center leading-[20px] absolute left-1/4'>
+              <span className='small-loading'></span>
+            </div>
+          ) : (
+            <section
+              className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'
+              onClick={toggleLike}
+            >
+              <section className='rounded-full p-2 group-hover:bg-rose-700/10 transition'>
+                {hasLiked ? (
+                  <FilledHeart filledHeartProps='w-6 h-6 text-rose-700' />
+                ) : (
+                  <Heart heartProps='w-6 h-6 text-slate-400 group-hover:text-rose-700 transition' />
+                )}
+              </section>
+              <span
+                className={cn(
+                  hasLiked
+                    ? 'text-rose-700'
+                    : 'group-hover:text-rose-700 transition',
+                  'text-sm font-medium'
+                )}
+              >
+                {likesCount ? likesCount : null}
               </span>
             </section>
-          </ReplyDialog>
-
-          <section
-            className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'
-            onClick={toggleLike}
-          >
-            <section className='rounded-full p-2 group-hover:bg-rose-700/10 transition'>
-              {optimisticHasLiked ? (
-                <FilledHeart filledHeartProps='w-6 h-6 text-rose-700' />
-              ) : (
-                <Heart heartProps='w-6 h-6 text-slate-400 group-hover:text-rose-700 transition' />
-              )}
-            </section>
-            <span
-              className={cn(
-                optimisticHasLiked
-                  ? 'text-rose-700'
-                  : 'group-hover:text-rose-700 transition',
-                'text-sm font-medium'
-              )}
-            >
-              {optimisticLikes ? optimisticLikes : null}
-            </span>
-          </section>
+          )}
 
           <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
             <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>

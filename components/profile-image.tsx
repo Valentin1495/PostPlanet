@@ -4,46 +4,28 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import Link from 'next/link';
-import ToggleFollowButton from './toggle-follow-button';
 
 type ProfileImageProps = {
-  followingPage?: boolean;
-  profileImage: string;
-  name: string;
-  username: string;
-  bio: string | null;
-  followingIds: string[];
+  isFollowingPage?: boolean;
+  profileImage?: string;
+  name?: string;
+  username?: string;
+  bio?: string | null;
   isCurrentUser?: boolean;
-  btnText: string;
-  handleMouseOver: () => void;
-  handleMouseOut: () => void;
-  optimisticFollow?: boolean;
-  optimisticFollowers: number;
-  toggleFollow: () => Promise<void>;
   randomUser?: boolean;
 };
 
 export default function ProfileImage({
-  followingPage,
   profileImage,
   name,
   username,
   bio,
-  followingIds,
-  isCurrentUser,
-  btnText,
-  handleMouseOver,
-  handleMouseOut,
-  optimisticFollow,
-  optimisticFollowers,
-  toggleFollow,
-  randomUser,
 }: ProfileImageProps) {
   return (
     <HoverCard>
       <div className='max-w-fit'>
         <HoverCardTrigger href={`/${username}/posts`}>
-          {profileImage.includes('#') ? (
+          {profileImage?.includes('#') ? (
             <section
               style={{
                 backgroundColor: profileImage,
@@ -65,7 +47,7 @@ export default function ProfileImage({
         >
           <section className='flex justify-between'>
             <Link href={`/${username}/posts`}>
-              {profileImage.includes('#') ? (
+              {profileImage?.includes('#') ? (
                 <section
                   style={{
                     backgroundColor: profileImage,
@@ -81,15 +63,6 @@ export default function ProfileImage({
                 </Avatar>
               )}
             </Link>
-            {!isCurrentUser && !followingPage && !randomUser && (
-              <ToggleFollowButton
-                btnText={btnText}
-                handleMouseOver={handleMouseOver}
-                handleMouseOut={handleMouseOut}
-                optimisticFollow={optimisticFollow}
-                toggleFollow={toggleFollow}
-              />
-            )}
           </section>
 
           <section>
@@ -106,16 +79,6 @@ export default function ProfileImage({
               @{username}
             </Link>
             <p className='my-2'>{bio}</p>
-            <section className='text-sm space-x-5'>
-              <span>
-                <span className='font-bold'>{followingIds.length}</span>{' '}
-                following
-              </span>
-              <span>
-                <span className='font-bold'>{optimisticFollowers}</span>{' '}
-                followers
-              </span>
-            </section>
           </section>
         </HoverCardContent>
       </div>

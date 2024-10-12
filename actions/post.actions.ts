@@ -2,47 +2,15 @@
 
 import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { Post } from '@prisma/client';
+import { Post, User } from '@prisma/client';
+import { countFollowers, readUser } from './user.actions';
+import { countPostReplies } from './reply.action';
 
-export async function createPost(
-  prevState: {
-    message: string;
-  },
-  formData: FormData
-) {
-  const image = formData.get('fileUrl') as string;
-  let text = formData.get('text') as string;
-  text = text.trim();
-  const userId = formData.get('userId') as string;
-
-  try {
-    await db.post.create({
-      data: {
-        text,
-        image,
-        author: {
-          connect: {
-            id: userId,
-          },
-        },
-      },
-    });
-
-    revalidatePath('/', 'layout');
-
-    return {
-      message: 'Success',
-    };
-  } catch (error) {
-    return {
-      message: 'Failed to post 😢',
-    };
-  }
-}
-
-export async function readAllPosts() {
+export async function readAllPosts(limit: number, page: number) {
   try {
     const posts = await db.post.findMany({
+      take: limit,
+      skip: page * limit,
       orderBy: {
         createdAt: 'desc',
       },
@@ -54,7 +22,15 @@ export async function readAllPosts() {
   }
 }
 
-export async function readPosts(userId: string) {
+export async function readPosts({
+  userId,
+  limit,
+  page,
+}: {
+  userId: string;
+  limit: number;
+  page: number;
+}) {
   try {
     const posts = await db.post.findMany({
       where: {
@@ -63,9 +39,28 @@ export async function readPosts(userId: string) {
       orderBy: {
         createdAt: 'desc',
       },
+      take: limit,
+      skip: limit * page,
     });
 
     return posts;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function readAllUserPosts(userId: string) {
+  try {
+    const allUserPosts = await db.post.findMany({
+      where: {
+        authorId: userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return allUserPosts;
   } catch (error: any) {
     throw new Error(error);
   }
@@ -85,6 +80,25 @@ export async function readPost(postId: string) {
   }
 }
 
+export async function readPostInfo({
+  id,
+  authorId,
+  currentUserId,
+}: {
+  id: string;
+  authorId: string;
+  currentUserId: string;
+}) {
+  const author = (await readUser(authorId)) as User;
+  const post = await readPost(id);
+  const likesCount = post?.likedIds.length;
+  const hasLiked = await checkHasLiked(id, currentUserId);
+  const replyCount = await countPostReplies(id);
+  const followers = await countFollowers(authorId);
+
+  return { author, hasLiked, replyCount, followers, likesCount };
+}
+
 export async function countPosts(userId: string) {
   try {
     const postCount = await db.post.count({
@@ -99,29 +113,18 @@ export async function countPosts(userId: string) {
   }
 }
 
-export async function searchPosts(q: string) {
-  let query = q?.trim();
-  query = query.replace(/\s+/g, ' ');
+export async function readFollowingPosts({
+  followingIds,
+  limit,
+  page,
+}: {
+  followingIds: string[];
+  limit: number;
+  page: number;
+}) {
+  const postPromises = followingIds.map(async (userId) => {
+    const promise = await readAllUserPosts(userId);
 
-  try {
-    const posts = await db.post.findMany({
-      where: {
-        text: {
-          contains: query,
-          mode: 'insensitive',
-        },
-      },
-    });
-
-    return posts;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function readFollowingPosts(followingIds: string[]) {
-  const postPromises = followingIds.map(async (id) => {
-    const promise = await readPosts(id);
     return promise;
   });
 
@@ -129,10 +132,21 @@ export async function readFollowingPosts(followingIds: string[]) {
   const posts = postArrays.flat();
   posts.sort((a, b) => b!.createdAt.getTime() - a!.createdAt.getTime());
 
-  return posts;
+  const startIndex = page * limit;
+  const paginatedPosts = posts.slice(startIndex, startIndex + limit);
+
+  return paginatedPosts;
 }
 
-export async function readLikedPosts(userId: string) {
+export async function readLikedPosts({
+  userId,
+  limit,
+  page,
+}: {
+  userId: string;
+  limit: number;
+  page: number;
+}) {
   try {
     const likedPosts = await db.post.findMany({
       where: {
@@ -143,6 +157,8 @@ export async function readLikedPosts(userId: string) {
       orderBy: {
         createdAt: 'desc',
       },
+      take: limit,
+      skip: limit * page,
     });
 
     return likedPosts;
@@ -204,20 +220,6 @@ export async function unlikePost(postId: string, userId: string) {
       },
       data: {
         likedIds: newLikedIds,
-      },
-    });
-
-    revalidatePath('/', 'layout');
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function deletePost(postId: string) {
-  try {
-    await db.post.delete({
-      where: {
-        id: postId,
       },
     });
 

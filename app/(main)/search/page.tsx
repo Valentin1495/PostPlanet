@@ -1,11 +1,9 @@
-import { fetchUserId, readUser, searchPeople } from '@/actions/user.actions';
-import SingleUser from '@/components/single-user';
-import { Post as SinglePost, User } from '@prisma/client';
-import { searchPosts } from '@/actions/post.actions';
-import Post from '@/components/post';
-import SearchTabs from '@/components/search-tabs';
+import { fetchUserId, readUser } from '@/actions/user.actions';
+import { User } from '@prisma/client';
 import { Metadata } from 'next';
 import SearchBar from '@/components/search-bar';
+import UserResults from '@/components/user-results';
+import PostResults from '@/components/post-results';
 
 type SearchProps = {
   searchParams: {
@@ -35,61 +33,15 @@ export async function generateMetadata({
 export default async function Search({ searchParams }: SearchProps) {
   const { q, f } = searchParams;
   const userId = await fetchUserId();
-  const {
-    id: currentUserId,
-    followingIds,
-    profileImage,
-  } = (await readUser(userId)) as User;
-  let searchResults;
+  const { id, profileImage } = (await readUser(userId)) as User;
 
   if (f === 'user') {
-    searchResults = (await searchPeople(q as string)) as User[];
-
-    return (
-      <main className='min-h-screen'>
-        <div className='bg-background z-10 sticky top-0 pt-5'>
-          <SearchBar />
-          <SearchTabs q={q as string} f={f} />
-        </div>
-        {searchResults.length ? (
-          searchResults.map((user) => (
-            <SingleUser
-              key={user.id}
-              {...user}
-              currentUserId={currentUserId}
-              myFollowingIds={followingIds}
-            />
-          ))
-        ) : (
-          <p className='text-center mt-10 text-lg'>No results.</p>
-        )}
-      </main>
-    );
+    return <UserResults q={q} f={f} />;
   }
 
   if (q) {
-    searchResults = (await searchPosts(q)) as SinglePost[];
-
     return (
-      <main className='min-h-screen'>
-        <div className='bg-background z-10 sticky top-0 pt-5'>
-          <SearchBar />
-          <SearchTabs q={q} f={f} />
-        </div>
-        {searchResults.length ? (
-          searchResults.map((post) => (
-            <Post
-              key={post.id}
-              {...post}
-              currentUserId={currentUserId}
-              myProfilePic={profileImage}
-              myFollowingIds={followingIds}
-            />
-          ))
-        ) : (
-          <p className='text-center mt-10 text-lg'>No results.</p>
-        )}
-      </main>
+      <PostResults q={q} f={f} myProfileImage={profileImage} myUserId={id} />
     );
   }
 

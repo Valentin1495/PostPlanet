@@ -1,17 +1,19 @@
 import { Button } from './ui/button';
-import { useFormStatus } from 'react-dom';
 
-export default function DeleteButton() {
-  const { pending } = useFormStatus();
+type DeleteButtonProps = {
+  isPending: boolean;
+  remove: () => void;
+};
 
+export default function DeleteButton({ isPending, remove }: DeleteButtonProps) {
   return (
     <Button
-      type='submit'
       className='rounded-full w-full font-bold'
       variant='destructive'
-      disabled={pending}
+      onClick={remove}
+      disabled={isPending}
     >
-      {pending ? (
+      {isPending ? (
         <span className='pending'>
           <span></span>
           <span></span>

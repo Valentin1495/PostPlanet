@@ -4,23 +4,19 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { Button } from './ui/button';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useFormState, useFormStatus } from 'react-dom';
 import { X } from 'lucide-react';
-import { createPost } from '@/actions/post.actions';
 import { Input } from './ui/input';
 import Image from 'next/image';
 import { Image as ImageIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { replyToPost } from '@/actions/reply.action';
+import { toast } from 'sonner';
 import UploadPostPic from './upload/upload-post-pic';
 import { FileType } from '@/lib/types';
-
-const initialState = {
-  message: '',
-};
+import { useQueryClient } from '@tanstack/react-query';
+import { useCreatePost } from '@/hooks/use-create-post';
+import { useReplyToPost } from '@/hooks/use-reply-to-post';
 
 type PostFormPorps = {
   profileImage?: string;
@@ -47,30 +43,72 @@ export default function PostForm({
   const [mounted, setMounted] = useState(false);
   const [file, setFile] = useState<FileType | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [state, postAction] = useFormState(
-    isForReply ? replyToPost : createPost,
-    initialState
-  );
-  const { message } = state;
+  const queryClient = useQueryClient();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const createPostFormData = new FormData();
+  createPostFormData.append('text', text);
+
+  if (file) {
+    createPostFormData.append('fileUrl', file.url);
+  }
+  createPostFormData.append('authorId', userId);
+  const createPostMutation = useCreatePost({
+    queryClient,
+    setText,
+    textAreaRef,
+    formData: createPostFormData,
+    userId,
+    setOpen,
+  });
+
+  const replyToPostFormData = new FormData();
+  replyToPostFormData.append('text', text);
+  replyToPostFormData.append('userId', userId);
+
+  if (postId) {
+    replyToPostFormData.append('postId', postId);
+  }
+
+  if (file) {
+    replyToPostFormData.append('fileUrl', file.url);
+  }
+
+  const replyToPostMutation = useReplyToPost({
+    queryClient,
+    formData: replyToPostFormData,
+    postId,
+    isForDialog,
+    setOpen,
+    setText,
+    setFile,
+    textAreaRef,
+  });
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (message === 'Success') {
-      setText('');
-      setFile(null);
-      if (!setOpen) return;
-      setOpen(false);
-    } else if (message) {
-      toast(message);
+    if (createPostMutation.isError) {
+      toast.error(createPostMutation.error.message);
     }
-  }, [message, setOpen]);
+
+    if (replyToPostMutation.isError) {
+      toast.error(replyToPostMutation.error.message);
+    }
+  }, [createPostMutation, replyToPostMutation]);
 
   return (
     <form
-      action={postAction}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (isForPost) {
+          createPostMutation.mutate();
+        } else {
+          replyToPostMutation.mutate();
+        }
+      }}
       className={cn(
         'space-y-2',
         !isForDialog && 'border-b',
@@ -116,6 +154,7 @@ export default function PostForm({
         )}
         {mounted && (
           <TextareaAutosize
+            ref={textAreaRef}
             className='resize-none w-full outline-none my-auto text-xl hide-scrollbar'
             minRows={isForDialog ? 3 : 1}
             placeholder={
@@ -131,7 +170,7 @@ export default function PostForm({
       </section>
 
       {file && (
-        <section className='relative ml-10 aspect-video rounded-xl overflow-hidden'>
+        <section className='relative aspect-square w-1/2 mx-auto rounded-xl overflow-hidden'>
           <Image
             src={file.url}
             alt='image to post'
@@ -166,27 +205,14 @@ export default function PostForm({
           <ImageIcon size='18' className='text-primary' />
         </button>
 
-        {!isForPost && (
-          <Input className='hidden' name='postId' value={postId} readOnly />
-        )}
-        {isForDialog && (
-          <Input
-            className='hidden'
-            name='isForDialog'
-            value={String(isForDialog)}
-            readOnly
-          />
-        )}
-
-        <Input
-          className='hidden'
-          name='userId'
-          value={userId}
-          readOnly
-          type='hidden'
+        <SubmitButton
+          text={text}
+          isPending={
+            createPostMutation.isPending || replyToPostMutation.isPending
+          }
+          fileUrl={file?.url}
+          isForReply={isForReply}
         />
-
-        <SubmitButton text={text} fileUrl={file?.url} isForReply={isForReply} />
       </div>
       {isOpen && <UploadPostPic handleFile={setFile} setIsOpen={setIsOpen} />}
     </form>
@@ -195,20 +221,24 @@ export default function PostForm({
 
 type SubmitButtonProps = {
   text: string;
+  isPending: boolean;
   fileUrl?: string;
   isForReply?: boolean;
 };
 
-function SubmitButton({ text, fileUrl, isForReply }: SubmitButtonProps) {
-  const { pending } = useFormStatus();
-
+function SubmitButton({
+  text,
+  isPending,
+  fileUrl,
+  isForReply,
+}: SubmitButtonProps) {
   return (
     <Button
       className='rounded-full h-8 w-[66px] text-base font-semibold'
-      disabled={(!text.trim() && !fileUrl) || pending}
+      disabled={(!text.trim() && !fileUrl) || isPending}
     >
       {isForReply ? (
-        pending ? (
+        isPending ? (
           <span className='pending'>
             <span></span>
             <span></span>
@@ -217,7 +247,7 @@ function SubmitButton({ text, fileUrl, isForReply }: SubmitButtonProps) {
         ) : (
           'Reply'
         )
-      ) : pending ? (
+      ) : isPending ? (
         <span className='pending'>
           <span></span>
           <span></span>

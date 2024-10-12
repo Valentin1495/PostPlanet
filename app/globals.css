@@ -110,6 +110,15 @@
     @apply border-4 border-l-[hsl(var(--primary))] border-[hsl(var(--primary)/0.2)];
   }
 
+  .small-loading {
+    display: inline-block;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: donut-spin 1.2s linear infinite;
+    @apply border-4 border-l-[hsl(var(--primary))] border-[hsl(var(--primary)/0.2)];
+  }
+
   .pending span {
     width: 8px;
     height: 8px;

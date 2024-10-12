@@ -9,8 +9,6 @@ type ProfileInfoProps = {
   name: string;
   username: string;
   createdAt: Date;
-  followingIds: string[];
-  followers: number;
 };
 
 export default function ProfileInfo({
@@ -18,11 +16,8 @@ export default function ProfileInfo({
   name,
   username,
   createdAt,
-  followers,
-  followingIds,
 }: ProfileInfoProps) {
   const timestamp = format(createdAt, 'MMMM yyyy');
-  const following = followingIds.length;
 
   return (
     <div className='flex flex-col items-center p-3 gap-4'>
@@ -56,23 +51,6 @@ export default function ProfileInfo({
       <section className='flex items-center text-muted-foreground text-sm gap-1.5'>
         <CalendarDays size={16} />
         Joined {timestamp}
-      </section>
-
-      <section className='text-sm space-x-5'>
-        <Link
-          href={`/${username}/following`}
-          className='text-muted-foreground hover:underline'
-        >
-          <span className='font-semibold text-foreground'>{following}</span>{' '}
-          Following
-        </Link>
-        <Link
-          href={`/${username}/followers`}
-          className='text-muted-foreground hover:underline'
-        >
-          <span className='font-semibold text-foreground'>{followers}</span>{' '}
-          Followers
-        </Link>
       </section>
     </div>
   );

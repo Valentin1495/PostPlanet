@@ -1,5 +1,6 @@
 'use client';
 
+import { scrollToTop } from '@/lib/utils';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -8,6 +9,7 @@ type HeaderProps = {
   name?: string;
   isPostPage?: boolean;
   isActivitiesPage?: boolean;
+  isHomePage?: boolean;
 };
 
 export default function Header({
@@ -15,13 +17,8 @@ export default function Header({
   name,
   isPostPage,
   isActivitiesPage,
+  isHomePage,
 }: HeaderProps) {
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
   const router = useRouter();
 
   return (
@@ -29,15 +26,19 @@ export default function Header({
       onClick={scrollToTop}
       className='flex items-center gap-3 sticky top-0 px-3 py-1.5 cursor-pointer backdrop-blur-md z-10'
     >
-      <button
-        className='hover:bg-secondary transition rounded-full p-1.5'
-        onClick={() => router.back()}
-      >
-        <ChevronLeft />
-      </button>
+      {!isHomePage && (
+        <button
+          className='hover:bg-secondary transition rounded-full p-1.5'
+          onClick={() => router.back()}
+        >
+          <ChevronLeft />
+        </button>
+      )}
       <section>
         {isPostPage ? (
           <h1 className='text-xl font-semibold'>Post</h1>
+        ) : isHomePage ? (
+          <h1 className='text-xl font-semibold'>For You</h1>
         ) : isActivitiesPage ? (
           <h1 className='text-xl font-semibold'>Activities</h1>
         ) : (

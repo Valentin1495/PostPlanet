@@ -1,7 +1,6 @@
-import { readLikedPosts } from '@/actions/post.actions';
-import { readUser, readUserId } from '@/actions/user.actions';
-import Post from '@/components/post';
-import { Post as SinglePost, User } from '@prisma/client';
+import { fetchUserId, readUser, readUserId } from '@/actions/user.actions';
+import PostsLiked from '@/components/posts-liked';
+import { User } from '@prisma/client';
 import { Metadata } from 'next';
 
 type ProfileLikesProps = {
@@ -24,23 +23,18 @@ export async function generateMetadata({
 
 export default async function ProfileLikes({ params }: ProfileLikesProps) {
   const userId = (await readUserId(params.username)) as string;
-  const { id, profileImage, followingIds } = (await readUser(userId)) as User;
-  const likedPosts = (await readLikedPosts(userId)) as SinglePost[];
+  const { profileImage, followingIds } = (await readUser(userId)) as User;
+  const currentUserId = await fetchUserId();
 
-  if (!likedPosts.length)
-    return <p className='min-h-screen text-center mt-10'>No Likes.</p>;
   return (
     <main className='min-h-screen'>
-      {likedPosts.map((post) => (
-        <Post
-          {...post}
-          key={post.id}
-          currentUserId={id}
-          myProfilePic={profileImage}
-          myFollowingIds={followingIds}
-          isProfilePage
-        />
-      ))}
+      <PostsLiked
+        userId={userId}
+        currentUserId={currentUserId}
+        isProfilePage
+        myProfilePic={profileImage}
+        myFollowingIds={followingIds}
+      />
     </main>
   );
 }
