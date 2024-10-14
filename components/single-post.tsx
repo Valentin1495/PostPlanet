@@ -15,6 +15,7 @@ import { usePostInfoOptions } from '@/hooks/use-post-info-options';
 import { useOptimisticLike } from '@/hooks/use-optimistic-like';
 import { useLikePost } from '@/hooks/use-like-post';
 import { useUnlikePost } from '@/hooks/use-unlike-post';
+import { Skeleton } from './ui/skeleton';
 
 type SinglePostProps = {
   id: string;
@@ -28,10 +29,7 @@ type SinglePostProps = {
   name: string;
   bio: string | null;
   profileImage: string;
-  myFollowingIds: string[];
-  authorFollowingIds: string[];
   currentUserId: string;
-  followers: number;
   isMyPost: boolean;
   hasLiked: boolean;
   myProfilePic: string;
@@ -110,7 +108,7 @@ export default function SinglePost({
         <p className='mt-3'>{text}</p>
 
         {image && (
-          <section className='relative aspect-square w-1/2 mx-auto overflow-hidden rounded-xl my-3.5'>
+          <section className='relative w-full min-h-96 overflow-hidden rounded-xl my-3.5'>
             <Image src={image} alt='image' fill className='object-cover' />
           </section>
         )}
@@ -119,9 +117,7 @@ export default function SinglePost({
 
         <section className='relative -ml-2 flex items-center gap-14 border-y mt-3.5 py-1.5 h-12'>
           {isPending ? (
-            <div className='text-center ml-3 leading-[20px]'>
-              <span className='small-loading'></span>
-            </div>
+            <Skeleton className='w-12 h-10 ml-3' />
           ) : (
             <ReplyDialog
               handleClick={(e) => e.stopPropagation()}
@@ -145,9 +141,7 @@ export default function SinglePost({
             </ReplyDialog>
           )}
           {isLoading ? (
-            <div className='text-center leading-[20px] absolute left-1/4'>
-              <span className='small-loading'></span>
-            </div>
+            <Skeleton className='w-12 h-10 absolute left-1/4' />
           ) : (
             <section
               className='flex items-center -space-x-1 group w-fit cursor-pointer absolute top-1/2 -translate-y-1/2 left-1/4'

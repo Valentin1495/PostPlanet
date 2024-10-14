@@ -6,7 +6,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/hover-card';
 import Link from 'next/link';
 
 type ProfileImageProps = {
-  isFollowingPage?: boolean;
   profileImage?: string;
   name?: string;
   username?: string;

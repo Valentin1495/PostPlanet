@@ -9,7 +9,6 @@ type PostsLikedProps = {
   userId: string;
   currentUserId: string;
   myProfilePic: string;
-  myFollowingIds: string[];
   isProfilePage: boolean;
 };
 
@@ -18,7 +17,6 @@ const LIMIT = 10;
 export default function PostsLiked({
   userId,
   currentUserId,
-  myFollowingIds,
   myProfilePic,
   isProfilePage,
 }: PostsLikedProps) {

@@ -94,7 +94,7 @@ export default function Reply({
         <section className='space-y-2'>
           <p>{text}</p>
           {image && (
-            <article className='relative aspect-square w-1/2 mx-auto rounded-xl overflow-hidden'>
+            <article className='relative w-full min-h-96 rounded-xl overflow-hidden'>
               <Image
                 src={image}
                 alt='reply image'

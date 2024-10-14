@@ -1,5 +1,5 @@
 import { checkHasLiked, readPost } from '@/actions/post.actions';
-import { countFollowers, fetchUserId, readUser } from '@/actions/user.actions';
+import { fetchUserId, readUser } from '@/actions/user.actions';
 import Header from '@/components/header';
 import PostForm from '@/components/post-form';
 import Replies from '@/components/replies';
@@ -40,12 +40,10 @@ export default async function PostPage({ params }: PostPageProps) {
 
   const author = (await readUser(post.authorId)) as User;
   const userId = await fetchUserId();
-  const { followingIds, id, profileImage, username } = (await readUser(
-    userId
-  )) as User;
+  const { id, profileImage, username } = (await readUser(userId)) as User;
   const isMyPost = post.authorId === id;
   const hasLiked = (await checkHasLiked(postId, userId)) as boolean;
-  const followers = await countFollowers(post.authorId);
+
   const timestamp = getDetailedDate(post.createdAt);
   const simpleTimestamp = getSimpleDate(post.createdAt);
 
@@ -58,14 +56,11 @@ export default async function PostPage({ params }: PostPageProps) {
         {...author}
         id={postId}
         authorId={post.authorId}
-        followers={followers}
         isMyPost={isMyPost}
         hasLiked={hasLiked}
         createdAt={timestamp}
         simpleCreatedAt={simpleTimestamp}
         currentUserId={id}
-        myFollowingIds={followingIds}
-        authorFollowingIds={author.followingIds}
         myProfilePic={profileImage}
       />
 

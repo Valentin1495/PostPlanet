@@ -24,7 +24,7 @@ export async function generateMetadata({
 export default async function ProfilePosts({ params }: ProfilePostsProps) {
   const userId = (await readUserId(params.username)) as string;
   const currentUserId = await fetchUserId();
-  const { profileImage, followingIds } = (await readUser(userId)) as User;
+  const { profileImage } = (await readUser(userId)) as User;
 
   return (
     <main className='min-h-screen'>
@@ -32,7 +32,6 @@ export default async function ProfilePosts({ params }: ProfilePostsProps) {
         userId={userId}
         currentUserId={currentUserId}
         profileImage={profileImage}
-        followingIds={followingIds}
       />
     </main>
   );

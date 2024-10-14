@@ -1,5 +1,4 @@
 import db from '@/lib/db';
-import { User } from '@prisma/client';
 
 export async function getActivities({
   userId,
@@ -370,16 +369,14 @@ export async function getUserId(username: string) {
 }
 
 export async function getFollowingUsers({
-  userId,
+  followingIds,
   limit,
   page,
 }: {
-  userId: string;
+  followingIds: string[];
   limit: number;
   page: number;
 }) {
-  const { followingIds } = (await getUser(userId)) as User;
-
   const startIndex = page * limit;
   const paginatedFollowingIds = followingIds.slice(
     startIndex,

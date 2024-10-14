@@ -9,7 +9,6 @@ type UserPostsProps = {
   userId: string;
   currentUserId: string;
   profileImage: string;
-  followingIds: string[];
 };
 
 const LIMIT = 10;
@@ -18,7 +17,6 @@ export default function UserPosts({
   userId,
   currentUserId,
   profileImage,
-  followingIds,
 }: UserPostsProps) {
   const { data, error, isFetchingNextPage, ref, status } = useInfiniteScroll(
     ['userPosts', userId],

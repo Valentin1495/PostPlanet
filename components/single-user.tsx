@@ -26,7 +26,6 @@ export default function SingleUser({
         onClick={() => router.push(`/${username}/posts`)}
       >
         <ProfileImage
-          isFollowingPage
           bio={bio}
           name={name}
           username={username}

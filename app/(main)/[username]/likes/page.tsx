@@ -23,7 +23,7 @@ export async function generateMetadata({
 
 export default async function ProfileLikes({ params }: ProfileLikesProps) {
   const userId = (await readUserId(params.username)) as string;
-  const { profileImage, followingIds } = (await readUser(userId)) as User;
+  const { profileImage } = (await readUser(userId)) as User;
   const currentUserId = await fetchUserId();
 
   return (
@@ -33,7 +33,6 @@ export default async function ProfileLikes({ params }: ProfileLikesProps) {
         currentUserId={currentUserId}
         isProfilePage
         myProfilePic={profileImage}
-        myFollowingIds={followingIds}
       />
     </main>
   );

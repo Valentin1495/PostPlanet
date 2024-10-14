@@ -170,7 +170,7 @@ export default function PostForm({
       </section>
 
       {file && (
-        <section className='relative aspect-square w-1/2 mx-auto rounded-xl overflow-hidden'>
+        <section className='relative w-full min-h-96 rounded-xl overflow-hidden'>
           <Image
             src={file.url}
             alt='image to post'

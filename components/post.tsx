@@ -18,6 +18,7 @@ import { useLikePost } from '@/hooks/use-like-post';
 import { useUnlikePost } from '@/hooks/use-unlike-post';
 import { useOptimisticLike } from '@/hooks/use-optimistic-like';
 import { Post as PostType } from '@prisma/client';
+import { Skeleton } from './ui/skeleton';
 
 export type PostProps = PostType & {
   currentUserId: string;
@@ -58,7 +59,7 @@ export default function Post({
   const isProfileReplies = pathname.includes('/with-replies');
 
   if (isPending) {
-    return null;
+    return <Skeleton className='w-full h-96 mb-1' />;
   }
 
   if (isError) {
@@ -115,7 +116,7 @@ export default function Post({
         <section className='space-y-2'>
           <p>{text}</p>
           {image && (
-            <article className='relative w-1/2 mx-auto aspect-square rounded-xl overflow-hidden'>
+            <article className='relative w-full min-h-96 rounded-xl overflow-hidden'>
               <Image
                 src={image}
                 alt='image'

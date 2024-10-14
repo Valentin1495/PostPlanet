@@ -10,10 +10,8 @@ type RandomUserProps = {
   name: string;
   id: string;
   bio: string | null;
-  myFollowingIds: string[];
-  userFollowingIds: string[];
+
   currentUserId: string;
-  followers: number;
 };
 
 export default function RandomUser({
