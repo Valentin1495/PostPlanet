@@ -1,4 +1,7 @@
-<h1 align="center">PostPlanet</h1>
+<a href="https://postplanet.vercel.app">
+  <img alt="home page" src="https://github.com/user-attachments/assets/af0e0f64-a2c1-478a-bc57-4ebc97b4c671" />
+  <h1 align="center">PostPlanet</h1>
+</a>
 
 <p align="center">
   소셜 미디어 플랫폼
