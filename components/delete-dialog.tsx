@@ -12,7 +12,6 @@ import {
 import DeleteButton from './delete-button';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useDeletePost } from '@/hooks/use-delete-post';
 import { useDeleteReply } from '@/hooks/use-delete-reply';
 
@@ -22,7 +21,6 @@ type DeleteDialogProps = {
   postId: string;
   replyId?: string;
   forReply?: boolean;
-
 };
 
 export default function DeleteDialog({
@@ -35,16 +33,13 @@ export default function DeleteDialog({
 }: DeleteDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const queryClient =useQueryClient()
   const deletePostMutation = useDeletePost({
-    queryClient,
     setOpen,
     router,
     postId,
   });
 
   const deleteReplyMutation = useDeleteReply({
-    queryClient,
     setOpen,
     replyId,
     postId,

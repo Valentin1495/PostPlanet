@@ -1,18 +1,19 @@
-import { QueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { Dispatch, SetStateAction } from 'react';
+import { toast } from 'sonner';
 
 export const useDeletePost = ({
-  queryClient,
   setOpen,
   router,
   postId,
 }: {
   postId: string;
-  queryClient: QueryClient;
   setOpen: Dispatch<SetStateAction<boolean>>;
   router: AppRouterInstance;
 }) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () =>
       await fetch('/api/deletePost', {
@@ -24,8 +25,13 @@ export const useDeletePost = ({
       }),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['allPosts'] });
-      setOpen(false);
+    },
+    onSuccess: () => {
       router.push('/home');
+      setOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 };

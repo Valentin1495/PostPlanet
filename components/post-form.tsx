@@ -11,10 +11,8 @@ import { Input } from './ui/input';
 import Image from 'next/image';
 import { Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 import UploadPostPic from './upload/upload-post-pic';
 import { FileType } from '@/lib/types';
-import { useQueryClient } from '@tanstack/react-query';
 import { useCreatePost } from '@/hooks/use-create-post';
 import { useReplyToPost } from '@/hooks/use-reply-to-post';
 
@@ -43,7 +41,7 @@ export default function PostForm({
   const [mounted, setMounted] = useState(false);
   const [file, setFile] = useState<FileType | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   const createPostFormData = new FormData();
@@ -54,12 +52,12 @@ export default function PostForm({
   }
   createPostFormData.append('authorId', userId);
   const createPostMutation = useCreatePost({
-    queryClient,
     setText,
     textAreaRef,
     formData: createPostFormData,
     userId,
     setOpen,
+    setFile,
   });
 
   const replyToPostFormData = new FormData();
@@ -75,7 +73,6 @@ export default function PostForm({
   }
 
   const replyToPostMutation = useReplyToPost({
-    queryClient,
     formData: replyToPostFormData,
     postId,
     isForDialog,
@@ -88,16 +85,6 @@ export default function PostForm({
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (createPostMutation.isError) {
-      toast.error(createPostMutation.error.message);
-    }
-
-    if (replyToPostMutation.isError) {
-      toast.error(replyToPostMutation.error.message);
-    }
-  }, [createPostMutation, replyToPostMutation]);
 
   return (
     <form

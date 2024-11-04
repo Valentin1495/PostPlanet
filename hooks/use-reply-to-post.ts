@@ -1,9 +1,9 @@
 import { FileType } from '@/lib/types';
-import { QueryClient, useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dispatch, RefObject, SetStateAction } from 'react';
+import { toast } from 'sonner';
 
 type ParamsType = {
-  queryClient: QueryClient;
   formData: FormData;
   postId?: string;
   isForDialog?: boolean;
@@ -12,8 +12,8 @@ type ParamsType = {
   setFile: Dispatch<SetStateAction<FileType | null>>;
   textAreaRef: RefObject<HTMLTextAreaElement>;
 };
+
 export const useReplyToPost = ({
-  queryClient,
   formData,
   postId,
   isForDialog,
@@ -22,6 +22,8 @@ export const useReplyToPost = ({
   setFile,
   textAreaRef,
 }: ParamsType) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/replyToPost`, {
@@ -36,17 +38,22 @@ export const useReplyToPost = ({
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
       queryClient.invalidateQueries({ queryKey: ['replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['repliesCount', postId] });
+
+      if (textAreaRef.current) {
+        textAreaRef.current.focus();
+      }
+    },
+    onSuccess: () => {
+      setText('');
+      setFile(null);
       if (isForDialog) {
         if (setOpen) {
           setOpen(false);
         }
       }
-      if (textAreaRef.current) {
-        textAreaRef.current.focus();
-      }
-
-      setText('');
-      setFile(null);
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 };
