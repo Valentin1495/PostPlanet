@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 type ParamsType = {
   formData: FormData;
   postId?: string;
+  userId: string;
   isForDialog?: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
   setText: Dispatch<SetStateAction<string>>;
@@ -16,6 +17,7 @@ type ParamsType = {
 export const useReplyToPost = ({
   formData,
   postId,
+  userId,
   isForDialog,
   setOpen,
   setText,
@@ -37,7 +39,10 @@ export const useReplyToPost = ({
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
       queryClient.invalidateQueries({ queryKey: ['replies', postId] });
+      queryClient.refetchQueries({ queryKey: ['replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['repliesCount', postId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', userId] });
+      queryClient.refetchQueries({ queryKey: ['activities', userId] });
 
       if (textAreaRef.current) {
         textAreaRef.current.focus();

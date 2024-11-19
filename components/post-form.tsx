@@ -31,10 +31,10 @@ export default function PostForm({
   profileImage,
   username,
   postId,
+  userId,
   isForPost,
   isForDialog,
   isForReply,
-  userId,
   setOpen,
 }: PostFormPorps) {
   const [text, setText] = useState('');
@@ -75,6 +75,7 @@ export default function PostForm({
   const replyToPostMutation = useReplyToPost({
     formData: replyToPostFormData,
     postId,
+    userId,
     isForDialog,
     setOpen,
     setText,

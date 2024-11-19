@@ -69,6 +69,8 @@ export const useLikePost = (userId: string, postInfoOptions: any) => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: postInfoOptions.queryKey });
       queryClient.invalidateQueries({ queryKey: ['postsLiked', userId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', userId] });
+      queryClient.refetchQueries({ queryKey: ['activities', userId] });
     },
   });
 };

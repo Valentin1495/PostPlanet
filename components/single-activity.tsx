@@ -73,7 +73,7 @@ export default function SingleActivity({
             <span className='font-semibold'>{name}</span>{' '}
             <span className='text-muted-foreground'>
               {' '}
-              {like ? 'liked your post' : 'replied to you post'}
+              {like ? 'liked your post' : 'replied to your post'}
             </span>
           </p>
 

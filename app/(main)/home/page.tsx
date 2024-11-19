@@ -14,7 +14,7 @@ export default async function Home() {
   const user = await readUser(userId);
 
   if (!user) return;
-  const { id, username, profileImage } = user;
+  const { username, profileImage } = user;
 
   return (
     <main className='min-h-screen w-full'>
@@ -23,9 +23,9 @@ export default async function Home() {
         isForPost
         profileImage={profileImage}
         username={username}
-        userId={id}
+        userId={userId}
       />
-      <AllPosts currentUserId={id} myProfileImage={profileImage} />
+      <AllPosts currentUserId={userId} myProfileImage={profileImage} />
     </main>
   );
 }
