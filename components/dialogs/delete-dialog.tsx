@@ -1,48 +1,35 @@
 'use client';
 
-import { MouseEvent, ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
-} from './ui/dialog';
-import DeleteButton from './delete-button';
+} from '../ui/dialog';
+import DeleteButton from '../delete-button';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useDeletePost } from '@/hooks/use-delete-post';
 import { useDeleteReply } from '@/hooks/use-delete-reply';
+import { useDialog } from '@/hooks/use-dialog';
 
-type DeleteDialogProps = {
-  children: ReactNode;
-  handleClick: (e: MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
-  postId: string;
-  replyId?: string;
-  forReply?: boolean;
-};
-
-export default function DeleteDialog({
-  children,
-  handleClick,
-  postId,
-  forReply,
-
-  replyId,
-}: DeleteDialogProps) {
-  const [open, setOpen] = useState(false);
+export default function DeleteDialog() {
+  const { dialogs, closeDialog } = useDialog();
   const router = useRouter();
+  const { data } = useDialog();
+  const forReply = data.deleteReply?.forReply;
   const deletePostMutation = useDeletePost({
-    setOpen,
+    closePostDialog: () => closeDialog('deletePost'),
     router,
-    postId,
+    postId: data.deletePost?.postId,
   });
 
   const deleteReplyMutation = useDeleteReply({
-    setOpen,
-    replyId,
-    postId,
+    closeReplyDialog: () => closeDialog('deleteReply'),
+    replyId: data.deleteReply?.replyId,
+    postId: data.deleteReply?.postId,
   });
 
   useEffect(() => {
@@ -56,8 +43,14 @@ export default function DeleteDialog({
   }, [deletePostMutation, deleteReplyMutation]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger onClick={handleClick}>{children}</DialogTrigger>
+    <Dialog
+      open={forReply ? dialogs.deleteReply : dialogs.deletePost}
+      onOpenChange={
+        forReply
+          ? () => closeDialog('deleteReply')
+          : () => closeDialog('deletePost')
+      }
+    >
       <DialogContent className='w-72'>
         <DialogTitle className='text-xl'>
           Delete {forReply ? 'reply' : 'post'}?

@@ -4,12 +4,12 @@ import { Dispatch, SetStateAction } from 'react';
 import { toast } from 'sonner';
 
 export const useDeletePost = ({
-  setOpen,
+  closePostDialog,
   router,
   postId,
 }: {
   postId: string;
-  setOpen: Dispatch<SetStateAction<boolean>>;
+  closePostDialog: () => void;
   router: AppRouterInstance;
 }) => {
   const queryClient = useQueryClient();
@@ -28,7 +28,8 @@ export const useDeletePost = ({
     },
     onSuccess: () => {
       router.push('/home');
-      setOpen(false);
+
+      closePostDialog();
     },
     onError: (error) => {
       toast.error(error.message);

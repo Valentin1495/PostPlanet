@@ -8,7 +8,7 @@ type ParamsType = {
   postId?: string;
   userId: string;
   isForDialog?: boolean;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
+  closeReplyDialog?: () => void;
   setText: Dispatch<SetStateAction<string>>;
   setFile: Dispatch<SetStateAction<FileType | null>>;
   textAreaRef: RefObject<HTMLTextAreaElement>;
@@ -19,7 +19,7 @@ export const useReplyToPost = ({
   postId,
   userId,
   isForDialog,
-  setOpen,
+  closeReplyDialog,
   setText,
   setFile,
   textAreaRef,
@@ -49,12 +49,17 @@ export const useReplyToPost = ({
       }
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['replies', postId] });
+      queryClient.refetchQueries({ queryKey: ['replies', postId] });
+      queryClient.invalidateQueries({ queryKey: ['repliesCount', postId] });
+      queryClient.invalidateQueries({ queryKey: ['activities', userId] });
+      queryClient.refetchQueries({ queryKey: ['activities', userId] });
+
       setText('');
       setFile(null);
-      if (isForDialog) {
-        if (setOpen) {
-          setOpen(false);
-        }
+      if (isForDialog && closeReplyDialog) {
+        closeReplyDialog();
       }
     },
     onError: (error) => {

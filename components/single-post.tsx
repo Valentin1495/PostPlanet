@@ -7,15 +7,15 @@ import Image from 'next/image';
 import ChatBubble from './icons/chat-bubble';
 import FilledHeart from './icons/filled-heart';
 import Heart from './icons/heart';
-import DeleteDialog from './delete-dialog';
+import DeleteDialog from './dialogs/delete-dialog';
 import { Trash2 } from 'lucide-react';
-import ReplyDialog from './reply-dialog';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { usePostInfoOptions } from '@/hooks/use-post-info-options';
 import { useOptimisticLike } from '@/hooks/use-optimistic-like';
 import { useLikePost } from '@/hooks/use-like-post';
 import { useUnlikePost } from '@/hooks/use-unlike-post';
 import { Skeleton } from './ui/skeleton';
+import { useDialog } from '@/hooks/use-dialog';
 
 type SinglePostProps = {
   id: string;
@@ -80,7 +80,7 @@ export default function SinglePost({
   };
 
   const { data: repliesCount, isPending } = useQuery(repliesOptions);
-
+  const { openDialog } = useDialog();
   return (
     <div>
       <div className='p-3'>
@@ -119,26 +119,41 @@ export default function SinglePost({
           {isPending ? (
             <Skeleton className='w-12 h-10 ml-3' />
           ) : (
-            <ReplyDialog
-              handleClick={(e) => e.stopPropagation()}
-              postId={id}
-              name={name}
-              username={username}
-              userId={currentUserId}
-              profileImage={profileImage}
-              createdAt={simpleCreatedAt}
-              text={text}
-              myProfilePic={myProfilePic}
+            // <ReplyDialog
+            //   handleClick={(e) => e.stopPropagation()}
+            //   postId={id}
+            //   name={name}
+            //   username={username}
+            //   userId={currentUserId}
+            //   profileImage={profileImage}
+            //   createdAt={simpleCreatedAt}
+            //   text={text}
+            //   myProfilePic={myProfilePic}
+            //   >
+            //   </ReplyDialog>
+            <section
+              onClick={(e) => {
+                e.stopPropagation();
+                openDialog('replyToPost', {
+                  postId: id,
+                  name,
+                  username,
+                  currentUserId,
+                  authorProfilePic: profileImage,
+                  text,
+                  createdAt: simpleCreatedAt,
+                  myProfilePic,
+                });
+              }}
+              className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 cursor-pointer'
             >
-              <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
-                <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
-                  <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
-                </section>
-                <span className='text-sm font-medium group-hover:text-primary transition'>
-                  {repliesCount ? repliesCount : null}
-                </span>
+              <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
+                <ChatBubble chatBubbleProps='w-6 h-6 text-slate-400 group-hover:text-primary transition' />
               </section>
-            </ReplyDialog>
+              <span className='text-sm font-medium group-hover:text-primary transition'>
+                {repliesCount ? repliesCount : null}
+              </span>
+            </section>
           )}
           {isLoading ? (
             <Skeleton className='w-12 h-10 absolute left-1/4' />
@@ -167,15 +182,23 @@ export default function SinglePost({
             </section>
           )}
 
-          <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
-            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
-              {isMyPost && (
-                <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
-                  <Trash2 className='w-6 h-6 text-slate-400 group-hover:text-destructive transition' />
-                </section>
-              )}
-            </section>
-          </DeleteDialog>
+          {/* <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
+            </DeleteDialog> */}
+          <section
+            onClick={(e) => {
+              e.stopPropagation();
+              openDialog('deletePost', {
+                postId: id,
+              });
+            }}
+            className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0 cursor-pointer'
+          >
+            {isMyPost && (
+              <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
+                <Trash2 className='w-6 h-6 text-slate-400 group-hover:text-destructive transition' />
+              </section>
+            )}
+          </section>
         </section>
       </div>
     </div>

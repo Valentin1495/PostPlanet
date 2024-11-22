@@ -5,10 +5,11 @@ import { cn, getSimpleDate } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import ProfileImage from './profile-image';
 import Link from 'next/link';
-import DeleteDialog from './delete-dialog';
+import DeleteDialog from './dialogs/delete-dialog';
 import Image from 'next/image';
 import { Trash2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { useDialog } from '@/hooks/use-dialog';
 
 type ReplyProps = ReplyType & {
   currentUserId: string;
@@ -40,6 +41,7 @@ export default function Reply({
   const pathname = usePathname();
   const isProfileReplies = pathname.includes('/with-replies');
   const isMyReply = authorId === currentUserId;
+  const { openDialog } = useDialog();
 
   return (
     <div
@@ -78,16 +80,26 @@ export default function Reply({
           </span>
 
           {isMyReply && (
-            <DeleteDialog
-              handleClick={(e) => e.stopPropagation()}
-              postId={postId}
-              replyId={id}
-              forReply
+            // <DeleteDialog
+            //   handleClick={(e) => e.stopPropagation()}
+            //   postId={postId}
+            //   replyId={id}
+            //   forReply
+            // >
+            // </DeleteDialog>
+            <section
+              onClick={(e) => {
+                e.stopPropagation();
+                openDialog('deleteReply', {
+                  postId,
+                  replyId: id,
+                  forReply: true,
+                });
+              }}
+              className='hover:text-destructive text-slate-400 transition hover:bg-destructive/10 p-1.5 rounded-full cursor-pointer'
             >
-              <section className='hover:text-destructive text-slate-400 transition hover:bg-destructive/10 p-1.5 rounded-full'>
-                <Trash2 size={16} />
-              </section>
-            </DeleteDialog>
+              <Trash2 size={16} />
+            </section>
           )}
         </section>
 

@@ -24,7 +24,8 @@ type PostFormPorps = {
   isForDialog?: boolean;
   isForReply?: boolean;
   userId: string;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
+  closeCreateDialog?: () => void;
+  closeReplyDialog?: () => void;
 };
 
 export default function PostForm({
@@ -35,7 +36,8 @@ export default function PostForm({
   isForPost,
   isForDialog,
   isForReply,
-  setOpen,
+  closeCreateDialog,
+  closeReplyDialog,
 }: PostFormPorps) {
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -56,7 +58,7 @@ export default function PostForm({
     textAreaRef,
     formData: createPostFormData,
     userId,
-    setOpen,
+    closeCreateDialog,
     setFile,
   });
 
@@ -77,7 +79,7 @@ export default function PostForm({
     postId,
     userId,
     isForDialog,
-    setOpen,
+    closeReplyDialog,
     setText,
     setFile,
     textAreaRef,

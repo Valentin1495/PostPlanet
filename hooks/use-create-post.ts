@@ -9,7 +9,7 @@ type ParamsType = {
   textAreaRef: RefObject<HTMLTextAreaElement>;
   formData: FormData;
   userId: string;
-  setOpen?: Dispatch<SetStateAction<boolean>>;
+  closeCreateDialog?: () => void;
 };
 
 export const useCreatePost = ({
@@ -18,7 +18,7 @@ export const useCreatePost = ({
   textAreaRef,
   formData,
   userId,
-  setOpen,
+  closeCreateDialog,
 }: ParamsType) => {
   const queryClient = useQueryClient();
 
@@ -43,9 +43,8 @@ export const useCreatePost = ({
     onSuccess: () => {
       setText('');
       setFile(null);
-
-      if (setOpen) {
-        setOpen(false);
+      if (closeCreateDialog) {
+        closeCreateDialog();
       }
     },
     onError: (error) => {

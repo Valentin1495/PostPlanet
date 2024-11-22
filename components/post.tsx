@@ -10,15 +10,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import ChatBubble from '@/components/icons/chat-bubble';
 import FilledHeart from '@/components/icons/filled-heart';
 import Heart from '@/components/icons/heart';
-import ReplyDialog from './reply-dialog';
 import { Trash2 } from 'lucide-react';
-import DeleteDialog from './delete-dialog';
+import DeleteDialog from './dialogs/delete-dialog';
 import { usePostInfoOptions } from '@/hooks/use-post-info-options';
 import { useLikePost } from '@/hooks/use-like-post';
 import { useUnlikePost } from '@/hooks/use-unlike-post';
 import { useOptimisticLike } from '@/hooks/use-optimistic-like';
 import { Post as PostType } from '@prisma/client';
 import { Skeleton } from './ui/skeleton';
+import { useDialog } from '@/hooks/use-dialog';
 
 export type PostProps = PostType & {
   currentUserId: string;
@@ -57,6 +57,7 @@ export default function Post({
   const router = useRouter();
   const pathname = usePathname();
   const isProfileReplies = pathname.includes('/with-replies');
+  const { openDialog } = useDialog();
 
   if (isPending) {
     return <Skeleton className='w-full h-96 mb-1' />;
@@ -129,26 +130,29 @@ export default function Post({
         </section>
 
         <section className='-ml-2 relative h-10'>
-          <ReplyDialog
-            handleClick={(e) => e.stopPropagation()}
-            postId={id}
-            name={name}
-            username={username}
-            userId={currentUserId}
-            profileImage={profileImage}
-            createdAt={timestamp}
-            text={text}
-            myProfilePic={myProfilePic}
+          <section
+            onClick={(e) => {
+              e.stopPropagation();
+              openDialog('replyToPost', {
+                postId: id,
+                name,
+                username,
+                authorProfilePic: profileImage,
+                createdAt: timestamp,
+                text,
+                currentUserId,
+                myProfilePic,
+              });
+            }}
+            className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 cursor-pointer'
           >
-            <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2'>
-              <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
-                <ChatBubble chatBubbleProps='w-[18px] h-[18px] text-slate-400 group-hover:text-primary transition' />
-              </section>
-              <span className='text-sm font-medium group-hover:text-primary transition'>
-                {replyCount ? replyCount : null}
-              </span>
+            <section className='rounded-full p-2 group-hover:bg-primary/5 transition'>
+              <ChatBubble chatBubbleProps='w-[18px] h-[18px] text-slate-400 group-hover:text-primary transition' />
             </section>
-          </ReplyDialog>
+            <span className='text-sm font-medium group-hover:text-primary transition'>
+              {replyCount ? replyCount : null}
+            </span>
+          </section>
 
           <button
             className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 left-1/4'
@@ -177,13 +181,21 @@ export default function Post({
           </button>
 
           {isMyPost && (
-            <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
-              <section className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0'>
-                <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
-                  <Trash2 className='w-[18px] h-[18px] text-slate-400 group-hover:text-destructive transition' />
-                </section>
+            // <DeleteDialog handleClick={(e) => e.stopPropagation()} postId={id}>
+            // </DeleteDialog>
+            <section
+              onClick={(e) => {
+                e.stopPropagation();
+                openDialog('deletePost', {
+                  postId: id,
+                });
+              }}
+              className='flex items-center -space-x-1 group w-fit absolute top-1/2 -translate-y-1/2 right-0 cursor-pointer'
+            >
+              <section className='rounded-full p-2 group-hover:bg-destructive/5 transition'>
+                <Trash2 className='w-[18px] h-[18px] text-slate-400 group-hover:text-destructive transition' />
               </section>
-            </DeleteDialog>
+            </section>
           )}
         </section>
       </div>

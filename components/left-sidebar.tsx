@@ -6,9 +6,10 @@ import { CircleUser, LogOut, PenTool } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import PostDialog from './post-dialog';
 import { SignOutButton, useSession } from '@clerk/nextjs';
 import { logout } from '@/actions/user.actions';
+import { useDialog } from '@/hooks/use-dialog';
+import { Button } from './ui/button';
 
 type LeftSidebarProps = {
   username: string;
@@ -24,6 +25,7 @@ export default function LeftSidebar({
   const pathname = usePathname();
   const isProfilePage = pathname.includes(username);
   const { isSignedIn } = useSession();
+  const { openDialog } = useDialog();
 
   return (
     <nav className='flex flex-col items-end sticky top-0 min-h-screen py-5 md:pr-4 xl:pr-8 px-2.5 sm:px-5 lg:w-44 xl:w-[500px]'>
@@ -76,12 +78,35 @@ export default function LeftSidebar({
           </span>
         </Link>
 
-        <PostDialog userId={userId} profileImage={profileImage}>
+        <Button
+          onClick={() => {
+            openDialog('createPost', {
+              userId,
+              profileImage,
+            });
+          }}
+          className='rounded-full darker bg-primary hidden xl:inline-flex w-full h-12 text-background justify-center items-center font-semibold'
+        >
           Post
-        </PostDialog>
-        <PostDialog userId={userId} profileImage={profileImage} icon>
+        </Button>
+        <Button
+          onClick={() => {
+            openDialog('createPost', {
+              userId,
+              profileImage,
+            });
+          }}
+          className='rounded-full darker bg-primary text-background flex items-center justify-center xl:hidden size-fit p-2.5'
+        >
+          <PenTool size='28' strokeWidth='1.5' />
+        </Button>
+        {/* <PostDialog userId={userId} profileImage={profileImage}>
+          Post
+        </PostDialog> */}
+
+        {/* <PostDialog userId={userId} profileImage={profileImage} icon>
           <PenTool size='28' strokeWidth='1.5' className='text-background' />
-        </PostDialog>
+        </PostDialog> */}
 
         <div className='mt-auto max-w-fit cursor-pointer'>
           {isSignedIn ? (
