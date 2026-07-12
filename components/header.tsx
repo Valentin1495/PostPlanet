@@ -10,6 +10,7 @@ type HeaderProps = {
   isPostPage?: boolean;
   isActivitiesPage?: boolean;
   isHomePage?: boolean;
+  isFollowListPage?: boolean;
 };
 
 export default function Header({
@@ -18,6 +19,7 @@ export default function Header({
   isPostPage,
   isActivitiesPage,
   isHomePage,
+  isFollowListPage,
 }: HeaderProps) {
   const router = useRouter();
 
@@ -41,6 +43,8 @@ export default function Header({
           <h1 className='text-xl font-semibold'>For You</h1>
         ) : isActivitiesPage ? (
           <h1 className='text-xl font-semibold'>Activities</h1>
+        ) : isFollowListPage ? (
+          <h1 className='text-xl font-semibold'>{name}</h1>
         ) : (
           <>
             <h1 className='text-xl font-semibold'>{name}</h1>

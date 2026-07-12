@@ -1,11 +1,11 @@
-import { countReplies } from '@/lib/api';
+import { countPostReplies } from '@/actions/reply.action';
 
 export async function GET(
   request: Request,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
-  const postId = params.postId;
-  const repliesCount = await countReplies(postId);
+  const { postId } = await params;
+  const repliesCount = await countPostReplies(postId);
 
   return Response.json({ repliesCount });
 }

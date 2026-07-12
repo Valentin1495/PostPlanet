@@ -1,13 +1,21 @@
-import { countFollowers } from '@/actions/user.actions';
+import { readFollowers } from '@/actions/user.actions';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const userId = searchParams.get('userId');
+  const limit = searchParams.get('limit');
+  const page = searchParams.get('page');
 
-  if (userId === null) return;
+  if (userId === null || limit === null || page === null) {
+    return Response.json({ result: [] });
+  }
 
-  const followers = await countFollowers(userId);
+  const followers = await readFollowers({
+    userId,
+    limit: parseInt(limit),
+    page: parseInt(page),
+  });
 
-  return Response.json({ followers });
+  return Response.json({ result: followers });
 }

@@ -6,8 +6,6 @@ import { CircleUser, LogOut, PenTool } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SignOutButton, useSession } from '@clerk/nextjs';
-import { logout } from '@/actions/user.actions';
 import { useDialog } from '@/hooks/use-dialog';
 import { Button } from './ui/button';
 
@@ -24,7 +22,6 @@ export default function LeftSidebar({
 }: LeftSidebarProps) {
   const pathname = usePathname();
   const isProfilePage = pathname.includes(username);
-  const { isSignedIn } = useSession();
   const { openDialog } = useDialog();
 
   return (
@@ -100,34 +97,14 @@ export default function LeftSidebar({
         >
           <PenTool size='28' strokeWidth='1.5' />
         </Button>
-        {/* <PostDialog userId={userId} profileImage={profileImage}>
-          Post
-        </PostDialog> */}
 
-        {/* <PostDialog userId={userId} profileImage={profileImage} icon>
-          <PenTool size='28' strokeWidth='1.5' className='text-background' />
-        </PostDialog> */}
-
-        <div className='mt-auto max-w-fit cursor-pointer'>
-          {isSignedIn ? (
-            <SignOutButton redirectUrl='/'>
-              <div className='flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300'>
-                <LogOut size='28' strokeWidth='1.5' />
-                <span className='text-xl hidden xl:inline'>Log out</span>
-              </div>
-            </SignOutButton>
-          ) : (
-            <button
-              onClick={async () => {
-                await logout();
-              }}
-              className='flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300'
-            >
-              <LogOut size='28' strokeWidth='1.5' />
-              <span className='text-xl hidden xl:inline'>Log out</span>
-            </button>
-          )}
-        </div>
+        <button
+          onClick={() => openDialog('logout')}
+          className='mt-auto flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300 max-w-fit'
+        >
+          <LogOut size='28' strokeWidth='1.5' />
+          <span className='text-xl hidden xl:inline'>Log out</span>
+        </button>
       </div>
     </nav>
   );

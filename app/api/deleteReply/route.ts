@@ -1,8 +1,8 @@
-import { deleteReply } from '@/lib/api';
+import { deleteReply } from '@/actions/reply.action';
 
 export async function DELETE(request: Request) {
   const { replyId } = await request.json();
-  const reply = await deleteReply(replyId);
+  await deleteReply(replyId);
 
-  return Response.json({ replyDeleted: reply });
+  return Response.json({ success: true });
 }

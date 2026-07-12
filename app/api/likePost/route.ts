@@ -1,8 +1,7 @@
 import { likePost } from '@/actions/post.actions';
 
 export async function POST(request: Request) {
-  const res = await request.json();
-  const { postId, userId } = res;
+  const { postId, userId } = await request.json();
 
   await likePost(postId, userId);
 

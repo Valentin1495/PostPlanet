@@ -1,4 +1,4 @@
-import { getActivities } from '@/lib/api';
+import { readActivities } from '@/actions/activity.action';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -7,9 +7,11 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get('limit');
   const page = searchParams.get('page');
 
-  if (limit === null || page === null || userId === null) return;
+  if (limit === null || page === null || userId === null) {
+    return Response.json({ result: [] });
+  }
 
-  const activities = await getActivities({
+  const activities = await readActivities({
     userId,
     limit: parseInt(limit),
     page: parseInt(page),

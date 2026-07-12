@@ -11,7 +11,7 @@ type ParamsType = {
   closeReplyDialog?: () => void;
   setText: Dispatch<SetStateAction<string>>;
   setFile: Dispatch<SetStateAction<FileType | null>>;
-  textAreaRef: RefObject<HTMLTextAreaElement>;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
 };
 
 export const useReplyToPost = ({

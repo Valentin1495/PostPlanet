@@ -1,16 +1,12 @@
-import { getSession, login } from '@/actions/user.actions';
-import { Button } from '@/components/ui/button';
-import { SignInButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
-import { revalidatePath } from 'next/cache';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
+import { fetchCurrentAuthUser } from '@/actions/user.actions';
+import LoginForm from '@/components/login-form';
 
 export default async function Auth() {
-  const session = await getSession();
-  const { userId } = auth();
+  const user = await fetchCurrentAuthUser();
 
-  if (session || userId) {
+  if (user) {
     redirect('/onboarding');
   }
 
@@ -20,27 +16,7 @@ export default async function Auth() {
         <Image src='/logo.svg' alt='logo' width={60} height={60} />
         <h1 className='text-primary font-bold text-2xl'>PostPlanet</h1>
       </div>
-      <SignInButton
-        mode='modal'
-        forceRedirectUrl='/onboarding'
-        signUpForceRedirectUrl='/onboarding'
-      >
-        <Button size='lg' className='w-[132px]'>
-          Log in
-        </Button>
-      </SignInButton>
-      or
-      <form
-        action={async () => {
-          'use server';
-          await login();
-          revalidatePath('/');
-        }}
-      >
-        <Button variant='secondary' size='lg' className='w-[132px]'>
-          Skip Login
-        </Button>
-      </form>
+      <LoginForm />
     </main>
   );
 }

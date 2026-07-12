@@ -37,6 +37,8 @@ export default function RandomUser({
         name={name}
         bio={bio}
         isCurrentUser={isCurrentUser}
+        userId={id}
+        currentUserId={currentUserId}
       />
 
       <section className='mr-auto flex flex-col'>

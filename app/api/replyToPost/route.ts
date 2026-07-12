@@ -1,15 +1,8 @@
-import { replyToPost } from '@/lib/api';
+import { replyToPost } from '@/actions/reply.action';
 
 export async function POST(request: Request) {
   const formData = await request.formData();
+  const result = await replyToPost({ message: '' }, formData);
 
-  let text = formData.get('text') as string;
-  text = text.trim();
-  const fileUrl = formData.get('fileUrl') as string;
-  const userId = formData.get('userId') as string;
-  const postId = formData.get('postId') as string;
-
-  await replyToPost({ text, image: fileUrl, postId, userId });
-
-  return Response.json({ data: 'Success' });
+  return Response.json({ data: result.message });
 }

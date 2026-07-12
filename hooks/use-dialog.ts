@@ -1,19 +1,10 @@
-import { dialogData, DialogState, dialogState } from '@/lib/dialog-atoms';
-import { useRecoilState } from 'recoil';
+import { useDialogStore } from '@/lib/dialog-store';
 
 export const useDialog = () => {
-  const [dialogs, setDialogs] = useRecoilState(dialogState);
-  const [data, setData] = useRecoilState(dialogData);
-
-  const openDialog = (dialogName: keyof DialogState, data?: any) => {
-    setDialogs((prev) => ({ ...prev, [dialogName]: true }));
-    if (data) setData((prev) => ({ ...prev, [dialogName]: data }));
-  };
-
-  const closeDialog = (dialogName: keyof DialogState) => {
-    setDialogs((prev) => ({ ...prev, [dialogName]: false }));
-    setData((prev) => ({ ...prev, [dialogName]: undefined })); // 데이터 초기화
-  };
+  const openDialog = useDialogStore((state) => state.openDialog);
+  const closeDialog = useDialogStore((state) => state.closeDialog);
+  const dialogs = useDialogStore((state) => state.dialogs);
+  const data = useDialogStore((state) => state.data);
 
   return { openDialog, closeDialog, dialogs, data };
 };

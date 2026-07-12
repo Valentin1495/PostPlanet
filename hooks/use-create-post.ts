@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 type ParamsType = {
   setText: Dispatch<SetStateAction<string>>;
   setFile: Dispatch<SetStateAction<FileType | null>>;
-  textAreaRef: RefObject<HTMLTextAreaElement>;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
   formData: FormData;
   userId: string;
   closeCreateDialog?: () => void;

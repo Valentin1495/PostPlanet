@@ -4,17 +4,18 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import SearchBar from './search-bar';
 import SearchTabs from './search-tabs';
 import { Fragment } from 'react';
-import { User } from '@prisma/client';
+import { User } from '@/lib/types';
 import SingleUser from './single-user';
 
 type UserResultsProps = {
   q?: string;
   f: string;
+  currentUserId?: string;
 };
 
 const LIMIT = 20;
 
-export default function UserResults({ q, f }: UserResultsProps) {
+export default function UserResults({ q, f, currentUserId }: UserResultsProps) {
   const { data, error, isFetchingNextPage, ref, status } = useInfiniteScroll(
     ['userResults', q as string],
     `/api/searchPeople?q=${q}&limit=${LIMIT}`
@@ -40,7 +41,11 @@ export default function UserResults({ q, f }: UserResultsProps) {
         data!.pages.map((page, i) => (
           <Fragment key={i}>
             {page.map((user: User) => (
-              <SingleUser key={user.id} {...user} />
+              <SingleUser
+                key={user.id}
+                {...user}
+                currentUserId={currentUserId}
+              />
             ))}
           </Fragment>
         ))

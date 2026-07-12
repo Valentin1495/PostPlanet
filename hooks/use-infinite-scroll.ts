@@ -10,8 +10,15 @@ export const useInfiniteScroll = (queryKey: string[], apiUrl: string) => {
   const { data, isFetchingNextPage, fetchNextPage, status, error } =
     useInfiniteQuery({
       queryKey,
-      queryFn: async ({ pageParam }) => {
-        const response = await fetch(`${apiUrl}&page=${pageParam}`);
+      queryFn: async ({ pageParam, signal }) => {
+        const response = await fetch(`${apiUrl}&page=${pageParam}`, {
+          signal,
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
         const { result } = await response.json();
 
         return result;

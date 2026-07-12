@@ -1,7 +1,7 @@
 'use client';
 
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { Activity } from '@prisma/client';
+import { Activity } from '@/lib/types';
 import { Fragment } from 'react';
 import SingleActivity from './single-activity';
 
@@ -32,7 +32,11 @@ export default function Activities({ userId }: ActivitiesProps) {
         data.pages.map((page, i) => (
           <Fragment key={i}>
             {page.map((activity: Activity) => (
-              <SingleActivity {...activity} key={activity.id} />
+              <SingleActivity
+                {...activity}
+                key={activity.id}
+                currentUserId={userId}
+              />
             ))}
           </Fragment>
         ))

@@ -1,39 +1,60 @@
+'use client';
+
 import { FileType } from '@/lib/types';
-import { UploadDropzone } from '@/lib/uploadthing';
-import { Dispatch, SetStateAction } from 'react';
+import { uploadImage } from '@/hooks/use-upload-image';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { ImagePlus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type UploadProfilePicProps = {
+  userId: string;
   handleFile: Dispatch<SetStateAction<FileType | null>>;
   handleMouseEnter: Dispatch<SetStateAction<boolean>>;
 };
 
 export default function UploadProfilePic({
+  userId,
   handleFile,
   handleMouseEnter,
 }: UploadProfilePicProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const uploaded = await uploadImage(file, userId);
+      handleFile(uploaded);
+      handleMouseEnter(false);
+    } catch (error: any) {
+      alert(`ERROR! ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
-    <UploadDropzone
-      appearance={{
-        container:
-          'size-32 rounded-full p-0 border-2 border-primary cursor-pointer mx-auto space-y-0',
-        label: 'hidden',
-        allowedContent: 'hidden',
-        button({ isUploading }) {
-          return `text-sm w-[100px] h-9 rounded-full font-semibold ${
-            isUploading ? 'button-uploading' : 'bg-primary'
-          }`;
-        },
-        uploadIcon: 'text-primary size-11 -mt-3',
-      }}
-      endpoint='imageUploader'
-      onClientUploadComplete={(res) => {
-        const { url, name } = res[0];
-        handleFile({ url, name });
-        handleMouseEnter(false);
-      }}
-      onUploadError={(error: Error) => {
-        alert(`ERROR! ${error.message}`);
-      }}
-    />
+    <button
+      type='button'
+      onClick={() => inputRef.current?.click()}
+      disabled={isUploading}
+      className={cn(
+        'size-32 rounded-full border-2 border-primary flex flex-col items-center justify-center gap-1 mx-auto text-sm font-semibold text-primary',
+        isUploading && 'opacity-50 cursor-not-allowed'
+      )}
+    >
+      <ImagePlus size={28} />
+      {isUploading ? 'Uploading...' : 'Upload'}
+      <input
+        ref={inputRef}
+        type='file'
+        accept='image/*'
+        className='hidden'
+        onChange={handleChange}
+      />
+    </button>
   );
 }

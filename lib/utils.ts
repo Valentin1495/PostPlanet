@@ -1,12 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import { Post, Reply, User } from '@prisma/client';
-
-type ReplyWithPost = (Reply & {
-  post: Post;
-  author: User;
-})[];
+import { Post, Reply, ReplyWithPost as ReplyWithPostType } from '@/lib/types';
 
 type RepliesByPost = {
   [key: string]: {
@@ -67,7 +62,7 @@ export function getDetailedDate(date: string | Date) {
   return formattedDate;
 }
 
-export function groupRepliesByPost(replies: ReplyWithPost) {
+export function groupRepliesByPost(replies: ReplyWithPostType[]) {
   const repliesByPostId: RepliesByPost = replies.reduce<RepliesByPost>(
     (acc, reply) => {
       const { postId } = reply;

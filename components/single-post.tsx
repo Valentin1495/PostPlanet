@@ -23,7 +23,6 @@ type SinglePostProps = {
   image: string | null;
   createdAt: string;
   simpleCreatedAt: string;
-  likedIds: string[];
   authorId: string;
   username: string;
   name: string;
@@ -91,6 +90,8 @@ export default function SinglePost({
             username={username}
             bio={bio}
             isCurrentUser={isMyPost}
+            userId={authorId}
+            currentUserId={currentUserId}
           />
           <section className='text-sm flex flex-col'>
             <Link

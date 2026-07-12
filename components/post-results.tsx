@@ -4,7 +4,7 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import SearchBar from './search-bar';
 import SearchTabs from './search-tabs';
 import { Fragment } from 'react';
-import { Post as PostType } from '@prisma/client';
+import { Post as PostType } from '@/lib/types';
 import Post from './post';
 
 type PostResultsProps = {

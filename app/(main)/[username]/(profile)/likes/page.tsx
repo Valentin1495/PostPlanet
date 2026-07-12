@@ -1,38 +1,43 @@
 import { fetchUserId, readUser, readUserId } from '@/actions/user.actions';
 import PostsLiked from '@/components/posts-liked';
-import { User } from '@prisma/client';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 type ProfileLikesProps = {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 };
 
 export async function generateMetadata({
   params,
 }: ProfileLikesProps): Promise<Metadata> {
-  const { username } = params;
-  const userId = (await readUserId(username)) as string;
-  const { name } = (await readUser(userId)) as User;
+  const { username } = await params;
+  const userId = await readUserId(username);
+  const user = await readUser(userId);
 
   return {
-    title: `Posts liked by ${name} (@${username}) / PostPlanet `,
+    title: `Posts liked by ${user?.name ?? username} (@${username}) / PostPlanet `,
   };
 }
 
 export default async function ProfileLikes({ params }: ProfileLikesProps) {
-  const userId = (await readUserId(params.username)) as string;
-  const { profileImage } = (await readUser(userId)) as User;
+  const { username } = await params;
+  const userId = await readUserId(username);
+  if (!userId) notFound();
+
+  const user = await readUser(userId);
+  if (!user) notFound();
+
   const currentUserId = await fetchUserId();
 
   return (
     <main className='min-h-screen'>
       <PostsLiked
         userId={userId}
-        currentUserId={currentUserId}
+        currentUserId={currentUserId ?? ''}
         isProfilePage
-        myProfilePic={profileImage}
+        myProfilePic={user.profileImage}
       />
     </main>
   );

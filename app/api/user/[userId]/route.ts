@@ -1,11 +1,11 @@
-import { getUser } from '@/lib/api';
+import { readUser } from '@/actions/user.actions';
 
 export async function GET(
   request: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
-  const userId = params.userId;
-  const user = await getUser(userId);
+  const { userId } = await params;
+  const user = await readUser(userId);
 
   return Response.json({ user });
 }

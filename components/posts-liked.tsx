@@ -3,7 +3,7 @@
 import { Fragment } from 'react';
 import Post from './post';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { Post as PostType } from '@prisma/client';
+import { Post as PostType } from '@/lib/types';
 
 type PostsLikedProps = {
   userId: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Reply as ReplyType, User } from '@prisma/client';
+import { Reply as ReplyType, User } from '@/lib/types';
 import { cn, getSimpleDate } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 import ProfileImage from './profile-image';
@@ -54,6 +54,8 @@ export default function Reply({
           name={author?.name}
           profileImage={author?.profileImage}
           username={author?.username}
+          userId={authorId}
+          currentUserId={currentUserId}
         />
         {isProfileReplies && !isLast && (
           <div className='w-[2px] mx-auto h-full bg-primary/25'></div>

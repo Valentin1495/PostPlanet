@@ -1,8 +1,19 @@
-import { follow } from '@/lib/api';
+import { follow } from '@/actions/user.actions';
 
 export async function POST(request: Request) {
-  const { userId, currentUserId, followingIds } = await request.json();
-  const data = await follow({ userId, currentUserId, followingIds });
+  try {
+    const { userId, currentUserId } = await request.json();
+    await follow(currentUserId, userId);
 
-  return Response.json({ data });
+    return Response.json({ success: true });
+  } catch (error) {
+    return Response.json(
+      {
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Failed to follow the user',
+      },
+      { status: 500 }
+    );
+  }
 }

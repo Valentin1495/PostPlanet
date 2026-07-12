@@ -1,16 +1,18 @@
-import { getFollowingUsers } from '@/lib/api';
+import { readFollowingUsers } from '@/actions/user.actions';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const followingIds = searchParams.get('followingIds');
+  const userId = searchParams.get('userId');
   const limit = searchParams.get('limit');
   const page = searchParams.get('page');
 
-  if (followingIds === null || limit === null || page === null) return;
+  if (userId === null || limit === null || page === null) {
+    return Response.json({ result: [] });
+  }
 
-  const followingUsers = await getFollowingUsers({
-    followingIds: JSON.parse(followingIds),
+  const followingUsers = await readFollowingUsers({
+    userId,
     limit: parseInt(limit),
     page: parseInt(page),
   });

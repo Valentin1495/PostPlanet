@@ -1,165 +1,173 @@
 'use server';
 
-import db from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { faker } from '@faker-js/faker';
-import { User } from '@prisma/client';
-import { SignJWT, jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { createClient } from '@/lib/supabase/server';
 import {
   generateRandomColor,
   generateRandomUsername,
   leaveSingleSpace,
   removeAllSpaces,
 } from '@/lib/utils';
+import { User } from '@/lib/types';
 
-const secretKey = 'secret';
-const key = new TextEncoder().encode(secretKey);
-
-export async function encrypt(payload: any) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('12h')
-    .sign(key);
+function mapUser(row: {
+  id: string;
+  username: string;
+  name: string;
+  bio: string | null;
+  profile_image: string;
+  created_at: string;
+  updated_at: string;
+}): User {
+  return {
+    id: row.id,
+    username: row.username,
+    name: row.name,
+    bio: row.bio,
+    profileImage: row.profile_image,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
-export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
-    algorithms: ['HS256'],
-  });
-  return payload;
+export async function fetchCurrentAuthUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return user;
 }
 
-export async function login() {
-  const imageUrl = generateRandomColor();
-  const fullName = generateRandomUsername();
-  const user = { id: uuidv4(), imageUrl, fullName };
-
-  // Create the session
-  const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const session = await encrypt({ user, expires });
-
-  // Save the session in a cookie
-  cookies().set('session', session, { expires, httpOnly: true });
+export async function fetchUserId(): Promise<string | null> {
+  const user = await fetchCurrentAuthUser();
+  return user?.id ?? null;
 }
 
 export async function logout() {
-  // Destroy the session
-  cookies().set('session', '', { expires: new Date(0) });
+  const supabase = await createClient();
+  await supabase.auth.signOut();
   redirect('/');
-}
-
-export async function getSession() {
-  const session = cookies().get('session')?.value;
-  if (!session) return null;
-  return await decrypt(session);
-}
-
-export async function updateSession(request: NextRequest) {
-  const session = request.cookies.get('session')?.value;
-  if (!session) return;
-
-  // Refresh the session so it doesn't expire
-  const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
-  const res = NextResponse.next();
-  res.cookies.set({
-    name: 'session',
-    value: await encrypt(parsed),
-    httpOnly: true,
-    expires: parsed.expires,
-  });
-  return res;
-}
-
-export async function fetchUserId(): Promise<string> {
-  let userId;
-  const authentication = auth();
-  userId = authentication.userId;
-
-  if (!userId) {
-    const session = await getSession();
-
-    if (!session) {
-      redirect('/');
-    }
-    userId = session.user.id;
-  }
-
-  return userId;
-}
-
-export async function fetchCurrentUser() {
-  const session = await getSession();
-
-  if (session) {
-    return session.user;
-  } else {
-    const user = await currentUser();
-    return user;
-  }
 }
 
 export async function createUser(prevState: any, formData: FormData) {
   let username = formData.get('username') as string;
   username = removeAllSpaces(username);
 
-  let bio = formData.get('bio') as string;
+  let bio = (formData.get('bio') as string) ?? '';
   bio = bio.trim();
 
   let name = formData.get('name') as string;
   name = leaveSingleSpace(name);
 
-  let profileImage = formData.get('fileUrl') as string | null;
+  const profileImage = formData.get('fileUrl') as string | null;
 
   if (!profileImage) {
-    profileImage = formData.get('image') as string;
+    return { message: 'Please upload a profile picture.' };
   }
 
-  const id = await fetchUserId();
-  const userList = await db.user.findMany();
-  const sameUserList = userList.filter((el) => el.username === username);
+  const authUser = await fetchCurrentAuthUser();
+  if (!authUser) {
+    return { message: 'You must be signed in to onboard.' };
+  }
 
-  if (sameUserList[0]) {
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from('users')
+    .select('id')
+    .ilike('username', username)
+    .maybeSingle();
+
+  if (existing) {
     return {
       message: 'That username has been taken. Please choose another.',
     };
   }
 
-  try {
-    await db.user.create({
-      data: { id, username, name, bio, profileImage },
-    });
+  const { error } = await supabase.from('users').insert({
+    id: authUser.id,
+    username,
+    name,
+    bio,
+    profile_image: profileImage,
+  });
 
-    return {
-      message: 'Success',
-    };
-  } catch (error) {
+  if (error) {
     console.error(error);
-
-    return {
-      message: 'Onboarding failed 😢',
-    };
+    return { message: 'Onboarding failed 😢' };
   }
+
+  return { message: 'Success' };
 }
 
-export async function readUser(userId: string) {
-  try {
-    const user = await db.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+export async function createGuestUser(authUserId: string): Promise<User> {
+  const supabase = await createClient();
 
-    return user;
-  } catch (error: any) {
-    throw new Error(error);
+  let username = generateRandomUsername();
+
+  // Extremely unlikely, but guard against the random suffix colliding.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data: existing } = await supabase
+      .from('users')
+      .select('id')
+      .ilike('username', username)
+      .maybeSingle();
+
+    if (!existing) break;
+    username = generateRandomUsername();
   }
+
+  const { data, error } = await supabase
+    .from('users')
+    .insert({
+      id: authUserId,
+      username,
+      name: 'Guest',
+      bio: "I'm just here to look around 👀",
+      profile_image: generateRandomColor(),
+    })
+    .select('*')
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return mapUser(data);
+}
+
+export async function readUser(userId: string | null): Promise<User | null> {
+  if (!userId) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data ? mapUser(data) : null;
+}
+
+export async function readUserId(username: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('users')
+    .select('id')
+    .eq('username', username)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data?.id ?? null;
 }
 
 export async function readFollowingUsers({
@@ -171,18 +179,24 @@ export async function readFollowingUsers({
   limit: number;
   page: number;
 }) {
-  const { followingIds } = (await readUser(userId)) as User;
+  const supabase = await createClient();
 
-  const startIndex = page * limit;
-  const paginatedFollowingIds = followingIds.slice(
-    startIndex,
-    startIndex + limit
-  );
+  const { data, error } = await supabase
+    .from('follows')
+    .select('following:users!follows_following_id_fkey(*)')
+    .eq('follower_id', userId)
+    .order('created_at', { ascending: false })
+    .range(page * limit, page * limit + limit - 1);
 
-  const promises = paginatedFollowingIds.map(async (id) => await readUser(id));
-  const followingUsers = await Promise.all(promises);
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-  return followingUsers;
+  return (data ?? [])
+    .map((row: any) => row.following)
+    .filter(Boolean)
+    .map(mapUser);
 }
 
 export async function readFollowers({
@@ -194,176 +208,165 @@ export async function readFollowers({
   limit: number;
   page: number;
 }) {
-  try {
-    const followers = await db.user.findMany({
-      where: {
-        followingIds: {
-          has: userId,
-        },
-      },
-      take: limit,
-      skip: limit * page,
-    });
+  const supabase = await createClient();
 
-    return followers;
-  } catch (error: any) {
-    throw new Error(error);
+  const { data, error } = await supabase
+    .from('follows')
+    .select('follower:users!follows_follower_id_fkey(*)')
+    .eq('following_id', userId)
+    .order('created_at', { ascending: false })
+    .range(page * limit, page * limit + limit - 1);
+
+  if (error) {
+    console.error(error);
+    return [];
   }
+
+  return (data ?? []).map((row: any) => row.follower).filter(Boolean).map(mapUser);
 }
 
-export async function readRandomUsers(user: User) {
-  const { followingIds, id } = user;
+export async function readRandomUsers(currentUserId: string) {
+  const supabase = await createClient();
 
-  try {
-    const randomUsers = await db.user.findMany();
-    const nonFollowers = randomUsers.filter(
-      (user) => !followingIds.includes(user.id) && user.id !== id
-    );
+  const { data: followingRows } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', currentUserId);
 
-    const promises = nonFollowers.slice(-5).map(async (user) => {
-      const followers = await countFollowers(user.id);
-      return { ...user, followers };
-    });
+  const followingIds = new Set((followingRows ?? []).map((r) => r.following_id));
 
-    const usersWithFollowers = await Promise.all(promises);
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('*')
+    .neq('id', currentUserId)
+    .limit(20);
 
-    return usersWithFollowers;
-  } catch (error: any) {
-    throw new Error(error);
+  if (error) {
+    console.error(error);
+    return [];
   }
+
+  const nonFollowers = (users ?? []).filter((u) => !followingIds.has(u.id));
+
+  const candidates = nonFollowers.slice(-5);
+  const withFollowers = await Promise.all(
+    candidates.map(async (u) => ({
+      ...mapUser(u),
+      followers: await countFollowers(u.id),
+    }))
+  );
+
+  return withFollowers;
 }
 
 export async function countFollowers(userId: string) {
-  try {
-    const followersCount = await db.user.count({
-      where: {
-        followingIds: {
-          has: userId,
-        },
-      },
-    });
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('following_id', userId);
 
-    return followersCount;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-async function generateUniqueUsername(baseUsername: string) {
-  let uniqueUsername = baseUsername;
-  let userExists = await db.user.findUnique({
-    where: {
-      username: uniqueUsername,
-    },
-  });
-  let attempt = 0;
-
-  while (userExists) {
-    attempt++;
-    uniqueUsername = `${baseUsername}${attempt}`;
-    userExists = await db.user.findUnique({
-      where: {
-        username: uniqueUsername,
-      },
-    });
+  if (error) {
+    console.error(error);
+    return 0;
   }
 
-  return uniqueUsername;
+  return count ?? 0;
 }
 
-export async function createRandomUsers(userCount: number) {
-  for (let i = 0; i < userCount; i++) {
-    const sex = faker.person.sexType();
-    const firstName = faker.person.firstName(sex);
-    const lastName = faker.person.lastName();
-    const fullName = `${firstName} ${lastName}`;
-    const baseUsername = faker.internet.userName();
-    const username = await generateUniqueUsername(baseUsername);
-    const userData = {
-      id: faker.string.uuid(),
-      profileImage: faker.image.avatar(),
-      name: fullName,
-      username,
-      bio: faker.lorem.sentence(),
-      createdAt: faker.date.past(),
-      updatedAt: faker.date.past(),
-      hasActivity: false,
-    };
+export async function countFollowing(userId: string) {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('follows')
+    .select('*', { count: 'exact', head: true })
+    .eq('follower_id', userId);
 
-    try {
-      await db.user.create({
-        data: userData,
-      });
-    } catch (error: any) {
-      throw new Error(error);
+  if (error) {
+    console.error(error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+export async function isFollowing(followerId: string, followingId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('follows')
+    .select('follower_id')
+    .eq('follower_id', followerId)
+    .eq('following_id', followingId)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    return false;
+  }
+
+  return Boolean(data);
+}
+
+export async function follow(followerId: string, followingId: string) {
+  if (!followerId || !followingId || followerId === followingId) return;
+
+  const supabase = await createClient();
+
+  const { data: existingFollow, error: existingFollowError } = await supabase
+    .from('follows')
+    .select('follower_id')
+    .eq('follower_id', followerId)
+    .eq('following_id', followingId)
+    .maybeSingle();
+
+  if (existingFollowError) {
+    throw new Error(existingFollowError.message);
+  }
+
+  if (existingFollow) {
+    revalidatePath('/', 'layout');
+    return;
+  }
+
+  const { error } = await supabase
+    .from('follows')
+    .insert({ follower_id: followerId, following_id: followingId });
+
+  if (error) {
+    if (error.code === '23505') {
+      revalidatePath('/', 'layout');
+      return;
     }
+
+    throw new Error(error.message);
   }
+
+  const { error: activityError } = await supabase.from('activities').insert({
+    type: 'follow',
+    giver_id: followerId,
+    receiver_id: followingId,
+  });
+
+  if (activityError) {
+    console.error(activityError);
+  }
+
+  revalidatePath('/', 'layout');
 }
 
-export async function readUserId(username: string) {
-  try {
-    const user = await db.user.findUnique({
-      where: {
-        username,
-      },
-    });
+export async function unfollow(followerId: string, followingId: string) {
+  if (!followerId || !followingId || followerId === followingId) return;
 
-    return user?.id;
-  } catch (error: any) {
-    throw new Error(error);
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('follows')
+    .delete()
+    .eq('follower_id', followerId)
+    .eq('following_id', followingId);
+
+  if (error) {
+    throw new Error(error.message);
   }
-}
 
-export async function follow(
-  userId: string,
-  currentUserId: string,
-  followingIds: string[]
-) {
-  followingIds.push(userId);
-
-  try {
-    await db.user.update({
-      where: {
-        id: currentUserId,
-      },
-      data: {
-        followingIds,
-      },
-    });
-
-    await db.activity.create({
-      data: {
-        giverId: currentUserId,
-        receiverId: userId,
-        type: 'follow',
-      },
-    });
-
-    revalidatePath('/', 'layout');
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function unfollow(
-  userId: string,
-  currentUserId: string,
-  followingIds: string[]
-) {
-  const newFollowingIds = followingIds.filter((id) => id !== userId);
-
-  try {
-    await db.user.update({
-      where: {
-        id: currentUserId,
-      },
-      data: {
-        followingIds: newFollowingIds,
-      },
-    });
-
-    revalidatePath('/', 'layout');
-  } catch (error: any) {
-    throw new Error(error);
-  }
+  revalidatePath('/', 'layout');
 }

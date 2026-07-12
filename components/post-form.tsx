@@ -4,14 +4,14 @@ import TextareaAutosize from 'react-textarea-autosize';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from './ui/skeleton';
 import { Button } from './ui/button';
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
 import { Input } from './ui/input';
 import Image from 'next/image';
 import { Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import UploadPostPic from './upload/upload-post-pic';
+import UploadPostPic, { UploadPostPicHandle } from './upload/upload-post-pic';
 import { FileType } from '@/lib/types';
 import { useCreatePost } from '@/hooks/use-create-post';
 import { useReplyToPost } from '@/hooks/use-reply-to-post';
@@ -42,9 +42,10 @@ export default function PostForm({
   const [text, setText] = useState('');
   const [mounted, setMounted] = useState(false);
   const [file, setFile] = useState<FileType | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const uploadPicRef = useRef<UploadPostPicHandle>(null);
 
   const createPostFormData = new FormData();
   createPostFormData.append('text', text);
@@ -86,6 +87,7 @@ export default function PostForm({
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time mount flag to avoid SSR/CSR markup mismatch for the autosizing textarea
     setMounted(true);
   }, []);
 
@@ -187,10 +189,9 @@ export default function PostForm({
       <div className='justify-end flex items-center gap-2'>
         <button
           type='button'
-          onClick={() => {
-            setIsOpen((prev) => !prev);
-          }}
-          className='size-8 rounded-full hover:bg-primary/20 transition-colors center'
+          disabled={isUploading}
+          onClick={() => uploadPicRef.current?.open()}
+          className='size-8 rounded-full hover:bg-primary/20 transition-colors center disabled:opacity-50'
         >
           <ImageIcon size='18' className='text-primary' />
         </button>
@@ -204,7 +205,12 @@ export default function PostForm({
           isForReply={isForReply}
         />
       </div>
-      {isOpen && <UploadPostPic handleFile={setFile} setIsOpen={setIsOpen} />}
+      <UploadPostPic
+        ref={uploadPicRef}
+        userId={userId}
+        handleFile={setFile}
+        onUploadingChange={setIsUploading}
+      />
     </form>
   );
 }

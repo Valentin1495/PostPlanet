@@ -1,4 +1,4 @@
-import { searchPosts } from '@/lib/api';
+import { searchPosts } from '@/actions/post.actions';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
   const page = searchParams.get('page');
   const q = searchParams.get('q');
 
-  if (q === null || limit === null || page === null) return;
+  if (q === null || limit === null || page === null) {
+    return Response.json({ result: [] });
+  }
 
   const posts = await searchPosts({
     q,

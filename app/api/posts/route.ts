@@ -1,4 +1,4 @@
-import { getAllPosts } from '@/lib/api';
+import { readAllPosts } from '@/actions/post.actions';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -6,9 +6,9 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get('limit');
   const page = searchParams.get('page');
 
-  if (limit === null || page === null) return;
+  if (limit === null || page === null) return Response.json({ result: [] });
 
-  const allPosts = await getAllPosts(parseInt(limit), parseInt(page));
+  const allPosts = await readAllPosts(parseInt(limit), parseInt(page));
 
   return Response.json({ result: allPosts });
 }

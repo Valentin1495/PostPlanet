@@ -5,17 +5,21 @@ import Link from 'next/link';
 import ProfileImage from './profile-image';
 
 export type SingleUserProps = {
+  id: string;
   username: string;
   name: string;
   bio: string | null;
   profileImage: string;
+  currentUserId?: string;
 };
 
 export default function SingleUser({
+  id,
   username,
   name,
   bio,
   profileImage,
+  currentUserId,
 }: SingleUserProps) {
   const router = useRouter();
 
@@ -30,6 +34,8 @@ export default function SingleUser({
           name={name}
           username={username}
           profileImage={profileImage}
+          userId={id}
+          currentUserId={currentUserId}
         />
 
         <div className='space-y-1.5 w-full'>

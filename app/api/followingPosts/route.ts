@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get('limit');
   const page = searchParams.get('page');
 
-  if (limit === null || page === null || followingIds === null) return;
+  if (limit === null || page === null || followingIds === null) {
+    return Response.json({ result: [] });
+  }
 
   const followingPosts = await readFollowingPosts({
     followingIds: JSON.parse(followingIds),

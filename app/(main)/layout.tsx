@@ -3,7 +3,6 @@ import '@/app/globals.css';
 import LeftSidebar from '@/components/left-sidebar';
 import RightSidebar from '@/components/right-sidebar';
 import { fetchUserId, readUser } from '@/actions/user.actions';
-import { User } from '@prisma/client';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
@@ -23,7 +22,13 @@ export default async function MainLayout({
     redirect('/');
   }
 
-  const { username, profileImage } = (await readUser(userId)) as User;
+  const user = await readUser(userId);
+
+  if (!user) {
+    redirect('/onboarding');
+  }
+
+  const { username, profileImage } = user;
 
   return (
     <div className='flex items-start max-w-3xl lg:max-w-6xl xl:max-w-7xl mx-auto lg:pr-8 xl:px-5'>

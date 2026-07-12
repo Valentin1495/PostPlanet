@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, User as UserType } from '@prisma/client';
+import { Activity, User as UserType } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
 import FilledHeart from './icons/filled-heart';
@@ -8,13 +8,16 @@ import FilledChatBubble from './icons/filled-chat-bubble';
 import ProfileImage from './profile-image';
 import { useQuery } from '@tanstack/react-query';
 
-type SingleActivityProps = Activity;
+type SingleActivityProps = Activity & {
+  currentUserId: string;
+};
 export default function SingleActivity({
   type,
   giverId,
   postId,
   text,
   receiverId,
+  currentUserId,
 }: SingleActivityProps) {
   const {
     data: giver,
@@ -67,6 +70,8 @@ export default function SingleActivity({
             username={username}
             profileImage={profileImage}
             isCurrentUser={isGiverReceiver}
+            userId={giverId}
+            currentUserId={currentUserId}
           />
 
           <p>

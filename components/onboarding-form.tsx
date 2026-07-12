@@ -1,11 +1,12 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { createUser } from '@/actions/user.actions';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Textarea } from './ui/textarea';
 import { toast } from 'sonner';
@@ -14,8 +15,10 @@ import { AvatarPicture } from './avatar-picture';
 import UploadProfilePic from './upload/upload-profile-pic';
 
 type OnboardingFormProps = {
-  imageUrl: string;
-  fullName: string;
+  userId: string;
+  defaultName: string;
+  defaultUsername?: string;
+  defaultProfileImage?: string;
 };
 
 const initialState = {
@@ -23,22 +26,23 @@ const initialState = {
 };
 
 export default function OnboardingForm({
-  imageUrl,
-  fullName,
+  userId,
+  defaultName,
+  defaultUsername = '',
+  defaultProfileImage = '',
 }: OnboardingFormProps) {
-  const [state, onboardUser] = useFormState(createUser, initialState);
-  const [file, setFile] = useState<FileType | null>(null);
-  const [image, setImage] = useState(imageUrl);
-  const [username, setUsername] = useState('');
+  const [state, onboardUser] = useActionState(createUser, initialState);
+  const [file, setFile] = useState<FileType | null>(
+    defaultProfileImage
+      ? { url: defaultProfileImage, name: 'profile-picture' }
+      : null
+  );
+  const [username, setUsername] = useState(defaultUsername);
   const [mouseEnter, setMouseEnter] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState(defaultName);
   const router = useRouter();
   const successful = state.message === 'Success';
   const failed = state.message && !successful;
-
-  useEffect(() => {
-    setName(fullName);
-  }, [fullName]);
 
   useEffect(() => {
     if (successful) {
@@ -48,7 +52,7 @@ export default function OnboardingForm({
     if (failed) {
       toast.error(state.message);
     }
-  }, [state, router]);
+  }, [state, successful, failed, router]);
 
   return (
     <div className='w-1/2 xl:w-1/3'>
@@ -63,9 +67,7 @@ export default function OnboardingForm({
           <div
             onMouseEnter={() => setMouseEnter(true)}
             onMouseLeave={() => setMouseEnter(false)}
-            onClick={() => {
-              setFile(null);
-            }}
+            onClick={() => setFile(null)}
             className='relative rounded-full size-32 center cursor-pointer mx-auto'
           >
             <AvatarPicture src={file.url} alt={file.name} className='size-32' />
@@ -85,38 +87,9 @@ export default function OnboardingForm({
               </section>
             )}
           </div>
-        ) : image ? (
-          <div
-            onMouseEnter={() => setMouseEnter(true)}
-            onMouseLeave={() => setMouseEnter(false)}
-            onClick={() => {
-              setImage('');
-            }}
-            className='relative rounded-full size-32 center cursor-pointer mx-auto'
-          >
-            <section
-              className='size-32 rounded-full mx-auto'
-              style={{
-                backgroundColor: image,
-              }}
-            />
-            <Input
-              value={image}
-              className='hidden'
-              name='image'
-              type='hidden'
-              readOnly
-            />
-            {mouseEnter && (
-              <section className='absolute inset-0 bg-black/50 rounded-full flex items-center justify-center'>
-                <h3 className='text-xs text-center font-bold text-primary-foreground dark:text-foreground'>
-                  CHANGE <br /> PICTURE
-                </h3>
-              </section>
-            )}
-          </div>
         ) : (
           <UploadProfilePic
+            userId={userId}
             handleFile={setFile}
             handleMouseEnter={setMouseEnter}
           />
@@ -158,7 +131,6 @@ export default function OnboardingForm({
         <div className='text-end'>
           <SubmitButton
             fileUrl={file?.url}
-            image={image}
             username={username.trim()}
             name={name.trim()}
           />
@@ -170,18 +142,17 @@ export default function OnboardingForm({
 
 type SubmitButtonProps = {
   fileUrl?: string;
-  image: string;
   username: string;
   name: string;
 };
 
-function SubmitButton({ fileUrl, username, name, image }: SubmitButtonProps) {
+function SubmitButton({ fileUrl, username, name }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button
       className='w-[66px]'
-      disabled={pending || !username || !name || (!fileUrl && !image)}
+      disabled={pending || !username || !name || !fileUrl}
     >
       {pending ? (
         <span className='pending'>

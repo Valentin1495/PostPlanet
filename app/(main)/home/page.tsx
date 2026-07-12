@@ -8,12 +8,12 @@ export default async function Home() {
   const userId = await fetchUserId();
 
   if (!userId) {
-    redirect('/onboarding');
+    redirect('/');
   }
 
   const user = await readUser(userId);
 
-  if (!user) return;
+  if (!user) redirect('/onboarding');
   const { username, profileImage } = user;
 
   return (
@@ -25,7 +25,7 @@ export default async function Home() {
         username={username}
         userId={userId}
       />
-      <AllPosts currentUserId={userId} myProfileImage={profileImage} />
+      <AllPosts currentUser={user} />
     </main>
   );
 }

@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
   const limit = searchParams.get('limit');
   const page = searchParams.get('page');
 
-  if (userId === null || limit === null || page === null) return;
+  if (userId === null || limit === null || page === null) {
+    return Response.json({ result: [] });
+  }
 
   const postsLiked = await readLikedPosts({
     userId,

@@ -1,7 +1,7 @@
 'use client';
 
 import Reply from './reply';
-import { Reply as SingleReply } from '@prisma/client';
+import { Reply as SingleReply } from '@/lib/types';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { Fragment } from 'react';
 

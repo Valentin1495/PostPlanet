@@ -1,4 +1,4 @@
-import { isFollowing } from '@/lib/api';
+import { isFollowing } from '@/actions/user.actions';
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -6,7 +6,9 @@ export async function GET(request: NextRequest) {
   const userFollowing = searchParams.get('userFollowing');
   const userFollowed = searchParams.get('userFollowed');
 
-  if (!userFollowed || !userFollowing) return;
+  if (!userFollowed || !userFollowing) {
+    return Response.json({ isFollowingUser: false });
+  }
 
   const isFollowingUser = await isFollowing(userFollowing, userFollowed);
 

@@ -16,12 +16,13 @@ import { usePostInfoOptions } from '@/hooks/use-post-info-options';
 import { useLikePost } from '@/hooks/use-like-post';
 import { useUnlikePost } from '@/hooks/use-unlike-post';
 import { useOptimisticLike } from '@/hooks/use-optimistic-like';
-import { Post as PostType } from '@prisma/client';
+import { Post as PostType, User } from '@/lib/types';
 import { Skeleton } from './ui/skeleton';
 import { useDialog } from '@/hooks/use-dialog';
 
 export type PostProps = PostType & {
   currentUserId: string;
+  currentUser?: User | null;
   myProfilePic?: string;
   isProfilePage?: boolean;
 };
@@ -33,6 +34,7 @@ export default function Post({
   createdAt,
   authorId,
   currentUserId,
+  currentUser,
   myProfilePic,
 }: PostProps) {
   const { postInfoOptions } = usePostInfoOptions({
@@ -86,6 +88,10 @@ export default function Post({
           username={username}
           profileImage={profileImage}
           isCurrentUser={isMyPost}
+          userId={authorId}
+          user={author}
+          currentUserId={currentUserId}
+          currentUser={currentUser}
         />
         {isProfileReplies && (
           <div className='w-[2px] mx-auto h-full bg-primary/25'></div>

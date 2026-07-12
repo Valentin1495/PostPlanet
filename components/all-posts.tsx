@@ -3,19 +3,15 @@
 import { Fragment } from 'react';
 import Post from './post';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
-import { Post as PostType } from '@prisma/client';
+import { Post as PostType, User } from '@/lib/types';
 
 type AllPostsProps = {
-  currentUserId: string;
-  myProfileImage: string;
+  currentUser: User;
 };
 
 const LIMIT = 10;
 
-export default function AllPosts({
-  currentUserId,
-  myProfileImage,
-}: AllPostsProps) {
+export default function AllPosts({ currentUser }: AllPostsProps) {
   const { data, error, isFetchingNextPage, ref, status } = useInfiniteScroll(
     ['allPosts'],
     `/api/posts?limit=${LIMIT}`
@@ -38,8 +34,9 @@ export default function AllPosts({
               <Post
                 {...post}
                 key={post.id}
-                currentUserId={currentUserId}
-                myProfilePic={myProfileImage}
+                currentUserId={currentUser.id}
+                currentUser={currentUser}
+                myProfilePic={currentUser.profileImage}
               />
             ))}
           </Fragment>

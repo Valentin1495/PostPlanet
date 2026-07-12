@@ -1,21 +1,20 @@
 import { fetchUserId, readUser } from '@/actions/user.actions';
-import { User } from '@prisma/client';
 import { Metadata } from 'next';
 import SearchBar from '@/components/search-bar';
 import UserResults from '@/components/user-results';
 import PostResults from '@/components/post-results';
 
 type SearchProps = {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     f?: string;
-  };
+  }>;
 };
 
 export async function generateMetadata({
   searchParams,
 }: SearchProps): Promise<Metadata> {
-  const { q } = searchParams;
+  const { q } = await searchParams;
 
   if (!q)
     return {
@@ -31,17 +30,17 @@ export async function generateMetadata({
 }
 
 export default async function Search({ searchParams }: SearchProps) {
-  const { q, f } = searchParams;
+  const { q, f } = await searchParams;
   const userId = await fetchUserId();
-  const { id, profileImage } = (await readUser(userId)) as User;
+  const user = await readUser(userId);
 
   if (f === 'user') {
-    return <UserResults q={q} f={f} />;
+    return <UserResults q={q} f={f} currentUserId={userId ?? undefined} />;
   }
 
-  if (q) {
+  if (q && user) {
     return (
-      <PostResults q={q} f={f} myProfileImage={profileImage} myUserId={id} />
+      <PostResults q={q} f={f} myProfileImage={user.profileImage} myUserId={user.id} />
     );
   }
 
