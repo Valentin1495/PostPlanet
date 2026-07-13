@@ -160,6 +160,30 @@ export async function readFollowingPosts({
   return (data ?? []).map(mapPost);
 }
 
+export async function readFollowingPostsByUser({
+  userId,
+  limit,
+  page,
+}: {
+  userId: string;
+  limit: number;
+  page: number;
+}) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', userId);
+
+  if (error) throw new Error(error.message);
+
+  return readFollowingPosts({
+    followingIds: (data ?? []).map((row) => row.following_id),
+    limit,
+    page,
+  });
+}
+
 export async function readLikedPosts({
   userId,
   limit,

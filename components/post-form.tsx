@@ -167,6 +167,7 @@ export default function PostForm({
             src={file.url}
             alt='image to post'
             fill
+            sizes='(max-width: 768px) 100vw, 680px'
             className='object-cover'
           />
           <span

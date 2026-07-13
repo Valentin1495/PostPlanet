@@ -2,7 +2,8 @@
 
 import { sidebarLinks } from '@/constants';
 import { cn } from '@/lib/utils';
-import { CircleUser, LogOut, PenTool } from 'lucide-react';
+import { CircleUser, Ellipsis, PenTool } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -10,12 +11,14 @@ import { useDialog } from '@/hooks/use-dialog';
 import { Button } from './ui/button';
 
 type LeftSidebarProps = {
+  name: string;
   username: string;
   userId: string;
   profileImage: string;
 };
 
 export default function LeftSidebar({
+  name,
   username,
   userId,
   profileImage,
@@ -99,11 +102,40 @@ export default function LeftSidebar({
         </Button>
 
         <button
+          type='button'
           onClick={() => openDialog('logout')}
-          className='mt-auto flex items-center gap-4 hover:bg-secondary p-2.5 rounded-full duration-300 max-w-fit'
+          aria-label='Open logout dialog'
+          className='mt-auto flex max-w-fit items-center gap-3 rounded-full p-2.5 text-left duration-300 hover:bg-secondary xl:w-full xl:max-w-[260px] xl:p-3'
         >
-          <LogOut size='28' strokeWidth='1.5' />
-          <span className='text-xl hidden xl:inline'>Log out</span>
+          {profileImage.includes('#') ? (
+            <span
+              aria-hidden='true'
+              style={{ backgroundColor: profileImage }}
+              className='size-10 shrink-0 rounded-full darker'
+            />
+          ) : (
+            <Avatar className='size-10 shrink-0 darker'>
+              <AvatarImage
+                src={profileImage}
+                alt={`${name}'s profile picture`}
+                className='object-cover'
+              />
+              <AvatarFallback className='bg-primary/10'>
+                {name.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          <span className='hidden min-w-0 flex-1 xl:block'>
+            <span className='block truncate font-bold leading-5'>{name}</span>
+            <span className='block truncate text-sm leading-5 text-muted-foreground'>
+              @{username}
+            </span>
+          </span>
+          <Ellipsis
+            size='20'
+            strokeWidth='2'
+            className='hidden shrink-0 xl:block'
+          />
         </button>
       </div>
     </nav>

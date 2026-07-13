@@ -5,7 +5,7 @@ import type {
   QueryClient,
   QueryKey,
 } from '@tanstack/react-query';
-import type { User } from '@/lib/types';
+import type { Post, User } from '@/lib/types';
 import type { FollowInfo } from './use-follow-info';
 
 export type FollowMutationVariables = {
@@ -18,11 +18,13 @@ export type FollowMutationVariables = {
 export type FollowAction = 'follow' | 'unfollow';
 
 type FollowListData = InfiniteData<User[], number>;
+type FollowingPostsData = InfiniteData<Post[], number>;
 type CacheSnapshot<T> = Array<[QueryKey, T | undefined]>;
 
 export type FollowCacheSnapshot = {
   followInfo: CacheSnapshot<FollowInfo>;
   followLists: CacheSnapshot<FollowListData>;
+  followingPosts: CacheSnapshot<FollowingPostsData>;
 };
 
 type FollowCacheMessage =
@@ -55,6 +57,12 @@ const getSourceId = () => {
 const isFollowListQuery = (query: Query) =>
   query.queryKey[0] === 'followers' || query.queryKey[0] === 'following';
 
+const isAffectedFollowingPostsQuery =
+  ({ currentUserId }: FollowMutationVariables) =>
+  (query: Query) =>
+    query.queryKey[0] === 'followingPosts' &&
+    query.queryKey[1] === currentUserId;
+
 const isAffectedFollowInfoQuery =
   ({ userId, currentUserId }: FollowMutationVariables) =>
   (query: Query) => {
@@ -78,6 +86,14 @@ const getAffectedFollowInfoQueries = (
   queryClient
     .getQueryCache()
     .findAll({ predicate: isAffectedFollowInfoQuery(variables) });
+
+const getAffectedFollowingPostsQueries = (
+  queryClient: QueryClient,
+  variables: FollowMutationVariables
+) =>
+  queryClient
+    .getQueryCache()
+    .findAll({ predicate: isAffectedFollowingPostsQuery(variables) });
 
 const insertUser = (
   data: FollowListData,
@@ -163,6 +179,22 @@ const updateFollowInfo = (
   return next;
 };
 
+const removePostsByAuthor = (
+  data: FollowingPostsData | undefined,
+  authorId: string
+) => {
+  if (!data) return data;
+
+  let changed = false;
+  const pages = data.pages.map((page) => {
+    const filteredPage = page.filter((post) => post.authorId !== authorId);
+    changed ||= filteredPage.length !== page.length;
+    return filteredPage;
+  });
+
+  return changed ? { ...data, pages } : data;
+};
+
 const isFollowCacheMessage = (
   message: unknown
 ): message is FollowCacheMessage => {
@@ -184,6 +216,12 @@ export const snapshotFollowCaches = (
     query.queryKey,
     queryClient.getQueryData<FollowListData>(query.queryKey),
   ]),
+  followingPosts: getAffectedFollowingPostsQueries(queryClient, variables).map(
+    (query) => [
+      query.queryKey,
+      queryClient.getQueryData<FollowingPostsData>(query.queryKey),
+    ]
+  ),
 });
 
 export const cancelFollowCaches = (
@@ -195,6 +233,9 @@ export const cancelFollowCaches = (
       predicate: isAffectedFollowInfoQuery(variables),
     }),
     queryClient.cancelQueries({ predicate: isFollowListQuery }),
+    queryClient.cancelQueries({
+      predicate: isAffectedFollowingPostsQuery(variables),
+    }),
   ]);
 
 export const restoreFollowCaches = (
@@ -208,6 +249,10 @@ export const restoreFollowCaches = (
   });
 
   snapshot.followLists.forEach(([queryKey, data]) => {
+    queryClient.setQueryData(queryKey, data);
+  });
+
+  snapshot.followingPosts.forEach(([queryKey, data]) => {
     queryClient.setQueryData(queryKey, data);
   });
 };
@@ -228,6 +273,14 @@ export const applyFollowCacheUpdate = (
       updateFollowList(data, query.queryKey, variables, action)
     );
   });
+
+  if (action === 'unfollow') {
+    getAffectedFollowingPostsQueries(queryClient, variables).forEach((query) => {
+      queryClient.setQueryData<FollowingPostsData>(query.queryKey, (data) =>
+        removePostsByAuthor(data, variables.userId)
+      );
+    });
+  }
 };
 
 export const invalidateFollowCaches = (
@@ -236,7 +289,9 @@ export const invalidateFollowCaches = (
 ) => {
   queryClient.invalidateQueries({
     predicate: (query) =>
-      isFollowListQuery(query) || isAffectedFollowInfoQuery(variables)(query),
+      isFollowListQuery(query) ||
+      isAffectedFollowInfoQuery(variables)(query) ||
+      isAffectedFollowingPostsQuery(variables)(query),
   });
 };
 

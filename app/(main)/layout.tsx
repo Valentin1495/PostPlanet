@@ -28,11 +28,12 @@ export default async function MainLayout({
     redirect('/onboarding');
   }
 
-  const { username, profileImage } = user;
+  const { name, username, profileImage } = user;
 
   return (
     <div className='flex items-start max-w-3xl lg:max-w-6xl xl:max-w-7xl mx-auto lg:pr-8 xl:px-5'>
       <LeftSidebar
+        name={name}
         username={username}
         userId={userId}
         profileImage={profileImage}

@@ -14,6 +14,7 @@ export const useUnfollow = (followInfoOptions: any) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['unfollow'],
     mutationFn: async ({ userId, currentUserId }: FollowMutationVariables) => {
       const response = await fetch('/api/unfollow', {
         method: 'POST',

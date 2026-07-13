@@ -54,6 +54,7 @@ export default function SearchBar() {
       {searchQuery && focus && (
         <button
           type='button'
+          aria-label='Clear search'
           onMouseDown={() => setPreventBlur(true)}
           onMouseUp={() => setPreventBlur(false)}
           onClick={() => {
@@ -62,9 +63,9 @@ export default function SearchBar() {
             inputRef.current?.focus();
           }}
           disabled={!searchQuery}
-          className='rounded-full bg-primary p-1 darker mr-4'
+          className='rounded-full bg-primary p-1 darker mr-4 text-background'
         >
-          <X size={16} color='hsl(var(--background))' />
+          <X size={16} />
         </button>
       )}
     </form>

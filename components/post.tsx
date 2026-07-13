@@ -128,6 +128,7 @@ export default function Post({
                 src={image}
                 alt='image'
                 fill
+                sizes='(max-width: 768px) 100vw, 680px'
                 className='object-cover'
                 priority
               />

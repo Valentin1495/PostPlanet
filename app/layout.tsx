@@ -19,14 +19,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClientProvider>
-      <html lang='en'>
-        <body className={inter.className}>
+    <html lang='en'>
+      <body className={inter.className}>
+        <ClientProvider>
           {children}
           <Toaster position='top-center' />
           <DialogProvider />
-        </body>
-      </html>
-    </ClientProvider>
+        </ClientProvider>
+      </body>
+    </html>
   );
 }

@@ -110,7 +110,13 @@ export default function SinglePost({
 
         {image && (
           <section className='relative w-full min-h-96 overflow-hidden rounded-xl my-3.5'>
-            <Image src={image} alt='image' fill className='object-cover' />
+            <Image
+              src={image}
+              alt='image'
+              fill
+              sizes='(max-width: 768px) 100vw, 680px'
+              className='object-cover'
+            />
           </section>
         )}
 

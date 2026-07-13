@@ -113,6 +113,7 @@ export default function Reply({
                 src={image}
                 alt='reply image'
                 fill
+                sizes='(max-width: 768px) 100vw, 680px'
                 priority
                 className='object-cover'
               />

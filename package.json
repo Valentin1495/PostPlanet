@@ -2,9 +2,12 @@
   "name": "postplanet",
   "version": "0.2.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "supabase:types": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_ID\" --schema public > lib/supabase/database.types.ts"

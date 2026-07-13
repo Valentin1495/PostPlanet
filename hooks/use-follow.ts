@@ -14,6 +14,7 @@ export const useFollow = (followInfoOptions: any) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ['follow'],
     mutationFn: async ({ userId, currentUserId }: FollowMutationVariables) => {
       const response = await fetch('/api/follow', {
         method: 'POST',
